@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'address',
     'core',
+    'profesionales',
+    'centros_de_salud'
 ]
 
 MIDDLEWARE = [
