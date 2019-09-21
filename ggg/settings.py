@@ -41,7 +41,9 @@ INSTALLED_APPS = [
     'address',
     'core',
     'profesionales',
-    'centros_de_salud'
+    'centros_de_salud',
+    'django_extensions',
+    'cie10_django',
 ]
 
 MIDDLEWARE = [
@@ -85,6 +87,26 @@ DATABASES = {
     }
 }
 
+""" SI SE CANSAN DE ESTA BASE pueden hacer esto en local_settings
+
+sudo su - postgres
+psql
+
+CREATE USER ggg_user WITH PASSWORD 'ggg_pass';
+ALTER ROLE ggg_user SUPERUSER;
+CREATE EXTENSION postgis;
+CREATE DATABASE ggg_db OWNER ggg_user;
+
+DATABASES = {
+    'default': {
+         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+         'NAME': 'ggg_db',
+         'USER': 'ggg_user',
+         'PASSWORD': 'ggg_pass',
+         # 'HOST': 'localhost'  # SIN ESTA PORONGA, NO ANDA EN PROD
+    },
+}
+"""
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -124,3 +146,49 @@ GOOGLE_API_KEY = 'xxx'
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'ggg.log',
+            'formatter': 'verbose'
+        },
+ 
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'propagate': False,
+        },
+        'cie10_django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        }
+    }
+}
+
+try:
+    from .local_settings import *
+except:
+    pass
