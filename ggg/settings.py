@@ -87,6 +87,26 @@ DATABASES = {
     }
 }
 
+""" SI SE CANSAN DE ESTA BASE pueden hacer esto en local_settings
+
+sudo su - postgres
+psql
+
+CREATE USER ggg_user WITH PASSWORD 'ggg_pass';
+ALTER ROLE ggg_user SUPERUSER;
+CREATE EXTENSION postgis;
+CREATE DATABASE ggg_db OWNER ggg_user;
+
+DATABASES = {
+    'default': {
+         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+         'NAME': 'ggg_db',
+         'USER': 'ggg_user',
+         'PASSWORD': 'ggg_pass',
+         # 'HOST': 'localhost'  # SIN ESTA PORONGA, NO ANDA EN PROD
+    },
+}
+"""
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -167,3 +187,8 @@ LOGGING = {
         }
     }
 }
+
+try:
+    from .local_settings import *
+except:
+    pass
