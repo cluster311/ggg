@@ -41,7 +41,9 @@ INSTALLED_APPS = [
     'address',
     'core',
     'profesionales',
-    'centros_de_salud'
+    'centros_de_salud',
+    'django_extensions',
+    'cie10_django',
 ]
 
 MIDDLEWARE = [
@@ -124,3 +126,44 @@ GOOGLE_API_KEY = 'xxx'
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'ggg.log',
+            'formatter': 'verbose'
+        },
+ 
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'propagate': False,
+        },
+        'cie10_django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        }
+    }
+}
