@@ -7,7 +7,8 @@ from cie10_django.models import CIE10
 class Factura(models.Model):
     """ Cada una de las unidades a cobrar a una obra social o programa de salud 
         De aquí salen los formularios Anexo 2 (y otros según tipo de prestación)
-        Ver la imagen: https://github.com/cluster311/Anexo2/blob/master/originales/Anexo-II-RESOLUCION-487-2002.gif
+        Ver imagen: https://github.com/cluster311/Anexo2/blob/master/originales/Anexo-II-RESOLUCION-487-2002.gif
+        Ver imagen: https://user-images.githubusercontent.com/3237309/64081477-fc091780-ccd7-11e9-88aa-6e8bfb34f6c2.png
         Referencia de atencion en Anexo II
         atencion = {'tipo': 'consulta',  # | practica | internacion
                     'especialidad': 'Especialidad médica',
