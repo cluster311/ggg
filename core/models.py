@@ -13,8 +13,7 @@ class ObraSocial(models.Model):
         verbose_name_plural = "Obras Sociales"
 
     def __str__(self):
-        pass
-    
+        return self.nombre
 
 
 class CarpetaFamiliar(models.Model):

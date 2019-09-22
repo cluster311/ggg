@@ -2,8 +2,24 @@ from django.db import models
 from address.models import AddressField
 
 
+class Institucion(models.Model):
+    """ Las instituciones son las administradoras finales de los centros de salud
+    """
+    nombre = models.CharField(max_length=290)
+
+    def __str__(self):
+        return self.nombre
+
+
 class CentroDeSalud(models.Model):
     nombre = models.CharField(max_length=290)
+    institucion = models.ForeignKey(Institucion, on_delete=models.SET_NULL, 
+                                      null=True, blank=True,
+                                      related_name='centros')
+    codigo_hpgd = models.CharField(max_length=30,
+                                   null=True, blank=True,
+                                   help_text='Código de Hospital Público de Gestión Descentralizada. Requerido para recupero')
+    
     # TODO create a PointField from GeoDjango
     """ TODO: importar datos
         info para importar del mapa / KML
@@ -18,4 +34,4 @@ class CentroDeSalud(models.Model):
     telefonos = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return self.nombre     
+        return self.nombre
