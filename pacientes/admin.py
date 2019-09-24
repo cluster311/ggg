@@ -32,6 +32,8 @@ class PacienteAdmin(admin.ModelAdmin):
     inlines = [
         ContactoAdminInline,
     ]
+
+
 admin.site.register(HistoriaClinica, HistoriaClinicaAdmin)
 admin.site.register(ObraSocial)
 admin.site.register(Paciente, PacienteAdmin)

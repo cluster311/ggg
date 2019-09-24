@@ -2,6 +2,7 @@ from django.db import models
 from core.models import Persona
 from profesionales.models import Profesional
 from model_utils import Choices
+from model_utils.models import TimeStampedModel
 from address.models import AddressField
 from django.contrib.contenttypes.fields import (GenericForeignKey,
     GenericRelation)
@@ -116,14 +117,12 @@ class HistoriaClinica(models.Model):
         return '{} - {}, {}'.format(self.id, self.paciente.nombres, self.paciente.apellido)
 
 
-class Consulta(models.Model):
+class Consulta(TimeStampedModel):
     """
     Observaciones que realiza el médico al paciente en una consulta.
     """
     historia = models.ForeignKey('HistoriaClinica', related_name='consultas',
                     on_delete=models.CASCADE)
-    fecha = models.DateField(auto_now=True)
-    ultima_modificacion = models.DateField(auto_now_add=True)
     diagnostico = models.TextField()
     indicaciones = models.TextField(null=True, blank=True)
     receta = models.TextField(null=True, blank=True) #podria ser un manytomany a un modelo de medicamentos
