@@ -102,3 +102,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+.vscode/
+
+profesionales/resources/PADRONACTIVOS.xls
+.~lock*
+
