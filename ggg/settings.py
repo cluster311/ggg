@@ -188,12 +188,14 @@ LOGGING = {
     }
 }
 
-
 # para obtener datos oficiales de las obras sociales de las personas vía SISA
 # https://pypi.org/project/sisa/
 os.environ['USER_SISA'] = ''
 os.environ['PASS_SISA'] = ''
 CACHED_OSS_INFO_SISA_SECONDS = 60 * 60 * 24 * 30  # 30 dias de cache para info de las OSS de los pacientes
+
+SOURCE_OSS_SISA = 'SISA'
+SOURCE_OSS_SSSALUD = 'SSSalud'
 
 try:
     from .local_settings import *

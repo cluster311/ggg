@@ -13,20 +13,23 @@ from datetime import timedelta
 # requiere un mock
 p = Paciente(nombres='Andres', apellido='Vazquez', numero_documento='26453653')
 p.save()
-ok, msg = p.get_obra_social()
+ok, msg = p.get_obras_sociales_from_sisa()
 if ok:  # es posible que no se tengan las credenciales
     assert ok == True
     assert msg is None
-    assert p.obra_social.codigo == '904001'
-    assert p.obra_social.nombre == 'O.S.P. CORDOBA (APROSS)'
+    assert p.obras_sociales.count() == 1
+    assert p.obras_sociales.all()[0].codigo == '904001'
+    assert p.obras_sociales.all()[0] == 'O.S.P. CORDOBA (APROSS)'
 
     # la segunda vez
-    ok, msg = p.get_obra_social()
+    ok, msg = p.get_obras_sociales_from_sisa()
     assert ok == True
     assert msg.startswith('Cache valido aún')
 
-    p.obra_social_updated = timezone.now() - timedelta(seconds=settings.CACHED_OSS_INFO_SISA_SECONDS + 100)
+    """
+    p.obras_social_updated = timezone.now() - timedelta(seconds=settings.CACHED_OSS_INFO_SISA_SECONDS + 100)
     
     ok, msg = p.get_obra_social()
     assert ok == True
     assert msg is None
+    """

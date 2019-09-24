@@ -91,13 +91,8 @@ class Paciente(models.Model):
     grupo_sanguineo = models.CharField(max_length=20, null=True, choices=Choices('0-', '0+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'))
 
     telefono = models.CharField(max_length=50, null=True, blank=True)
-    obra_social = models.ForeignKey('ObraSocial', null=True, blank=True, on_delete=models.SET_NULL)
-    # las llamadas al sistema SISA son limitadas y tienen costo
-    # es por esto que tenemos que considerar un cache para no repetir consultas
-    obra_social_updated = models.DateTimeField(null=True, blank=True)
-
+    obras_sociales = models.ManyToManyField('ObraSocial', blank=True, through='ObraSocialPaciente')
     observaciones = models.TextField()
-
 
     @property
     def edad(self):
@@ -110,17 +105,26 @@ class Paciente(models.Model):
     def __str__(self):
         return f'{self.apellido}, {self.nombres}'
     
-    def get_obra_social(self, force_update=False):
+    def get_obras_sociales_from_sisa(self, force_update=False):
         """ Obtener la obra social de este paciente segun SISA
             Devuelve una tupla indicando
              - primero si encontro o no los datos
              - segundo el error si es que hubo uno
             """
-        if self.obra_social_updated is None:
+        oss_paciente = self.m2m_obras_sociales.filter(data_source=settings.SOURCE_OSS_SISA)
+        last_updated = None
+        for os in oss_paciente:
+            if os.obra_social_updated is not None:
+                if last_updated is None:
+                    last_updated = os.obra_social_updated
+                elif os.obra_social_updated > last_updated:
+                    last_updated = os.obra_social_updated
+
+        if last_updated is None:
             force_update = True
 
         if not force_update:
-            diff = now() - self.obra_social_updated
+            diff = now() - last_updated
             seconds_diff = diff.days * 86400 + diff.seconds
             if seconds_diff < settings.CACHED_OSS_INFO_SISA_SECONDS:
                 return True, f'Cache valido aún {seconds_diff}'
@@ -137,13 +141,20 @@ class Paciente(models.Model):
                     oss.nombre = puco.cobertura_social
                     oss.save()
 
-                if self.obra_social != oss:
+                found = False
+                for os in oss_paciente:
+                    if os.obra_social == oss:
+                        found = True
+                        os.obra_social_updated = now()
+                        os.save()
+                if not found:
                     # TODO: estamos detectando un cambio de OSS.
                     # para tableros de control y estadísticas este dato puede ser valioso de grabar
-                    pass
-                    
-                self.obra_social = oss
-                self.obra_social_updated = now()
+                    new_oss = ObraSocialPaciente.objects.create(data_source=settings.SOURCE_OSS_SISA,
+                                                 paciente=self,
+                                                 obra_social_updated = now(),
+                                                 obra_social=oss)
+                
                 return True, None
                 # tengo aqui algunos datos que podría usar para verificar
                 # puco.tipo_doc
@@ -174,4 +185,14 @@ class Paciente(models.Model):
             error = f'Error de sistema: {puco.last_error}'
             logger.info(error)
             return False, error
+
+
+class ObraSocialPaciente(models.Model):
+    paciente = models.ForeignKey('Paciente', on_delete=models.CASCADE, related_name='m2m_obras_sociales')
+    obra_social = models.ForeignKey('ObraSocial', on_delete=models.CASCADE, related_name='pacientes')
+    # las llamadas al sistema SISA son limitadas y tienen costo
+    # es por esto que tenemos que considerar un cache para no repetir consultas
     
+    obra_social_updated = models.DateTimeField(null=True, blank=True)
+    # los datos pueden venir de SISA, de SSSalud y quizas en el futuro desde otros lugares
+    data_source = models.CharField(max_length=90)
