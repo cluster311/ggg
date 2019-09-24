@@ -111,10 +111,11 @@ class Paciente(models.Model):
         return f'{self.apellido}, {self.nombres}'
     
     def get_obra_social(self, force_update=False):
-        # obtener la obra social de este paciente segun SISA
-        # devuelve una tupla indicando
-        #  - primero si encontro o no los datos
-        #  - segundo el error si es que hubo uno
+        """ Obtener la obra social de este paciente segun SISA
+            Devuelve una tupla indicando
+             - primero si encontro o no los datos
+             - segundo el error si es que hubo uno
+            """
         if self.obra_social_updated is None:
             force_update = True
 
