@@ -1,5 +1,14 @@
 from django.contrib import admin
 from django.contrib.gis import admin as gisadmin
+from .models import DatoDeContacto
+from .forms import DatoDeContactoModelForm
+from django.contrib.contenttypes.admin import GenericTabularInline
+
+
+class ContactoAdminInline(GenericTabularInline):
+    model = DatoDeContacto
+    form = DatoDeContactoModelForm
+
 
 class OSMGeoAdmin(gisadmin.OSMGeoAdmin):
     """
@@ -18,3 +27,6 @@ class OSMGeoAdmin(gisadmin.OSMGeoAdmin):
     default_zoom = 12
     map_width = 1200
     map_height = 500
+
+
+# admin.site.register(DatoDeContacto)

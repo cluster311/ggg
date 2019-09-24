@@ -1,8 +1,9 @@
 from django.contrib import admin
+from django.contrib.contenttypes import admin as contentadmin
 from address.models import AddressField
 from address.forms import AddressWidget
-
-from .models import (CarpetaFamiliar, Paciente, ObraSocial, Telefono,
+from core.admin import ContactoAdminInline
+from .models import (CarpetaFamiliar, Paciente, ObraSocial,
                     HistoriaClinica, Consulta)
 
 
@@ -19,9 +20,6 @@ class CarpetaFamiliarAdmin(admin.ModelAdmin):
         }
     }
 
-class TelefonoInLine(admin.StackedInline):
-    model = Telefono
-    extra = 1
 
 class ConsultaInLine(admin.StackedInline):
     model = Consulta
@@ -31,8 +29,9 @@ class HistoriaClinicaAdmin(admin.ModelAdmin):
     inlines = (ConsultaInLine, )
 
 class PacienteAdmin(admin.ModelAdmin):
-    inlines = (TelefonoInLine, )
-
+    inlines = [
+        ContactoAdminInline,
+    ]
 admin.site.register(HistoriaClinica, HistoriaClinicaAdmin)
 admin.site.register(ObraSocial)
 admin.site.register(Paciente, PacienteAdmin)

@@ -3,6 +3,10 @@ from core.models import Persona
 from profesionales.models import Profesional
 from model_utils import Choices
 from address.models import AddressField
+from django.contrib.contenttypes.fields import (GenericForeignKey,
+    GenericRelation)
+from django.contrib.contenttypes.models import ContentType
+
 
 class ObraSocial(models.Model):
     nombre = models.CharField(max_length=100)
@@ -73,11 +77,22 @@ class Paciente(Persona):
     grupo_sanguineo = models.CharField(max_length=20, null=True, choices=Choices('0-', '0+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'))
     obra_social = models.ForeignKey('ObraSocial', null=True, blank=True, on_delete=models.SET_NULL)
     observaciones = models.TextField()
-
+    datos_de_contacto = GenericRelation('core.DatoDeContacto',
+                        related_query_name='pacientes',
+                        null=True,
+                        blank=True
+                        )
 
     @property
     def edad(self):
         return (now().date() - self.fecha_nacimiento).days / 365
+
+    def agregar_dato_de_contacto(self, tipo, valor):
+        type_ = ContentType.objects.get_for_model(self)
+        try:
+            DatoDeContacto.objects.get(content_type__pk=type_.id, object_id=self.id, tipo=tipo, valor=valor)
+        except DatoDeContacto.DoesNotExist:
+            DatoDeContacto.objects.create(content_object=self, tipo=tipo, valor=valor)
 
     class Meta:
         verbose_name = "Paciente"
@@ -85,19 +100,6 @@ class Paciente(Persona):
 
     def __str__(self):
         return f'{self.apellido}, {self.nombres}'
-
-
-class Telefono(models.Model):
-    """
-    El paciente puede tener más de un número de contacto
-    """
-    caracteristica = models.IntegerField(default=351)
-    numero = models.IntegerField()
-    paciente = models.ForeignKey(Paciente, related_name='telefonos',
-                on_delete=models.SET_NULL, null=True, blank=True)
-
-    def __str__(self):
-        return '{} - {}'.format(self.caracteristica, self.numero)
 
 
 class HistoriaClinica(models.Model):
