@@ -142,12 +142,9 @@ class Paciente(models.Model):
             return False, f'Persona no encontrada: {puco.last_error}'
 
         logger.info('Persona encontrada')
-        oss, created = ObraSocial.objects.get_or_create(codigo=puco.rnos)
-        if created:
-            logger.info(f'Nueva OSS: {puco.rnos}={puco.cobertura_social}')
-            oss.nombre = puco.cobertura_social
-            oss.save()
-
+        oss, created = ObraSocial.objects.get_or_create(codigo=puco.rnos,
+                                                        defaults={'nombre': puco.cobertura_social})
+        
         found = False
         for os in oss_paciente:
             if os.obra_social == oss:
