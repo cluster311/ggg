@@ -132,59 +132,58 @@ class Paciente(models.Model):
         logger.info('Consultando PUCO')
         puco = Puco(dni=self.numero_documento)
         resp = puco.get_info_ciudadano()
-        if resp['ok']:
-            if resp['persona_encontrada']:
-                logger.info('Persona encontrada')
-                oss, created = ObraSocial.objects.get_or_create(codigo=puco.rnos)
-                if created:
-                    logger.info(f'Nueva OSS: {puco.rnos}={puco.cobertura_social}')
-                    oss.nombre = puco.cobertura_social
-                    oss.save()
-
-                found = False
-                for os in oss_paciente:
-                    if os.obra_social == oss:
-                        found = True
-                        os.obra_social_updated = now()
-                        os.save()
-                if not found:
-                    # TODO: estamos detectando un cambio de OSS.
-                    # para tableros de control y estadísticas este dato puede ser valioso de grabar
-                    new_oss = ObraSocialPaciente.objects.create(data_source=settings.SOURCE_OSS_SISA,
-                                                 paciente=self,
-                                                 obra_social_updated = now(),
-                                                 obra_social=oss)
-                
-                return True, None
-                # tengo aqui algunos datos que podría usar para verificar
-                # puco.tipo_doc
-                # nombre y apellido: puco.denominacion
-                # dict con datos de la obra social: puco.oss
-                """
-                puco.oss = {
-                    'rnos': '112301',
-                    'exists': True,
-                    'nombre': 'OBRA SOCIAL DEL PERSONAL DE MICROS Y OMNIBUS DE MENDOZA',
-                    'tipo_de_cobertura': 'Obra social',
-                    'sigla': 'OSPEMOM',
-                    'provincia': 'Mendoza',
-                    'localidad': 'MENDOZA',
-                    'domicilio': 'CATAMARCA 382',
-                    'cp': '5500',
-                    'telefonos': ['0261-4-203283', '0261-4-203342'],
-                    'emails': ['ospemom@ospemom.org.ar'],
-                    'web': None,
-                    'sources': ['SISA', 'SSSalud']
-                    }
-                """
-
-            else:
-                logger.info('Persona no encontrada')
-                return False, f'Persona no encontrada: {puco.last_error}'
-        else:
+        if not resp['ok']:
             error = f'Error de sistema: {puco.last_error}'
             logger.info(error)
             return False, error
+
+        if not resp['persona_encontrada']:
+            logger.info('Persona no encontrada')
+            return False, f'Persona no encontrada: {puco.last_error}'
+
+        logger.info('Persona encontrada')
+        oss, created = ObraSocial.objects.get_or_create(codigo=puco.rnos)
+        if created:
+            logger.info(f'Nueva OSS: {puco.rnos}={puco.cobertura_social}')
+            oss.nombre = puco.cobertura_social
+            oss.save()
+
+        found = False
+        for os in oss_paciente:
+            if os.obra_social == oss:
+                found = True
+                os.obra_social_updated = now()
+                os.save()
+        if not found:
+            # TODO: estamos detectando un cambio de OSS.
+            # para tableros de control y estadísticas este dato puede ser valioso de grabar
+            new_oss = ObraSocialPaciente.objects.create(data_source=settings.SOURCE_OSS_SISA,
+                                            paciente=self,
+                                            obra_social_updated = now(),
+                                            obra_social=oss)
+        
+        return True, None
+        # tengo aqui algunos datos que podría usar para verificar
+        # puco.tipo_doc
+        # nombre y apellido: puco.denominacion
+        # dict con datos de la obra social: puco.oss
+        """
+        puco.oss = {
+            'rnos': '112301',
+            'exists': True,
+            'nombre': 'OBRA SOCIAL DEL PERSONAL DE MICROS Y OMNIBUS DE MENDOZA',
+            'tipo_de_cobertura': 'Obra social',
+            'sigla': 'OSPEMOM',
+            'provincia': 'Mendoza',
+            'localidad': 'MENDOZA',
+            'domicilio': 'CATAMARCA 382',
+            'cp': '5500',
+            'telefonos': ['0261-4-203283', '0261-4-203342'],
+            'emails': ['ospemom@ospemom.org.ar'],
+            'web': None,
+            'sources': ['SISA', 'SSSalud']
+            }
+        """    
 
 
 class ObraSocialPaciente(models.Model):
