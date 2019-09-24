@@ -193,6 +193,10 @@ LOGGING = {
     }
 }
 
+# contacto settings
+CARACTERISTICA_TELEFONO_DEFAULT = '351'     # CORDOBA
+CARACTERISTICA_DEFAULT = '351'
+
 try:
     from .local_settings import *
 except:
