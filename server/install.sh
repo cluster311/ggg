@@ -34,6 +34,7 @@ DATABASES = {
 ./manage.py migrate
 ./manage.py createsuperuser
 
+cd server
 # gunicorn
 cp gunicorn/ggg.conf.py /etc/gunicorn/
 
