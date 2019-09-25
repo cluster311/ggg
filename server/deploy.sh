@@ -4,5 +4,5 @@ cd ggg/
 git pull
 pip install -r requirements.txt
 ./manage.py migrate
-./manage.py collectstatic
+./manage.py collectstatic --no-input
 sudo supervisorctl restart ggg

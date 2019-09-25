@@ -1,7 +1,7 @@
 
 # Ubutnu 18.04 LTS
 sudo apt update
-sudo apt install -y python3-venv postgresql postgresql-contrib postgis python-psycopg2 libpq-dev gcc python3-dev supervisor
+sudo apt install -y python3-venv postgresql postgresql-contrib postgis python-psycopg2 libpq-dev gcc python3-dev supervisor nginx
 
 cd ~
 python3 -m venv env
@@ -9,6 +9,7 @@ source env/bin/activate
 git clone https://github.com/cluster311/ggg.git
 cd ggg
 pip install -r requirements.txt
+pip install -r prod_requirements.txt
 
 # database
 sudo su - postgres
@@ -36,15 +37,21 @@ DATABASES = {
 
 cd server
 # gunicorn
-cp gunicorn/ggg.conf.py /etc/gunicorn/
+sudo mkdir /etc/gunicorn/
+sudo cp gunicorn/ggg.conf.py /etc/gunicorn/
 
 # supervisor
-cp supervisor/ggg.conf /etc/supervisor/conf.d/
+sudo cp supervisor/ggg.conf /etc/supervisor/conf.d/
+sudo supervisorctl reload
 sudo supervisorctl start ggg
 
 # nginx
 sudo cp nginx/cache.conf /etc/nginx/sites-available/
-sudo ln -s /etc/nginx/sites-available/cache.conf /etc/nginx/sites-available/cache.conf
+sudo ln -s /etc/nginx/sites-available/cache.conf /etc/nginx/sites-enabled/cache.conf
 
 sudo cp nginx/ggg.conf /etc/nginx/sites-available/
-sudo ln -s /etc/nginx/sites-available/ggg.conf /etc/nginx/sites-available/ggg.conf
+sudo ln -s /etc/nginx/sites-available/ggg.conf /etc/nginx/sites-enabled/ggg.conf
+
+# test
+sudo nginx -t
+sudo systemctl restart nginx
