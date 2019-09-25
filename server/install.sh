@@ -55,3 +55,12 @@ sudo ln -s /etc/nginx/sites-available/ggg.conf /etc/nginx/sites-enabled/ggg.conf
 # test
 sudo nginx -t
 sudo systemctl restart nginx
+
+# check URL: works
+# ready to deploy
+./deploy.sh
+
+# agregar HTTPS
+sudo add-apt-repository ppa:certbot/certbot
+sudo apt install -y python-certbot-nginx
+sudo certbot --nginx -d lala.com
