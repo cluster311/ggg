@@ -4,7 +4,8 @@ from django.conf.urls import url, include
 
 
 urlpatterns = [
+    url(r'^jet/', include('jet.urls', 'jet')),
     path('admin/', admin.site.urls),
-	url(r'^jet/', include('jet.urls', 'jet')),
+    url(r'^tinymce/', include('tinymce.urls')),
     path('', admin.site.urls),
 ]
