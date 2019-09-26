@@ -1,7 +1,11 @@
 from django.db import models
+from django.conf import settings
 from model_utils import Choices
 from address.models import AddressField
 from django.utils.timezone import now
+from sisa.puco import Puco
+import logging
+logger = logging.getLogger(__name__)
 
 
 class ObraSocial(models.Model):
@@ -13,9 +17,8 @@ class ObraSocial(models.Model):
         verbose_name_plural = "Obras Sociales"
 
     def __str__(self):
-        pass
+        return f'{self.codigo} {self.nombre}'
     
-
 
 class CarpetaFamiliar(models.Model):
     OPCIONES_TIPO_FAMILIA = Choices(
@@ -79,7 +82,7 @@ class Paciente(models.Model):
     nombres = models.CharField(max_length=50)
     apellido = models.CharField(max_length=30)
     sexo = models.CharField(max_length=20, choices=Choices('masculino', 'femenino', 'otro'))
-    fecha_nacimiento = models.DateField()
+    fecha_nacimiento = models.DateField(null=True, blank=True)
     tipo_documento = models.CharField(max_length=20, choices=Choices('DNI', 'LC', 'LE', 'PASAPORTE', 'OTRO'))
     numero_documento = models.CharField(max_length=30, null=True, blank=True, help_text='Deje en blanco si está indocumentado')
     nacionalidad = models.CharField(max_length=50, choices=NACIONALIDAD_CHOICES)
@@ -88,9 +91,8 @@ class Paciente(models.Model):
     grupo_sanguineo = models.CharField(max_length=20, null=True, choices=Choices('0-', '0+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'))
 
     telefono = models.CharField(max_length=50, null=True, blank=True)
-    obra_social = models.ForeignKey('ObraSocial', null=True, blank=True, on_delete=models.SET_NULL)
+    obras_sociales = models.ManyToManyField('ObraSocial', blank=True, through='ObraSocialPaciente')
     observaciones = models.TextField()
-
 
     @property
     def edad(self):
@@ -103,3 +105,90 @@ class Paciente(models.Model):
     def __str__(self):
         return f'{self.apellido}, {self.nombres}'
     
+    def get_obras_sociales_from_sisa(self, force_update=False):
+        """ Obtener la obra social de este paciente segun SISA
+            Devuelve una tupla indicando
+             - primero si encontro o no los datos
+             - segundo el error si es que hubo uno
+            """
+        oss_paciente = self.m2m_obras_sociales.filter(data_source=settings.SOURCE_OSS_SISA)
+        last_updated = None
+        for os in oss_paciente:
+            if os.obra_social_updated is not None:
+                if last_updated is None:
+                    last_updated = os.obra_social_updated
+                elif os.obra_social_updated > last_updated:
+                    last_updated = os.obra_social_updated
+
+        if last_updated is None:
+            force_update = True
+
+        if not force_update:
+            diff = now() - last_updated
+            seconds_diff = diff.days * 86400 + diff.seconds
+            if seconds_diff < settings.CACHED_OSS_INFO_SISA_SECONDS:
+                return True, f'Cache valido aún {seconds_diff}'
+
+        logger.info('Consultando PUCO')
+        puco = Puco(dni=self.numero_documento)
+        resp = puco.get_info_ciudadano()
+        if not resp['ok']:
+            error = f'Error de sistema: {puco.last_error}'
+            logger.info(error)
+            return False, error
+
+        if not resp['persona_encontrada']:
+            logger.info('Persona no encontrada')
+            return False, f'Persona no encontrada: {puco.last_error}'
+
+        logger.info('Persona encontrada')
+        oss, created = ObraSocial.objects.get_or_create(codigo=puco.rnos,
+                                                        defaults={'nombre': puco.cobertura_social})
+        
+        found = False
+        for os in oss_paciente:
+            if os.obra_social == oss:
+                found = True
+                os.obra_social_updated = now()
+                os.save()
+        if not found:
+            # TODO: estamos detectando un cambio de OSS.
+            # para tableros de control y estadísticas este dato puede ser valioso de grabar
+            new_oss = ObraSocialPaciente.objects.create(data_source=settings.SOURCE_OSS_SISA,
+                                            paciente=self,
+                                            obra_social_updated = now(),
+                                            obra_social=oss)
+        
+        return True, None
+        # tengo aqui algunos datos que podría usar para verificar
+        # puco.tipo_doc
+        # nombre y apellido: puco.denominacion
+        # dict con datos de la obra social: puco.oss
+        """
+        puco.oss = {
+            'rnos': '112301',
+            'exists': True,
+            'nombre': 'OBRA SOCIAL DEL PERSONAL DE MICROS Y OMNIBUS DE MENDOZA',
+            'tipo_de_cobertura': 'Obra social',
+            'sigla': 'OSPEMOM',
+            'provincia': 'Mendoza',
+            'localidad': 'MENDOZA',
+            'domicilio': 'CATAMARCA 382',
+            'cp': '5500',
+            'telefonos': ['0261-4-203283', '0261-4-203342'],
+            'emails': ['ospemom@ospemom.org.ar'],
+            'web': None,
+            'sources': ['SISA', 'SSSalud']
+            }
+        """    
+
+
+class ObraSocialPaciente(models.Model):
+    paciente = models.ForeignKey('Paciente', on_delete=models.CASCADE, related_name='m2m_obras_sociales')
+    obra_social = models.ForeignKey('ObraSocial', on_delete=models.CASCADE, related_name='pacientes')
+    # las llamadas al sistema SISA son limitadas y tienen costo
+    # es por esto que tenemos que considerar un cache para no repetir consultas
+    
+    obra_social_updated = models.DateTimeField(null=True, blank=True)
+    # los datos pueden venir de SISA, de SSSalud y quizas en el futuro desde otros lugares
+    data_source = models.CharField(max_length=90)
