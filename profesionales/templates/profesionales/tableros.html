@@ -1,6 +1,7 @@
-<html>
-  <head>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{% extends "base_tableros.html" %}
+
+{% block extra_head %}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(drawCharts);
@@ -44,10 +45,15 @@
         {% endfor %}
       }
     </script>
-  </head>
-  <body>
-        {% for chart in charts %}
-        <div id="chr_{{ chart.id }}" style="width: 100vw; height: 500px;"></div>
-        {% endfor %}
-  </body>
-</html>
+{% endblock %}
+
+{% block content %}
+    {% for chart in charts %}
+        <h2>{{ chart.title }}</h2>
+        <p>
+            <div id="chr_{{ chart.id }}" style="width: 100%; height: 400px;"></div>
+        </p>
+        <div class="line"></div>
+        
+    {% endfor %}
+{% endblock %}

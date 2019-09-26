@@ -15,6 +15,7 @@ class TableroProfesionalesView(PermissionRequiredMixin, TemplateView):
     model = Profesional
     permission_required = ('can_view_tablero', )
     template_name = 'profesionales/tableros.html'
+    # https://bootstrapious.com/tutorial/sidebar/index5.html
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
