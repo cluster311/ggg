@@ -8,4 +8,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^tinymce/', include('tinymce.urls')),
     path('', admin.site.urls),
+    url(r'^profesionales/', include('profesionales.urls')),
 ]

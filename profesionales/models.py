@@ -41,3 +41,8 @@ class Profesional(models.Model):
     def __str__(self):
         apellidos = '' if self.apellidos is None else self.apellidos
         return f'{self.nombres, apellidos}'
+
+    class Meta:
+        permissions = [
+            ('can_view_tablero', 'Puede ver los tableros de comandos sobre profesionales'),
+            ]
