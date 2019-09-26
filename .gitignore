@@ -103,4 +103,7 @@ venv.bak/
 # mypy
 .mypy_cache/
 .vscode/
+.~lock*
 profesionales/resources/
+centros_de_salud/resources/
+static/
