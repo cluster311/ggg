@@ -1,0 +1,53 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawCharts);
+
+      function drawCharts() {
+
+        {% for chart in charts %}
+        
+        var d1 = "{{ chart.data|safe }}";
+        var d2 = d1.replace(/\'/gi,'"');
+        var d3 = JSON.parse(d2);
+        var data = new google.visualization.DataTable(d3, 0.6);
+
+        var options = {
+            chart: {
+                title: '{{ chart.title }}',
+                subtitle: '{{ chart.subtitle }}',
+                },
+            // backgroundColor: '#FFEEFF',
+            legend: { position: 'in'},
+            hAxis: {
+                slantedText: true,
+                slantedTextAngle: 45,
+                },
+            };
+
+        var sdiv = document.getElementById('chr_{{ chart.id }}');
+        {% if chart.type == 'column' %}    
+            var chart = new google.visualization.ColumnChart(sdiv);
+            chart.draw(data, options);
+        {% endif %}
+
+        {% if chart.type == 'pie' %}
+            options.pieHole = 0.4;
+            // options.pieSliceText = 'label';
+            options.legend = {position: 'left'};
+            var chart = new google.visualization.PieChart(sdiv);
+            chart.draw(data, options);
+        {% endif %}
+
+        {% endfor %}
+      }
+    </script>
+  </head>
+  <body>
+        {% for chart in charts %}
+        <div id="chr_{{ chart.id }}" style="width: 100vw; height: 500px;"></div>
+        {% endfor %}
+  </body>
+</html>
