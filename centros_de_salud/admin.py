@@ -14,5 +14,6 @@ class CentroDeSaludAdmin(gisadmin.GeoModelAdmin):
     map_width = 1200
     map_height = 400
 
-    list_display = ['nombre', 'ubicacion', 'descripcion', 'direccion',
+    list_display = ['nombre', 'descripcion', 'direccion',
                     'horario_de_atencion', 'telefonos']
+    search_fields = ['nombre', 'descripcion']
