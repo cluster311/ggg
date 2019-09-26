@@ -38,10 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
+    'tinymce',
     'address',
     'core',
     'profesionales',
-    'centros_de_salud'
+    'centros_de_salud',
+    'django_extensions',
+    'cie10_django',
 ]
 
 MIDDLEWARE = [
@@ -85,6 +89,26 @@ DATABASES = {
     }
 }
 
+""" SI SE CANSAN DE ESTA BASE pueden hacer esto en local_settings
+
+sudo su - postgres
+psql
+
+CREATE USER ggg_user WITH PASSWORD 'ggg_pass';
+ALTER ROLE ggg_user SUPERUSER;
+CREATE EXTENSION postgis;
+CREATE DATABASE ggg_db OWNER ggg_user;
+
+DATABASES = {
+    'default': {
+         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+         'NAME': 'ggg_db',
+         'USER': 'ggg_user',
+         'PASSWORD': 'ggg_pass',
+         # 'HOST': 'localhost'  # SIN ESTA PORONGA, NO ANDA EN PROD
+    },
+}
+"""
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -124,3 +148,61 @@ GOOGLE_API_KEY = 'xxx'
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'ggg.log',
+            'formatter': 'verbose'
+        },
+ 
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'propagate': False,
+        },
+        'cie10_django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        }
+    }
+}
+
+# para obtener datos oficiales de las obras sociales de las personas vía SISA
+# https://pypi.org/project/sisa/
+os.environ['USER_SISA'] = ''
+os.environ['PASS_SISA'] = ''
+CACHED_OSS_INFO_SISA_SECONDS = 60 * 60 * 24 * 30  # 30 dias de cache para info de las OSS de los pacientes
+
+SOURCE_OSS_SISA = 'SISA'
+SOURCE_OSS_SSSALUD = 'SSSalud'
+
+try:
+    from .local_settings import *
+except:
+    pass

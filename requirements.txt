@@ -3,3 +3,11 @@ django-address==0.2.1
 django-jet==1.0.8
 django-model-utils==3.2.0
 django-annoying==0.10.4
+django_extensions>=2.2.1
+psycopg2>=2.8.3
+sisa>=0.918
+pyexcel>=0.5.15
+pyexcel_xls>=0.5.8
+cie>=0.204
+fastkml>=0.11
+django_tinymce>=2.8.0

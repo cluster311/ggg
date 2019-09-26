@@ -1,0 +1,5 @@
+{% extends 'gis/admin/openlayers.html' %}
+
+{% block init_function %}
+jQuery(document).ready(function ($) {    {{ module }}.init();  });
+{% endblock %}
