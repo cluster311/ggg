@@ -4,8 +4,8 @@ from django.contrib.gis import admin as gisadmin
 
 
 @admin.register(CentroDeSalud)
-class CentroDeSaludAdmin(gisadmin.OSMGeoAdmin):
-# class CentroDeSaludAdmin(gisadmin.GeoModelAdmin):
+# class CentroDeSaludAdmin(gisadmin.OSMGeoAdmin):
+class CentroDeSaludAdmin(gisadmin.GeoModelAdmin):
 
     map_template = 'gis/admin/fixed_openlayers.html'
     default_lon = -71.44296
