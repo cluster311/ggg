@@ -64,3 +64,6 @@ sudo systemctl restart nginx
 sudo add-apt-repository ppa:certbot/certbot
 sudo apt install -y python-certbot-nginx
 sudo certbot --nginx -d lala.com
+
+# etapa 2, GeoDjango
+sudo apt install binutils libproj-dev gdal-bin
