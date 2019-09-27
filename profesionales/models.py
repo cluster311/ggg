@@ -34,7 +34,9 @@ class Profesional(models.Model):
         self.matricula_profesional = str(row['AFILIADO'])
         self.profesion = row['PROFESION'].strip()
         self.dni = str(row['DOCUMENTO'])
-        self.telefono = row.get('TELEFONO', '').strip()
+        tel = row.get('TELEFONO', '')
+        tel = str(tel) if type(tel) == int else tel.strip()
+        self.telefono = tel
         self.localidad = row.get('LOCALIDAD', '').strip()
         self.departamento = row.get('DEPARTAMENTO', '').strip()
 

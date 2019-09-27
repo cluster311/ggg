@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--path', type=str, help='Path del archivo XLS local',
-                                default='profesionales/resources/PADRONACTIVOS.xls')
+                                default='profesionales/resources/PADRONACTIVOS2.xls')
 
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS('--- Comenzando carga, por favor espere ---'))
@@ -29,42 +29,49 @@ class Command(BaseCommand):
                       'VOTA']
         
         path = options['path']
-        records = pe.iget_records(file_name=path)
+        
         count = 0
         matriculas = []
         dnis = []
         errores = []
-        for row in records:
+        
+        book = pe.get_book(file_name=path)
+        
+        for sheet in book:
             
-            self.stdout.write(self.style.SUCCESS(f'importando {row}'))
+            for fila in sheet:
+                self.stdout.write(self.style.SUCCESS(f'importando {fila}'))
+                row = {'AFILIADO': fila[0], 'NOMBRE': fila[1], 'PROFESION': fila[2], 'DOCUMENTO': fila[3], 'ESTADO': fila[4], 'TELEFONO': fila[5], 'DOMICILIO': fila[6], 'BARRIO': fila[7], 'LOCALIDAD': fila[8], 'DEPARTAMENTO': fila[9]}
 
-            dni = row['DOCUMENTO'] # es un numero! .strip().replace('.', '')
-            if dni in dnis:
-                error = f'DNI DUPLICADO: {dni} en {row}'
-                self.stdout.write(self.style.ERROR(error))
-                # sys.exit(1)
-                errores.append(error)
-                continue
+                self.stdout.write(self.style.SUCCESS(f'importando {row}'))
 
-            matricula = row['AFILIADO']
-            if matricula in matriculas:
-                error = f'Matricula DUPLICADa: {matricula} en {row}'
-                self.stdout.write(self.style.ERROR(error))
-                # sys.exit(1)
-                errores.append(error)
-                continue
-            
-            dnis.append(dni)
-            matriculas.append(matricula)
-            
-            p, created = Profesional.objects.get_or_create(dni=dni)
-            p.importar_matriculado(row=row)
-            p.save()
-            
-            count += 1
+                dni = row['DOCUMENTO'] # es un numero! .strip().replace('.', '')
+                if dni in dnis:
+                    error = f'DNI DUPLICADO: {dni} en {row}'
+                    self.stdout.write(self.style.ERROR(error))
+                    # sys.exit(1)
+                    errores.append(error)
+                    continue
+
+                matricula = row['AFILIADO']
+                if matricula in matriculas:
+                    error = f'Matricula DUPLICADa: {matricula} en {row}'
+                    self.stdout.write(self.style.ERROR(error))
+                    # sys.exit(1)
+                    errores.append(error)
+                    continue
                 
-        txt = f'Se procesaron {count} rpofesionales'
-        self.stdout.write(self.style.SUCCESS(txt))
-        txt = f'Errores: {errores}'
-        self.stdout.write(self.style.ERROR(txt))
+                dnis.append(dni)
+                matriculas.append(matricula)
+                
+                p, created = Profesional.objects.get_or_create(dni=dni)
+                p.importar_matriculado(row=row)
+                p.save()
+                
+                count += 1
+                    
+            txt = f'Se procesaron {count} profesionales'
+            self.stdout.write(self.style.SUCCESS(txt))
+            txt = f'Errores: {errores}'
+            self.stdout.write(self.style.ERROR(txt))
         

@@ -10,7 +10,7 @@ from .models import Profesional
 
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
-class TableroProfesionalesView(PermissionRequiredMixin, TemplateView):
+class TableroProfesionalesPorEspecialidadView(PermissionRequiredMixin, TemplateView):
     """ mostrar datos de los profesionales """
     model = Profesional
     permission_required = ('can_view_tablero', )
@@ -50,6 +50,56 @@ class TableroProfesionalesView(PermissionRequiredMixin, TemplateView):
                    'tech': 'google',
                    'type': 'pie',
                    'title': '% Profesionales por profesión',
+                   'subtitle': '',
+                   }
+        context['charts'] = [
+                chart_1,
+                chart_2
+            ]
+        
+        return context
+    
+
+class TableroProfesionalesPorLocalidadView(PermissionRequiredMixin, TemplateView):
+    """ mostrar datos de los profesionales """
+    model = Profesional
+    permission_required = ('can_view_tablero', )
+    template_name = 'profesionales/tableros.html'
+    # https://bootstrapious.com/tutorial/sidebar/index5.html
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        profesionales = Profesional.objects.all()
+        por_profesion = profesionales.values('departamento').annotate(total=Count('departamento')).order_by('-total')
+
+        cols = [
+            {'id': 'departamento', 'label': 'Departamento', 'type': 'string'},
+            {'id': 'profesionales', 'label': 'Profesionales', 'type': 'number'}
+            # , {'type': 'string', 'role': 'annotation'}
+            ]
+        rows = []
+        for p in por_profesion:
+            rows.append(
+                {'c': [
+                    {'v': p['departamento']},
+                    {'v': p['total']}
+                    ]}
+            )
+
+        data = {'cols': cols, 'rows': rows}
+
+        chart_1 = {'id': 'por_depto',
+                   'data': data,
+                   'tech': 'google',
+                   'type': 'column',
+                   'title': 'Profesionales por departamento',
+                   'subtitle': '',
+                   }
+        chart_2 = {'id': 'pie_por_depto',
+                   'data': data,
+                   'tech': 'google',
+                   'type': 'pie',
+                   'title': '% Profesionales por departamento',
                    'subtitle': '',
                    }
         context['charts'] = [
