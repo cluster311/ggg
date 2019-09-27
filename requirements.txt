@@ -11,3 +11,4 @@ pyexcel_xls>=0.5.8
 cie>=0.204
 fastkml>=0.11
 django_tinymce>=2.8.0
+oss-ar>=0.131

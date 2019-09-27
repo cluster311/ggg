@@ -6,18 +6,47 @@ from django.utils.timezone import now
 from sisa.puco import Puco
 import logging
 logger = logging.getLogger(__name__)
+from oss_ar.oss import ObrasSocialesArgentinas
 
 
 class ObraSocial(models.Model):
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=240)
     codigo = models.CharField(max_length=50, unique=True)
-
+    siglas = models.CharField(max_length=100, null=True, blank=True)
+    provincia = models.CharField(max_length=100, null=True, blank=True)
+    localidad = models.CharField(max_length=100, null=True, blank=True)
+    domicilio = models.CharField(max_length=100, null=True, blank=True)
+    cp = models.CharField(max_length=100, null=True, blank=True)
+    web = models.CharField(max_length=100, null=True, blank=True)
+    telefonos = models.CharField(max_length=100, null=True, blank=True)
+    emails = models.CharField(max_length=100, null=True, blank=True)
+    
     class Meta:
         verbose_name = "Obra Social"
         verbose_name_plural = "Obras Sociales"
 
     def __str__(self):
         return f'{self.codigo} {self.nombre}'
+    
+    @classmethod
+    def startdb(cls):
+        osss = ObrasSocialesArgentinas()
+        for rnos, oss in osss.local_json_object.items():
+            print(oss)
+            if oss.get('nombre', None) is None:
+                continue
+            defaults = {
+                'nombre': oss['nombre'],
+                'siglas': oss['sigla'],
+                'provincia': oss['provincia'],
+                'localidad': oss['localidad'],
+                'domicilio': oss['domicilio'],
+                'cp': oss['cp'],
+                'web': oss['web'],
+                # telefonos y emails
+                }
+            o = ObraSocial.objects.get_or_create(codigo=rnos, defaults=defaults)
+            
     
 
 class CarpetaFamiliar(models.Model):

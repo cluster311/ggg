@@ -18,6 +18,9 @@ class CarpetaFamiliarAdmin(admin.ModelAdmin):
         }
     }
 
-admin.site.register(ObraSocial)
 admin.site.register(Paciente)
 admin.site.register(CarpetaFamiliar, CarpetaFamiliarAdmin)
+
+@admin.register(ObraSocial)
+class ObraSocialAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'codigo', 'siglas', 'provincia', 'localidad']
