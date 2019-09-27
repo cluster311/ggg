@@ -45,10 +45,10 @@
                 <!--titulo agrupador sin link <p>Atenciones</p> -->
                 <li>
                     <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
-                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Atenciones</a>
+                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Obras sociales</a>
                     <ul class="collapse list-unstyled" id="pageSubmenu">
                         <li>
-                            <a href="#">Por centro de salud</a>
+                            <a href="{% url 'obras-sociales.tablero.por_provincia' %}">Por provincia</a>
                         </li>
                         <li>
                             <a href="#">Por especialidad</a>

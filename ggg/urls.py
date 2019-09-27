@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^tinymce/', include('tinymce.urls')),
     path('', admin.site.urls),
     url(r'^profesionales/', include('profesionales.urls')),
+    url(r'^core/', include('core.urls')),
 ]
