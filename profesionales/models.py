@@ -11,6 +11,10 @@ class Profesional(models.Model):
     profesion = models.CharField(max_length=190, null=True, blank=True)
     telefono = models.CharField(max_length=190, null=True, blank=True)
     domicilio = models.CharField(max_length=190, null=True, blank=True)
+    # para tranformar a _address_ despues
+    localidad = models.CharField(max_length=190, null=True, blank=True)
+    departamento = models.CharField(max_length=190, null=True, blank=True)
+
     
     def importar_matriculado(self, row):
         """ importar desde una base de datos específica matriculados 
@@ -31,10 +35,14 @@ class Profesional(models.Model):
         self.profesion = row['PROFESION'].strip()
         self.dni = str(row['DOCUMENTO'])
         self.telefono = row.get('TELEFONO', '').strip()
+        self.localidad = row.get('LOCALIDAD', '').strip()
+        self.departamento = row.get('DEPARTAMENTO', '').strip()
+
         domicilio = '{}, {}, {}, {}, Córdoba'.format(row.get('DOMICILIO', '').strip(),
                                                      row.get('BARRIO', ''),
-                                                     row.get('LOCALIDAD', ''),
-                                                     row.get('DEPARTAMENTO', ''))
+                                                     self.localidad,
+                                                     self.departamento
+                                                     )
         self.domicilio = domicilio
 
     
