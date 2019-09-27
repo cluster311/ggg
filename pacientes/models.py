@@ -77,7 +77,7 @@ class Paciente(Persona):
     es_jefe_familia = models.BooleanField(default=False)
     grupo_sanguineo = models.CharField(max_length=20, null=True, choices=Choices('0-', '0+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'))
     obra_social = models.ForeignKey('ObraSocial', null=True, blank=True, on_delete=models.SET_NULL)
-    observaciones = models.TextField()
+    observaciones = models.TextField(blank=True, null=True)
     datos_de_contacto = GenericRelation('core.DatoDeContacto',
                         related_query_name='pacientes',
                         null=True,
