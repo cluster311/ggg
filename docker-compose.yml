@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  db:
+    image: mdillon/postgis
+  web:
+    build: .
+    command: bash ./docker_entrypoint.sh
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+      - "5555:5555"
+    depends_on:
+      - db
