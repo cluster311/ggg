@@ -1,21 +1,33 @@
 from django.db import models
+from core.models import Persona
+from address.models import AddressField
+from django.contrib.contenttypes.fields import (GenericForeignKey,
+    GenericRelation)
+from django.contrib.contenttypes.models import ContentType
 
 
-class Profesional(models.Model):
-    nombres = models.CharField(max_length=120)
-    apellidos = models.CharField(max_length=120, null=True, blank=True)
-    
-    dni = models.CharField(max_length=20, null=True, blank=True)
+class Profesional(Persona):
     matricula_profesional = models.CharField(max_length=20, null=True, blank=True)
-
     profesion = models.CharField(max_length=190, null=True, blank=True)
-    telefono = models.CharField(max_length=190, null=True, blank=True)
-    domicilio = models.CharField(max_length=190, null=True, blank=True)
-    # para tranformar a _address_ despues
-    localidad = models.CharField(max_length=190, null=True, blank=True)
-    departamento = models.CharField(max_length=190, null=True, blank=True)
+    direccion = AddressField(null=True, on_delete=models.SET_NULL)
+    datos_de_contacto = GenericRelation('core.DatoDeContacto',
+                        related_query_name='pacientes',
+                        null=True,
+                        blank=True
+                        )
+    # TODO: importar datos desde el sistema municipal
 
-    
+    def __str__(self):
+        apellidos = '' if self.apellidos is None else self.apellidos
+        return f'{self.nombres, apellidos}'
+
+    def agregar_dato_de_contacto(self, tipo, valor):
+        type_ = ContentType.objects.get_for_model(self)
+        try:
+            DatoDeContacto.objects.get(content_type__pk=type_.id, object_id=self.id, tipo=tipo, valor=valor)
+        except DatoDeContacto.DoesNotExist:
+            DatoDeContacto.objects.create(content_object=self, tipo=tipo, valor=valor)
+
     def importar_matriculado(self, row):
         """ importar desde una base de datos específica matriculados 
         Ejemplo de row de Excel
@@ -33,26 +45,24 @@ class Profesional(models.Model):
         self.nombres = row['NOMBRE'].strip()
         self.matricula_profesional = str(row['AFILIADO'])
         self.profesion = row['PROFESION'].strip()
-        self.dni = str(row['DOCUMENTO'])
+        self.numero_documento = str(row['DOCUMENTO'])
         tel = row.get('TELEFONO', '')
         tel = str(tel) if type(tel) == int else tel.strip()
-        self.telefono = tel
-        self.localidad = row.get('LOCALIDAD', '').strip()
-        self.departamento = row.get('DEPARTAMENTO', '').strip()
-
-        domicilio = '{}, {}, {}, {}, Córdoba'.format(row.get('DOMICILIO', '').strip(),
-                                                     row.get('BARRIO', ''),
-                                                     self.localidad,
-                                                     self.departamento
-                                                     )
-        self.domicilio = domicilio
-
-    
-    def __str__(self):
-        apellidos = '' if self.apellidos is None else self.apellidos
-        return f'{self.nombres, apellidos}'
+        # self.localidad = row.get('LOCALIDAD', '').strip()
+        # self.departamento = row.get('DEPARTAMENTO', '').strip()
+        # domicilio = '{}, {}, {}, {}, Córdoba'.format(row.get('DOMICILIO', '').strip(),
+        #                                              row.get('BARRIO', ''),
+        #                                              self.localidad,
+        #                                              self.departamento
+        #                                              )
+        # self.domicilio = domicilio
+        self.datos_de_contacto = self.agregar_dato_de_contacto(self,
+                                        'teléfono',
+                                        tel
+                                        )
 
     class Meta:
         permissions = [
             ('can_view_tablero', 'Puede ver los tableros de comandos sobre profesionales'),
             ]
+        verbose_name_plural = 'Profesionales'
