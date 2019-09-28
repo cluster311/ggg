@@ -1,12 +1,71 @@
 from django.db import models
+from django.conf import settings
 from model_utils import Choices
 from address.models import AddressField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.utils.timezone import now
+from sisa.puco import Puco
+import logging
+logger = logging.getLogger(__name__)
+
+
+class ObraSocial(models.Model):
+    nombre = models.CharField(max_length=100)
+    codigo = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        verbose_name = "Obra Social"
+        verbose_name_plural = "Obras Sociales"
+
+    def __str__(self):
+        return f'{self.codigo} {self.nombre}'
+    
+
+class CarpetaFamiliar(models.Model):
+    OPCIONES_TIPO_FAMILIA = Choices(
+        ('nuclear', 'Nuclear'),
+        ('nuclear_ampliada', 'Nuclear Ampliada'),
+        ('binuclear', 'Binuclear'),
+        ('monoparental', 'Monoparental'),
+        ('extensa','Extensa'),
+        ('unipersonal','Unipersonal'),
+        ('equivalentes', 'Equivalentes Familiares')
+    )
+    direccion = AddressField(null=True, on_delete=models.SET_NULL)
+    tipo_familia = models.CharField(max_length=50, choices=OPCIONES_TIPO_FAMILIA)
+    apellido_principal = models.CharField(max_length=100)
+
+    def __str__(self):
+        return 'Familia {0.apellido_principal} ({0.direccion})'.format(self)
+
+    @property
+    def jefe_familia(self):
+        try:
+            return self.miembros.filter(jefe_familia=True)[0]
+        except IndexError:
+            return None
+
+    class Meta:
+        verbose_name = "Carpeta familiar"
+        verbose_name_plural = "Carpetas familiares"
 
 
 class Persona(models.Model):
+    VINCULO_TYPE = Choices(
+        ('Padre','Padre'),
+        ('Hijo/a','Hijo/a'),
+        ('Madre','Madre'),
+        ('Abuelo/a','Abuelo/a'),
+        ('Primo/a', 'Primo/a'),
+        ('Nuera/Yerno', 'Nuera/Yerno'),
+        ('Nieto/a', 'Nieto/a'),
+        ('Cuñado/a', 'Cuñado/a'),
+        ('Concuñado/a', 'Concuñado/a'),
+        ('Tio/a', 'Tio/a'),
+        ('Sobrino/a', 'Sobrino/a'),
+        ('Esposo/a', 'Esposo/a'),
+    )
     NACIONALIDAD_CHOICES = Choices(
         'argentina',
         'boliviana',
@@ -22,10 +81,10 @@ class Persona(models.Model):
     )
 
     nombres = models.CharField(max_length=50)
-    apellido = models.CharField(max_length=30)
+    apellidos = models.CharField(max_length=30)
     sexo = models.CharField(max_length=20,
                     choices=Choices('masculino', 'femenino', 'otro'))
-    fecha_nacimiento = models.DateField()
+    fecha_nacimiento = models.DateField(null=True, blank=True)
     tipo_documento = models.CharField(max_length=20, default='DNI',
                         choices=Choices('DNI', 'LC', 'LE', 'PASAPORTE', 'OTRO'))
     numero_documento = models.CharField(max_length=30, null=True, blank=True, help_text='Deje en blanco si está indocumentado')

@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
+    'tinymce',
     'address',
     'core',
     'pacientes',
@@ -151,6 +153,9 @@ GOOGLE_API_KEY = 'xxx'
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 LOGGING = {
@@ -196,6 +201,15 @@ LOGGING = {
 # contacto settings
 CARACTERISTICA_TELEFONO_DEFAULT = '351'     # CORDOBA
 CARACTERISTICA_DEFAULT = '351'
+
+# para obtener datos oficiales de las obras sociales de las personas vía SISA
+# https://pypi.org/project/sisa/
+os.environ['USER_SISA'] = ''
+os.environ['PASS_SISA'] = ''
+CACHED_OSS_INFO_SISA_SECONDS = 60 * 60 * 24 * 30  # 30 dias de cache para info de las OSS de los pacientes
+
+SOURCE_OSS_SISA = 'SISA'
+SOURCE_OSS_SSSALUD = 'SSSalud'
 
 try:
     from .local_settings import *
