@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 
 class ObraSocial(models.Model):
     nombre = models.CharField(max_length=100)
-    codigo = models.CharField(max_length=50, unique=True)    siglas = models.CharField(max_length=100, null=True, blank=True)
+    codigo = models.CharField(max_length=50, unique=True)
+    siglas = models.CharField(max_length=100, null=True, blank=True)
     provincia = models.CharField(max_length=100, null=True, blank=True)
     localidad = models.CharField(max_length=100, null=True, blank=True)
     domicilio = models.CharField(max_length=100, null=True, blank=True)
