@@ -3,8 +3,9 @@ from django.contrib.contenttypes import admin as contentadmin
 from address.models import AddressField
 from address.forms import AddressWidget
 from core.admin import ContactoAdminInline
-from .models import (CarpetaFamiliar, Paciente, ObraSocial,
+from .models import (Paciente, ObraSocial,
                     HistoriaClinica, Consulta)
+from core.models import CarpetaFamiliar
 
 
 class CarpetaFamiliarAdmin(admin.ModelAdmin):

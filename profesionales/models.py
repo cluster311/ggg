@@ -1,5 +1,8 @@
 from django.db import models
 from core.models import Persona
+from django.contrib.contenttypes.fields import (GenericForeignKey,
+    GenericRelation)
+from django.contrib.contenttypes.models import ContentType
 
 
 class Profesional(Persona):

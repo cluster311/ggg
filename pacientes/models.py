@@ -1,5 +1,5 @@
 from django.db import models
-from core.models import Persona
+from core.models import Persona, CarpetaFamiliar
 from profesionales.models import Profesional
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
@@ -31,37 +31,6 @@ class ObraSocialPaciente(models.Model):
     # los datos pueden venir de SISA, de SSSalud y quizas en el futuro desde otros lugares
     data_source = models.CharField(max_length=90)
 
-class CarpetaFamiliar(models.Model):
-    """
-    Asocia varios pacientes con vínculo familiares.
-    """
-    OPCIONES_TIPO_FAMILIA = Choices(
-        ('nuclear', 'Nuclear'),
-        ('nuclear_ampliada', 'Nuclear Ampliada'),
-        ('binuclear', 'Binuclear'),
-        ('monoparental', 'Monoparental'),
-        ('extensa','Extensa'),
-        ('unipersonal','Unipersonal'),
-        ('equivalentes', 'Equivalentes Familiares')
-    )
-    direccion = AddressField(null=True, on_delete=models.SET_NULL)
-    tipo_familia = models.CharField(max_length=50, choices=OPCIONES_TIPO_FAMILIA)
-    apellido_principal = models.CharField(max_length=100)
-
-    def __str__(self):
-        return 'Familia {0.apellido_principal} ({0.direccion})'.format(self)
-
-    @property
-    def jefe_familia(self):
-        try:
-            return self.miembros.filter(jefe_familia=True)[0]
-        except IndexError:
-            return None
-
-    class Meta:
-        verbose_name = "Carpeta familiar"
-        verbose_name_plural = "Carpetas familiares"
-
 
 class Paciente(Persona):
     """
@@ -82,7 +51,7 @@ class Paciente(Persona):
         ('Esposo/a', 'Esposo/a'),
     )
 
-    carpeta_familiar = models.ForeignKey('CarpetaFamiliar', null=True, related_name='miembros', on_delete=models.SET_NULL)
+    carpeta_familiar = models.ForeignKey('core.CarpetaFamiliar', null=True, related_name='miembros', on_delete=models.SET_NULL)
     vinculo = models.CharField(max_length=50, null=True, choices=VINCULO_TYPE, help_text='Relación parental relativa a jefe de familia')
     es_jefe_familia = models.BooleanField(default=False)
     grupo_sanguineo = models.CharField(max_length=20, null=True, choices=Choices('0-', '0+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'))

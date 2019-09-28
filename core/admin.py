@@ -10,7 +10,7 @@ class ContactoAdminInline(GenericTabularInline):
     form = DatoDeContactoModelForm
 
 
-class GeoAdmin(gisadmin.GeoAdmin):
+class GeoAdmin(gisadmin.GeoModelAdmin):
     """
     admin para modelos con GIS
     """
