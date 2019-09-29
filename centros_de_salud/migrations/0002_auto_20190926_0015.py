@@ -21,4 +21,8 @@ class Migration(migrations.Migration):
             name='ubicacion',
             field=django.contrib.gis.db.models.fields.PointField(blank=True, null=True, srid=4326),
         ),
+        migrations.AlterModelOptions(
+            name='centrodesalud',
+            options={'verbose_name': 'Centro de Salud', 'verbose_name_plural': 'Centros de Salud'},
+        )
     ]
