@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.http import Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.conf import settings
 from .models import Profesional
 
@@ -108,3 +108,10 @@ class TableroProfesionalesPorLocalidadView(PermissionRequiredMixin, TemplateView
             ]
         
         return context
+
+
+
+def calendario(request):
+    return render(request, 'calendario.html')
+
+    
