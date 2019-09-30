@@ -13,4 +13,8 @@ class CentroDeSalud(models.Model):
     ubicacion = models.PointField(null=True, blank=True)
 
     def __str__(self):
-        return self.nombre     
+        return self.nombre
+
+    class Meta:
+        verbose_name = 'Centro de Salud'
+        verbose_name_plural = 'Centros de Salud'
