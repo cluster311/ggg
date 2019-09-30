@@ -31,6 +31,9 @@ class Especialidad(models.Model):
 
 
 class Servicio(models.Model):
+    """
+    este modelo representa una especialidad en un determinado centro de salud
+    """
     centro = models.ForeignKey(CentroDeSalud, on_delete=models.CASCADE)
     especialidad = models.ForeignKey(Especialidad, on_delete=models.CASCADE)
 
