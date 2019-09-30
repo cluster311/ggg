@@ -17,7 +17,5 @@ class ProfesionalSite(admin.AdminSite):
 
 @admin.register(Profesional)
 class ProfesionalAdmin(admin.ModelAdmin):
-    list_display = ['nombres', 'apellidos', 'dni', 'matricula_profesional', 'localidad', 'departamento']
-    search_fields = ['nombres', 'apellidos', 'dni', 'matricula_profesional', 'localidad', 'departamento']
-    list_filter = ['localidad', 'departamento']
-
+    list_display = ['nombres', 'apellidos', 'numero_documento', 'matricula_profesional']
+    search_fields = ['nombres', 'apellidos', 'numero_documento', 'matricula_profesional']

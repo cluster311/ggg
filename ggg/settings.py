@@ -35,13 +35,15 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.gis',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.gis',
     'tinymce',
     'address',
     'core',
+    'obras_sociales',
+    'pacientes',
     'profesionales',
     'centros_de_salud',
     'django_extensions',
@@ -86,14 +88,13 @@ WSGI_APPLICATION = 'ggg.wsgi.application'
 
 DATABASES = {
     'default': {
-         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-         'NAME': 'ggg_db',
-         'USER': 'ggg_user',
-         'PASSWORD': 'ggg_pass',
-         # 'HOST': 'localhost'  # SIN ESTA PORONGA, NO ANDA EN PROD
-    },
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'HOST': 'db',
+        'PORT': 5432,
+    }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -178,6 +179,10 @@ LOGGING = {
         }
     }
 }
+
+# contacto settings
+CARACTERISTICA_TELEFONO_DEFAULT = '351'     # CORDOBA
+CARACTERISTICA_DEFAULT = '351'
 
 # para obtener datos oficiales de las obras sociales de las personas vía SISA
 # https://pypi.org/project/sisa/

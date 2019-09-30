@@ -2,83 +2,14 @@ from django.db import models
 from django.conf import settings
 from model_utils import Choices
 from address.models import AddressField
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.utils.timezone import now
-from sisa.puco import Puco
 import logging
 logger = logging.getLogger(__name__)
-from oss_ar.oss import ObrasSocialesArgentinas
 
 
-class ObraSocial(models.Model):
-    nombre = models.CharField(max_length=240)
-    codigo = models.CharField(max_length=50, unique=True)
-    siglas = models.CharField(max_length=100, null=True, blank=True)
-    provincia = models.CharField(max_length=100, null=True, blank=True)
-    localidad = models.CharField(max_length=100, null=True, blank=True)
-    domicilio = models.CharField(max_length=100, null=True, blank=True)
-    cp = models.CharField(max_length=100, null=True, blank=True)
-    web = models.CharField(max_length=100, null=True, blank=True)
-    telefonos = models.CharField(max_length=100, null=True, blank=True)
-    emails = models.CharField(max_length=100, null=True, blank=True)
-    
-    class Meta:
-        verbose_name = "Obra Social"
-        verbose_name_plural = "Obras Sociales"
-
-    def __str__(self):
-        return f'{self.codigo} {self.nombre}'
-    
-    @classmethod
-    def startdb(cls):
-        osss = ObrasSocialesArgentinas()
-        for rnos, oss in osss.local_json_object.items():
-            print(oss)
-            if oss.get('nombre', None) is None:
-                continue
-            defaults = {
-                'nombre': oss['nombre'],
-                'siglas': oss['sigla'],
-                'provincia': oss['provincia'],
-                'localidad': oss['localidad'],
-                'domicilio': oss['domicilio'],
-                'cp': oss['cp'],
-                'web': oss['web'],
-                # telefonos y emails
-                }
-            o = ObraSocial.objects.get_or_create(codigo=rnos, defaults=defaults)
-            
-    
-
-class CarpetaFamiliar(models.Model):
-    OPCIONES_TIPO_FAMILIA = Choices(
-        ('nuclear', 'Nuclear'),
-        ('nuclear_ampliada', 'Nuclear Ampliada'),
-        ('binuclear', 'Binuclear'),
-        ('monoparental', 'Monoparental'),
-        ('extensa','Extensa'),
-        ('unipersonal','Unipersonal'),
-        ('equivalentes', 'Equivalentes Familiares')
-    )
-    direccion = AddressField(null=True, on_delete=models.SET_NULL)
-    tipo_familia = models.CharField(max_length=50, choices=OPCIONES_TIPO_FAMILIA)
-    apellido_principal = models.CharField(max_length=100)
-
-    def __str__(self):
-        return 'Familia {0.apellido_principal} ({0.direccion})'.format(self)
-
-    @property
-    def jefe_familia(self):
-        try:
-            return self.miembros.filter(jefe_familia=True)[0]
-        except IndexError:
-            return None
-
-    class Meta:
-        verbose_name = "Carpeta familiar"
-        verbose_name_plural = "Carpetas familiares"
-
-
-class Paciente(models.Model):
+class Persona(models.Model):
     VINCULO_TYPE = Choices(
         ('Padre','Padre'),
         ('Hijo/a','Hijo/a'),
@@ -107,117 +38,55 @@ class Paciente(models.Model):
         'otra',
     )
 
-    carpeta_familiar = models.ForeignKey('CarpetaFamiliar', null=True, related_name='miembros', on_delete=models.SET_NULL)
     nombres = models.CharField(max_length=50)
-    apellido = models.CharField(max_length=30)
-    sexo = models.CharField(max_length=20, choices=Choices('masculino', 'femenino', 'otro'))
+    apellidos = models.CharField(max_length=30)
+    sexo = models.CharField(max_length=20,
+                    choices=Choices('masculino', 'femenino', 'otro'),
+                    default='masculino')
     fecha_nacimiento = models.DateField(null=True, blank=True)
-    tipo_documento = models.CharField(max_length=20, choices=Choices('DNI', 'LC', 'LE', 'PASAPORTE', 'OTRO'))
+    tipo_documento = models.CharField(max_length=20, default='DNI',
+                        choices=Choices('DNI', 'LC', 'LE', 'PASAPORTE', 'OTRO'))
     numero_documento = models.CharField(max_length=30, null=True, blank=True, help_text='Deje en blanco si está indocumentado')
-    nacionalidad = models.CharField(max_length=50, choices=NACIONALIDAD_CHOICES)
-    vinculo = models.CharField(max_length=50, null=True, choices=VINCULO_TYPE, help_text='Relación parental relativa a jefe de familia')
-    es_jefe_familia = models.BooleanField(default=False)
-    grupo_sanguineo = models.CharField(max_length=20, null=True, choices=Choices('0-', '0+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'))
-
-    telefono = models.CharField(max_length=50, null=True, blank=True)
-    obras_sociales = models.ManyToManyField('ObraSocial', blank=True, through='ObraSocialPaciente')
-    observaciones = models.TextField()
+    nacionalidad = models.CharField(max_length=50, choices=NACIONALIDAD_CHOICES,
+                    default=NACIONALIDAD_CHOICES.argentina)
 
     @property
     def edad(self):
         return (now().date() - self.fecha_nacimiento).days / 365
 
     class Meta:
-        verbose_name = "Paciente"
-        verbose_name_plural = "Pacientes"
+        abstract = True
 
     def __str__(self):
-        return f'{self.apellido}, {self.nombres}'
-    
-    def get_obras_sociales_from_sisa(self, force_update=False):
-        """ Obtener la obra social de este paciente segun SISA
-            Devuelve una tupla indicando
-             - primero si encontro o no los datos
-             - segundo el error si es que hubo uno
-            """
-        oss_paciente = self.m2m_obras_sociales.filter(data_source=settings.SOURCE_OSS_SISA)
-        last_updated = None
-        for os in oss_paciente:
-            if os.obra_social_updated is not None:
-                if last_updated is None:
-                    last_updated = os.obra_social_updated
-                elif os.obra_social_updated > last_updated:
-                    last_updated = os.obra_social_updated
-
-        if last_updated is None:
-            force_update = True
-
-        if not force_update:
-            diff = now() - last_updated
-            seconds_diff = diff.days * 86400 + diff.seconds
-            if seconds_diff < settings.CACHED_OSS_INFO_SISA_SECONDS:
-                return True, f'Cache valido aún {seconds_diff}'
-
-        logger.info('Consultando PUCO')
-        puco = Puco(dni=self.numero_documento)
-        resp = puco.get_info_ciudadano()
-        if not resp['ok']:
-            error = f'Error de sistema: {puco.last_error}'
-            logger.info(error)
-            return False, error
-
-        if not resp['persona_encontrada']:
-            logger.info('Persona no encontrada')
-            return False, f'Persona no encontrada: {puco.last_error}'
-
-        logger.info('Persona encontrada')
-        oss, created = ObraSocial.objects.get_or_create(codigo=puco.rnos,
-                                                        defaults={'nombre': puco.cobertura_social})
-        
-        found = False
-        for os in oss_paciente:
-            if os.obra_social == oss:
-                found = True
-                os.obra_social_updated = now()
-                os.save()
-        if not found:
-            # TODO: estamos detectando un cambio de OSS.
-            # para tableros de control y estadísticas este dato puede ser valioso de grabar
-            new_oss = ObraSocialPaciente.objects.create(data_source=settings.SOURCE_OSS_SISA,
-                                            paciente=self,
-                                            obra_social_updated = now(),
-                                            obra_social=oss)
-        
-        return True, None
-        # tengo aqui algunos datos que podría usar para verificar
-        # puco.tipo_doc
-        # nombre y apellido: puco.denominacion
-        # dict con datos de la obra social: puco.oss
-        """
-        puco.oss = {
-            'rnos': '112301',
-            'exists': True,
-            'nombre': 'OBRA SOCIAL DEL PERSONAL DE MICROS Y OMNIBUS DE MENDOZA',
-            'tipo_de_cobertura': 'Obra social',
-            'sigla': 'OSPEMOM',
-            'provincia': 'Mendoza',
-            'localidad': 'MENDOZA',
-            'domicilio': 'CATAMARCA 382',
-            'cp': '5500',
-            'telefonos': ['0261-4-203283', '0261-4-203342'],
-            'emails': ['ospemom@ospemom.org.ar'],
-            'web': None,
-            'sources': ['SISA', 'SSSalud']
-            }
-        """    
+        return '{}, {}'.format(self.apellido, self.nombres)
 
 
-class ObraSocialPaciente(models.Model):
-    paciente = models.ForeignKey('Paciente', on_delete=models.CASCADE, related_name='m2m_obras_sociales')
-    obra_social = models.ForeignKey('ObraSocial', on_delete=models.CASCADE, related_name='pacientes')
-    # las llamadas al sistema SISA son limitadas y tienen costo
-    # es por esto que tenemos que considerar un cache para no repetir consultas
-    
-    obra_social_updated = models.DateTimeField(null=True, blank=True)
-    # los datos pueden venir de SISA, de SSSalud y quizas en el futuro desde otros lugares
-    data_source = models.CharField(max_length=90)
+class DatoDeContacto(models.Model):
+    """Modelo generérico para guardar datos de contacto de personas o medios
+    Ejemplo de uso::
+        from django.contrib.contenttypes.fields import GenericRelation
+        class Paciente(models.Model):
+            datos_de_contacto = GenericRelation(
+                'contacto.DatoDeContacto',
+                related_query_name='pacientes'
+            )
+            ...
+    """
+
+    TIPOS = Choices(
+        'teléfono', 'email', 'web', 'twitter', 'facebook',
+        'instagram', 'youtube', 'skype'
+    )
+
+    tipo = models.CharField(choices=TIPOS, max_length=20)
+    valor = models.CharField(max_length=100)
+    # generic relation
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    class Meta:
+        unique_together = (('tipo', 'valor', 'content_type', 'object_id'),)
+
+    def __str__(self):
+        return f'{self.tipo}: {self.valor}'
