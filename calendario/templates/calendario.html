@@ -24,9 +24,12 @@
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
           plugins: [ 'dayGrid' ],
+          eventSources: [{
+              url: '{% url 'calendario.feed' %}',
+          }],
           locale: 'es',
           weekMode: 'liquid',
-    	  slotMinutes: 15,
+    	    slotMinutes: 15,
           defaultEventMinutes: 30,
           minTime: 8,
           maxTime: 20,

@@ -108,10 +108,3 @@ class TableroProfesionalesPorLocalidadView(PermissionRequiredMixin, TemplateView
             ]
         
         return context
-
-
-
-def calendario(request):
-    return render(request, 'calendario.html')
-
-    

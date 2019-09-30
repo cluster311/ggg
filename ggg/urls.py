@@ -4,11 +4,12 @@ from django.conf.urls import url, include
 
 
 urlpatterns = [
-    url(r'^jet/', include('jet.urls', 'jet')),
+    # url(r'^jet/', include('jet.urls', 'jet')),
     path('admin/', admin.site.urls),
     path('accounts/', admin.site.urls),
     url(r'^tinymce/', include('tinymce.urls')),
     path('', admin.site.urls),
     url(r'^profesionales/', include('profesionales.urls')),
+    url(r'^turnos/', include('calendario.urls')),
     # url(r'^obras-sociales/', include('obras_sociales.urls')),
 ]

@@ -1,6 +1,5 @@
 from django.contrib import admin
 from .models import Profesional
-from .views import calendario
 from django.conf.urls import url
 
 
