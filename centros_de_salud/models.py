@@ -18,3 +18,23 @@ class CentroDeSalud(models.Model):
     class Meta:
         verbose_name = 'Centro de Salud'
         verbose_name_plural = 'Centros de Salud'
+
+
+class Especialidad(models.Model):
+    """
+    obstetricia, dermatología, etc
+    """
+    nombre = models.CharField(max_length=290)
+
+    def __str__(self):
+        return self.nombre     
+
+
+class Servicio(models.Model):
+    centro = models.ForeignKey(CentroDeSalud, on_delete=models.CASCADE)
+    especialidad = models.ForeignKey(Especialidad, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.especialidad} - {self.centro}'
+
+
