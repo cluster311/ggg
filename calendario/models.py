@@ -11,4 +11,4 @@ class Turno(models.Model):
 
 
     def __str__(self):
-        return f'{self.inicio} - {self.fin} - {self.servicio}'
+        return f'{self.servicio.especialidad} '
