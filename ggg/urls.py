@@ -10,5 +10,6 @@ urlpatterns = [
     url(r'^tinymce/', include('tinymce.urls')),
     path('', admin.site.urls),
     url(r'^profesionales/', include('profesionales.urls')),
+    url(r'^turnos/', include('calendario.urls')),
     # url(r'^obras-sociales/', include('obras_sociales.urls')),
 ]

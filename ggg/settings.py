@@ -39,16 +39,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'tinymce',
     'address',
+    'cie10_django',
+    
+    # our apps
     'core',
     'obras_sociales',
     'pacientes',
     'profesionales',
     'centros_de_salud',
-    'django_extensions',
-    'cie10_django',
+    'calendario',
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -86,25 +91,13 @@ WSGI_APPLICATION = 'ggg.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'HOST': 'db',
-        'PORT': 5432,
-    }
-
+         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+         'NAME': 'ggg_db',
+         'USER': 'ggg_user',
+         'PASSWORD': 'ggg_pass',
+         # 'HOST': 'localhost'  # SIN ESTA PORONGA, NO ANDA EN PROD
+    },
 }
-
-""" SI SE CANSAN DE ESTA BASE pueden hacer esto en local_settings
-
-sudo su - postgres
-psql
-
-CREATE USER ggg_user WITH PASSWORD 'ggg_pass';
-ALTER ROLE ggg_user SUPERUSER;
-CREATE EXTENSION postgis;
-CREATE DATABASE ggg_db OWNER ggg_user;
-"""
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -147,6 +140,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 
 LOGGING = {
