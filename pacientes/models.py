@@ -4,6 +4,7 @@ from profesionales.models import Profesional
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
 from address.models import AddressField
+from cie10_django.models import CIE10
 from django.contrib.contenttypes.fields import (GenericForeignKey,
                                                 GenericRelation)
 from django.contrib.contenttypes.models import ContentType
@@ -113,7 +114,7 @@ class Paciente(Persona):
              - primero si encontro o no los datos
              - segundo el error si es que hubo uno
             """
-        oss_paciente = self.m2m_obras_sociales.filter(data_source=settings.+
+        oss_paciente = self.m2m_obras_sociales.filter(data_source=settings.
                                                       SOURCE_OSS_SISA
                                                       )
         last_updated = None
@@ -161,7 +162,7 @@ class Paciente(Persona):
             # para tableros de control y estadísticas este dato puede ser
             # valioso de grabar
             new_oss = ObraSocialPaciente.objects.create(
-                                            data_source=settings.+
+                                            data_source=settings.
                                             SOURCE_OSS_SISA,
                                             paciente=self,
                                             obra_social_updated=now(),
@@ -191,34 +192,24 @@ class Paciente(Persona):
         """
 
 
-class HistoriaClinica(models.Model):
-    """
-    Historial de consultas que realiza un médico sobre el paciente
-    """
-    paciente = models.ForeignKey('Paciente', related_name='historial_clinico',
-                                 on_delete=models.CASCADE)
-
-    class Meta:
-        verbose_name_plural = 'Historias clinicas'
-
-    def __str__(self):
-        return '{} - {}, {}'.format(self.id, self.paciente.nombres,
-                                    self.paciente.apellido)
-
-
 class Consulta(TimeStampedModel):
     """
     Observaciones que realiza el médico al paciente en una consulta.
     """
-    historia = models.ForeignKey('HistoriaClinica', related_name='consultas',
-                                 on_delete=models.CASCADE)
+    paciente = models.ForeignKey('Paciente', related_name='historial_clinico',
+                                 on_delete=models.CASCADE, default='')
     diagnostico = models.TextField()
     indicaciones = models.TextField(null=True, blank=True)
     # podria ser un manytomany a un modelo de medicamentos
     receta = models.TextField(null=True, blank=True)
     practicas = models.TextField(null=True, blank=True)
-    derivaciones = models.ManyToManyField(Profesional, blank=True)
+    derivaciones = models.ManyToManyField('centros_de_salud.Especialidad',
+                                          blank=True)
+    codigo = models.ManyToManyField(CIE10, blank=True)
 
     def __str__(self):
-        return '{} - fecha: {} - paciente: {}'.format(self.id, self.fecha,
-                                                      self.historia.paciente)
+        return '{} - fecha: {} - paciente: {}, {}'.format(self.id, self.fecha,
+                                                          self.paciente.
+                                                          nombres,
+                                                          self.paciente.
+                                                          apellido)

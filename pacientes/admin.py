@@ -3,7 +3,7 @@ from django.contrib.contenttypes import admin as contentadmin
 from address.models import AddressField
 from address.forms import AddressWidget
 from core.admin import ContactoAdminInline
-from .models import Paciente, HistoriaClinica, Consulta, CarpetaFamiliar
+from .models import Paciente, Consulta, CarpetaFamiliar
 
 
 class CarpetaFamiliarAdmin(admin.ModelAdmin):
@@ -24,15 +24,13 @@ class ConsultaInLine(admin.StackedInline):
     model = Consulta
     extra = 1
 
-class HistoriaClinicaAdmin(admin.ModelAdmin):
-    inlines = (ConsultaInLine, )
 
 class PacienteAdmin(admin.ModelAdmin):
     inlines = [
         ContactoAdminInline,
+        ConsultaInLine
     ]
 
 
-admin.site.register(HistoriaClinica, HistoriaClinicaAdmin)
 admin.site.register(Paciente, PacienteAdmin)
 admin.site.register(CarpetaFamiliar, CarpetaFamiliarAdmin)
