@@ -106,7 +106,7 @@ class Paciente(Persona):
         verbose_name_plural = "Pacientes"
 
     def __str__(self):
-        return f'{self.apellido}, {self.nombres}'
+        return f'{self.apellidos}, {self.nombres}'
 
     def get_obras_sociales_from_sisa(self, force_update=False):
         """ Obtener la obra social de este paciente segun SISA
