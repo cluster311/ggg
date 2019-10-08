@@ -1,17 +1,17 @@
 {% extends "base_tableros.html" %}
+{% load static %}
 
 {% block extra_head %}
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.css' rel='stylesheet' />
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.css' rel='stylesheet' />
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.css' rel='stylesheet' />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.css" rel="stylesheet" />
 
-    <link href='https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.css' rel='stylesheet' />
-	 
+  <link href="https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.css" rel="stylesheet" />
 
+  <link href="{% static 'css/modal_extra.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block js_footer %}
-	
 	{{ block.super }}
 
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.js'></script>
@@ -22,36 +22,41 @@
   <script src='https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.js'></script>
 
 	<script type="text/javascript">
-	document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
+    document.addEventListener('DOMContentLoaded', function() {
+      const calendarEl = document.getElementById('calendar');
 
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-          plugins: [ 'dayGrid', 'timeGrid' ],
-          eventSources: [{
-              url: '{% url 'calendario.feed' %}',
-          }],
-          defaultView: 'dayGridWeek',
-          header: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-          },
-          locale: 'es',
-          weekMode: 'liquid',
-    	    slotMinutes: 15,
-          defaultEventMinutes: 30,
-          minTime: 8,
-          maxTime: 20,
-          editable: true,
-          themeSystem: 'bootstrap'
-        });
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        plugins: [ 'dayGrid', 'timeGrid' ],
+        eventSources: [{
+            url: '{% url "calendario.feed" %}',
+        }],
+        defaultView: 'dayGridWeek',
+        header: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        locale: 'es',
+        weekMode: 'liquid',
+        slotMinutes: 15,
+        defaultEventMinutes: 30,
+        minTime: 8,
+        maxTime: 20,
+        editable: true,
+        themeSystem: 'bootstrap'
+      });
 
-        calendar.render();
+      calendar.render();
     });
-    
-	</script>
+
+  </script>
 {% endblock js_footer %}
 
 {% block content %}
-    <div id='calendar'></div>
+  {% include 'base_modal_button.html' with button_text=modal_title %}
+  <div id='calendar'></div>
+{% endblock %}
+
+{% block unwrapped_content %}
+  {% include 'base_modal.html' %}
 {% endblock %}
