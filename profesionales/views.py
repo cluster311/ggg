@@ -10,17 +10,20 @@ from .models import Profesional
 
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
-class TableroProfesionalesPorEspecialidadView(PermissionRequiredMixin, TemplateView):
+class TableroProfesionalesPorEspecialidadView(
+        PermissionRequiredMixin, TemplateView):
     """ mostrar datos de los profesionales """
     model = Profesional
     permission_required = ('can_view_tablero', )
     template_name = 'profesionales/tableros.html'
     # https://bootstrapious.com/tutorial/sidebar/index5.html
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         profesionales = Profesional.objects.all()
-        por_profesion = profesionales.values('profesion').annotate(total=Count('profesion')).order_by('-total')
+        por_profesion = profesionales.values('profesion').annotate(
+            total=Count('profesion')
+        ).order_by('-total')
 
         cols = [
             {'id': 'profesion', 'label': 'Profesion', 'type': 'string'},
@@ -56,21 +59,24 @@ class TableroProfesionalesPorEspecialidadView(PermissionRequiredMixin, TemplateV
                 chart_1,
                 chart_2
             ]
-        
-        return context
-    
 
-class TableroProfesionalesPorLocalidadView(PermissionRequiredMixin, TemplateView):
+        return context
+
+
+class TableroProfesionalesPorLocalidadView(
+        PermissionRequiredMixin, TemplateView):
     """ mostrar datos de los profesionales """
     model = Profesional
     permission_required = ('can_view_tablero', )
     template_name = 'profesionales/tableros.html'
     # https://bootstrapious.com/tutorial/sidebar/index5.html
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         profesionales = Profesional.objects.all()
-        por_profesion = profesionales.values('departamento').annotate(total=Count('departamento')).order_by('-total')
+        por_profesion = profesionales.values('departamento').annotate(
+            total=Count('departamento')
+        ).order_by('-total')
 
         cols = [
             {'id': 'departamento', 'label': 'Departamento', 'type': 'string'},
@@ -106,5 +112,5 @@ class TableroProfesionalesPorLocalidadView(PermissionRequiredMixin, TemplateView
                 chart_1,
                 chart_2
             ]
-        
+
         return context
