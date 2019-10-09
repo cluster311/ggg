@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <!-- Our Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/tableros.css' %}">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
 
     <!-- Font Awesome JS -->
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
@@ -28,65 +29,7 @@
                 <h3>Consultas</h3>
             </div>
 
-            <ul class="list-unstyled components">
-                <!--titulo agrupador sin link <p>Profesionales</p>-->
-                <li class="active">
-                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Profesionales</a>
-                    <ul class="collapse list-unstyled" id="homeSubmenu">
-                        <li>
-                            <a href="{% url 'profesionales.tablero.por_profesion' %}">Por profesion</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'profesionales.tablero.por_departamento' %}">Por departamento</a>
-                        </li>
-                    </ul>
-                </li>
-                
-                <!--titulo agrupador sin link <p>Atenciones</p> -->
-                <li>
-                    <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
-                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Obras sociales</a>
-                    <ul class="collapse list-unstyled" id="pageSubmenu">
-                        <li>
-                            <a href="#">Por provincia</a>
-                        </li>
-                        <li>
-                            <a href="#">Por especialidad</a>
-                        </li>
-                        
-                    </ul>
-                </li>
-
-                <!--titulo agrupador sin link <p>Atenciones</p> -->
-                <li>
-                    <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
-                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Centros de salud</a>
-                    <ul class="collapse list-unstyled" id="pageSubmenu">
-                        <li>
-                            <a href="#">Por area programática</a>
-                        </li>
-                        <li>
-                            <a href="#">Por especialidad</a>
-                        </li>
-                        
-                    </ul>
-                </li>
-
-                <!--titulo agrupador sin link <p>Atenciones</p> -->
-                <li>
-                    <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
-                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Turnos</a>
-                    <ul class="collapse list-unstyled" id="pageSubmenu">
-                        <li>
-                            <a href="#">Por centro de salud</a>
-                        </li>
-                        <li>
-                            <a href="#">Por especialidad</a>
-                        </li>
-                        
-                    </ul>
-                </li>
-            </ul>
+            {% block sidebar %}{% endblock %}
 
             <ul class="list-unstyled CTAs">
                 <li><a href="#" class="download">+ info</a></li>

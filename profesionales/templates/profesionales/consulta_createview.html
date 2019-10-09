@@ -1,0 +1,14 @@
+{% extends "base_consultas.html" %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block content %}
+    <h2>Nueva Consulta</h2>
+    <form method="post">{% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Save">
+    </form>
+    <div class="line"></div>
+    <a class="btn btn-primary" href="{% url 'profesionales.consulta.lista' dni=object.paciente.numero_documento %}" role="button">LISTADO</a>
+{% endblock %}

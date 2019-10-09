@@ -3,6 +3,10 @@
 {% block extra_head %}
 {% endblock %}
 
+{% block sidebar %}
+    {% include "sidebar_paciente.html" %}
+{% endblock %}
+
 {% block content %}
     <h2>Listado de consultas</h2>
     {% for consulta in consultas %}

@@ -1,14 +1,22 @@
 from django.views.generic import TemplateView, ListView
 from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView
 from django.db.models import Count
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, render_to_response
 from django.conf import settings
 from .models import Profesional
 from pacientes.models import Consulta
+
+
+def index (request):
+    """
+    Interfaz principal que ve un profesional
+    """
+    return render_to_response('index.html')
 
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
@@ -142,3 +150,12 @@ class ConsultaDetailView(PermissionRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['fecha'] = self.object.modified.strftime('%d/%m/%Y')
         return context
+
+
+class ConsultaCreateView(PermissionRequiredMixin, CreateView):
+    """
+    Crea un objeto Consulta
+    """
+    model = Consulta
+    permission_required = ('can_view_tablero', )
+    template_name = 'profesionales/consulta_createview.html'
