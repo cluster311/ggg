@@ -7,12 +7,23 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.css" rel="stylesheet" />
 
   <link href="https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.css" rel="stylesheet" />
+  
+  <!-- DateTime Picker's assets -->
+  {{ form.media }}
 
   <link href="{% static 'css/modal_extra.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block js_footer %}
 	{{ block.super }}
+
+  <!-- Import axios and configure it to send csrf tokens -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    'use strict';
+    axios.defaults.xsrfCookieName = 'csrftoken'
+    axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+  </script>
 
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.js'></script>
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.js'></script>
@@ -21,7 +32,8 @@
 
   <script src='https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.js'></script>
 
-	<script type="text/javascript">
+  <script type="text/javascript">
+    'use strict';
     document.addEventListener('DOMContentLoaded', function() {
       const calendarEl = document.getElementById('calendar');
 
@@ -48,7 +60,101 @@
 
       calendar.render();
     });
+  </script>
 
+  <script>
+    'use strict';
+    function customAppointmentFormSubmit() {
+      /* DONE:
+        - Iterate form fields, inserting them into an object and send object
+        as a request's POST data to url using add_appointment view.
+        - If errors in response, display them.
+      */
+      /* TODO:
+        - Load data into calendar.
+      */
+      const formData = getFormData();
+
+      axios({
+        method: 'post',
+        url: "{% url 'add_appointment' %}",
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        data: formData
+      })
+        .then(response => {
+          console.log(response);
+          if (!response.data.success) {
+            const errorItems = getErrorItems(response.data.errors);
+
+            const errorsList = getOrCreateErrorsList();
+
+            errorsList.innerHTML = errorItems;
+          }
+        })
+        .catch(error => {
+          console.log(error.response);
+        });
+    }
+
+    function getFormData() {
+      const appointmentForm = document.getElementById('appointmentForm');
+
+      const formData = {};
+      for (const field of appointmentForm) {
+        formData[field.name] = field.value;
+      }
+
+      return formData;
+    }
+
+    function getOrCreateErrorsList() {
+      let errorsList = document.getElementById('errorsList');
+
+      if (!errorsList) {
+        errorsList = document.createElement('ul');
+        errorsList.setAttribute('id', 'errorsList');
+        errorsList.classList.add('errors', 'list-group');
+        const form = document.getElementById('appointmentForm');
+        form.insertBefore(errorsList, form.firstChild);
+      }
+
+      return errorsList;
+    }
+
+    function getErrorItems(errors) {
+      let errorItems = '';
+      for (const field in errors) {
+        errorItems += `
+          <li class="list-group-item list-group-item-action
+            flex-column align-items-start list-group-item-danger"
+          >
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">
+                ${capitalize(field)}
+              </h5>
+              <span class="badge badge-danger badge-pill mb-2">
+                ${errors[field].length}
+              </span>
+            </div>
+            <ul class="list-group mb-1">
+              ${getFieldErrorsListItems(errors[field])}
+            </ul>
+          </li>`;
+      }
+      return errorItems;
+    }
+
+    function getFieldErrorsListItems(fieldErrors) {
+      let errorsUL = '';
+      for (const error of fieldErrors) {
+        errorsUL += `<li>${error}</li>`;
+      }
+      return errorsUL;
+    }
+
+    function capitalize(text) {
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    }
   </script>
 {% endblock js_footer %}
 

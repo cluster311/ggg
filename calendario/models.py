@@ -35,7 +35,6 @@ class Turno(models.Model):
         on_delete=models.SET_NULL
     )
     estado = models.IntegerField(choices=OPCIONES_ESTADO, default=DISPONIBLE)
-    duracion = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.servicio.especialidad} '

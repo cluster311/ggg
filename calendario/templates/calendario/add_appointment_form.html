@@ -1,4 +1,8 @@
-<form>
-    <input type="text" name="test" placeholder="Test">
-    <input type="submit" value="Agregar">
+<form
+  onsubmit="event.preventDefault(); customAppointmentFormSubmit();" 
+  id="appointmentForm"
+>
+  {% csrf_token %}
+  {{ form.as_p }}
+  <input type="submit" name="submit" value="Agregar">
 </form>

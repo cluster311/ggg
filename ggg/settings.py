@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'tinymce',
     'address',
     'cie10_django',
-    
+    'tempus_dominus',
+
     # our apps
     'core',
     'obras_sociales',
