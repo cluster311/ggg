@@ -1,4 +1,5 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
+from django.views.generic.detail import DetailView
 from django.db.models import Count
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.decorators import method_decorator
@@ -7,6 +8,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.conf import settings
 from .models import Profesional
+from pacientes.models import Consulta
 
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
@@ -107,4 +109,36 @@ class TableroProfesionalesPorLocalidadView(PermissionRequiredMixin, TemplateView
                 chart_2
             ]
         
+        return context
+
+
+class ConsultaListView(PermissionRequiredMixin, ListView):
+    """
+    Lista de consultas de un paciente para la interfaz del profesional.
+    """
+    model = Consulta
+    permission_required = ('can_view_tablero', )
+    template_name = 'profesionales/consulta_listview.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        dni = self.kwargs['dni']
+        consultas = Consulta.objects.filter(paciente__numero_documento=dni)
+        context['consultas'] = consultas
+
+        return context
+
+
+class ConsultaDetailView(PermissionRequiredMixin, DetailView):
+    """
+    Detalle de un objeto Consulta
+    """
+    model = Consulta
+    permission_required = ('can_view_tablero', )
+    template_name = 'profesionales/consulta_detailview.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['fecha'] = self.object.modified.strftime('%d/%m/%Y')
         return context

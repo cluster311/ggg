@@ -1,0 +1,20 @@
+{% extends "base_consultas.html" %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block content %}
+    <h2>Detalle</h2>
+    Paciente: {{object.paciente.nombres}} {{object.paciente.apellidos}}<br>
+    Número de documento: {{object.paciente.numero_documento}}<br>
+    Fecha: {{fecha}}<br>
+    Diagnóstico: {{object.diagnostico}}<br>
+    Indicaciones: {{oject.indicaciones}}<br>
+    Receta: {{object.receta}}<br>
+    Practicas: {{object.practicas}}<br>
+<!--     derivaciones = models.ManyToManyField('centros_de_salud.Especialidad',
+                                          blank=True)
+    codigo = models.ManyToManyField(CIE10, blank=True)
+ -->    <div class="line"></div>
+    <a class="btn btn-primary" href="{% url 'profesionales.consulta.lista' dni=object.paciente.numero_documento %}" role="button">LISTADO</a>
+{% endblock %}

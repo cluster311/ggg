@@ -208,8 +208,7 @@ class Consulta(TimeStampedModel):
     codigo = models.ManyToManyField(CIE10, blank=True)
 
     def __str__(self):
-        return '{} - fecha: {} - paciente: {}, {}'.format(self.id, self.fecha,
-                                                          self.paciente.
-                                                          nombres,
-                                                          self.paciente.
-                                                          apellido)
+        fecha = self.created.strftime('%d/%m/%Y')
+        return 'fecha: {} - Paciente: {} {}'.format(fecha,
+                                                     self.paciente.nombres,
+                                                     self.paciente.apellidos)
