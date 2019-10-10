@@ -10,11 +10,12 @@ from django.shortcuts import get_object_or_404, render, render_to_response
 from django.conf import settings
 from .models import Profesional
 from pacientes.models import Consulta
+from pacientes.forms import ConsultaForm
 
 
 def index (request):
     """
-    Interfaz principal que ve un profesional
+    Interfaz principal para un profesional
     """
     return render_to_response('index.html')
 
@@ -159,3 +160,13 @@ class ConsultaCreateView(PermissionRequiredMixin, CreateView):
     model = Consulta
     permission_required = ('can_view_tablero', )
     template_name = 'profesionales/consulta_createview.html'
+    form_class = ConsultaForm
+
+    # def form_valid(self, form):
+    #     messages.success(self.request, 'form is valid')
+    #     form.instance.user = self.request.user
+    #     form.save()
+
+    # def get_success_url(self):
+    #     messages.success(self.request, 'Business Added Successfully')
+    #     return reverse('business:list')

@@ -162,11 +162,11 @@ class Paciente(Persona):
             # para tableros de control y estadísticas este dato puede ser
             # valioso de grabar
             new_oss = ObraSocialPaciente.objects.create(
-                                            data_source=settings.
-                                            SOURCE_OSS_SISA,
-                                            paciente=self,
-                                            obra_social_updated=now(),
-                                            obra_social=oss)
+                data_source=settings.
+                SOURCE_OSS_SISA,
+                paciente=self,
+                obra_social_updated=now(),
+                obra_social=oss)
 
         return True, None
         # tengo aqui algunos datos que podría usar para verificar
@@ -210,5 +210,5 @@ class Consulta(TimeStampedModel):
     def __str__(self):
         fecha = self.created.strftime('%d/%m/%Y')
         return 'fecha: {} - Paciente: {} {}'.format(fecha,
-                                                     self.paciente.nombres,
-                                                     self.paciente.apellidos)
+                                                    self.paciente.nombres,
+                                                    self.paciente.apellidos)

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'tinymce',
     'address',
     'cie10_django',
+    'crispy_forms',
 
     # our apps
     'core',
@@ -197,6 +198,8 @@ CACHED_OSS_INFO_SISA_SECONDS = 60 * 60 * 24 * 30  # 30 dias de cache para info d
 
 SOURCE_OSS_SISA = 'SISA'
 SOURCE_OSS_SSSALUD = 'SSSalud'
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 try:
     from .local_settings import *

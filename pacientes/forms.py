@@ -5,6 +5,10 @@ from pacientes.models import Consulta, Paciente
 
 
 class ConsultaForm(forms.ModelForm):
+    paciente = forms.ModelChoiceField(
+        queryset=Paciente.objects.all(),
+        widget=autocomplete.ModelSelect2(url='paciente-autocomplete')
+    )
     codigo = forms.ModelChoiceField(
         queryset=CIE10.objects.all(),
         widget=autocomplete.ModelSelect2Multiple(url='cie10-autocomplete')

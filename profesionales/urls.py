@@ -30,7 +30,7 @@ urlpatterns = [
          ConsultaDetailView.as_view(),
          name='profesionales.consulta.detalle'
         ),
-    path(r'paciente/<int:dni>/nueva-consulta',
+    path(r'paciente/nueva-consulta',
          ConsultaCreateView.as_view(),
          name='profesionales.crear.consulta'
         )
