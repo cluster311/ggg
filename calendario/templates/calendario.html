@@ -6,8 +6,10 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.css" rel="stylesheet" />
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/css/bootstrap2/bootstrap-switch.min.css">
+
   <link href="https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.css" rel="stylesheet" />
-  
+
   <!-- DateTime Picker's assets -->
   {{ form.media }}
 
@@ -30,14 +32,18 @@
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.js'></script>
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/locales/es.js'></script>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
+
   <script src='https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.js'></script>
 
   <script type="text/javascript">
     'use strict';
+    let calendar;
+
     document.addEventListener('DOMContentLoaded', function() {
       const calendarEl = document.getElementById('calendar');
 
-      const calendar = new FullCalendar.Calendar(calendarEl, {
+      calendar = new FullCalendar.Calendar(calendarEl, {
         plugins: [ 'dayGrid', 'timeGrid' ],
         eventSources: [{
             url: '{% url "calendario.feed" %}',
@@ -64,47 +70,64 @@
 
   <script>
     'use strict';
+    $('#id_bulk').bootstrapSwitch();
+  </script>
+
+  <script>
+    'use strict';
     function customAppointmentFormSubmit() {
-      /* DONE:
-        - Iterate form fields, inserting them into an object and send object
-        as a request's POST data to url using add_appointment view.
-        - If errors in response, display them.
-      */
-      /* TODO:
-        - Load data into calendar.
-      */
       const formData = getFormData();
 
       axios({
         method: 'post',
-        url: "{% url 'add_appointment' %}",
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        url: "{% url 'add_appointments' %}",
+        headers: {'Content-Type': 'application/json'},
         data: formData
       })
         .then(response => {
           console.log(response);
           if (!response.data.success) {
-            const errorItems = getErrorItems(response.data.errors);
-
-            const errorsList = getOrCreateErrorsList();
-
-            errorsList.innerHTML = errorItems;
+            showErrors(response.data.errors);
+          } else {
+            calendar.refetchEvents();
+            dismissErrors();
+            $('#modalForm').modal('hide');
           }
         })
         .catch(error => {
-          console.log(error.response);
+          showErrors({Error: [error.toString().slice(7)]});
         });
     }
+
 
     function getFormData() {
       const appointmentForm = document.getElementById('appointmentForm');
 
       const formData = {};
       for (const field of appointmentForm) {
-        formData[field.name] = field.value;
+        if (field.type === 'checkbox') {
+          formData[field.name] = field.checked;
+        } else {
+          formData[field.name] = field.value;
+        }
       }
 
       return formData;
+    }
+
+
+    function showErrors(fields) {
+      const errorsList = getOrCreateErrorsList();
+      const errorItems = getErrorItems(fields);
+      errorsList.innerHTML = errorItems;
+      document.getElementById('modalForm').scroll(
+        {top: 0, behavior: 'smooth'}
+      );
+    }
+
+    function dismissErrors() {
+      const errorsList = document.getElementById('errorsList');
+      if (errorsList) errorsList.remove();
     }
 
     function getOrCreateErrorsList() {
@@ -151,6 +174,7 @@
       }
       return errorsUL;
     }
+
 
     function capitalize(text) {
       return text.charAt(0).toUpperCase() + text.slice(1);

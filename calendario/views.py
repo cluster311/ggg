@@ -21,14 +21,14 @@ def index(request):
 def add_appointment(request):
     form = TurnoForm(json.loads(request.body))
     if form.is_valid():
-        appointment = form.save()
+        appointments = form.save()
         response_data = {
             'success': True,
-            'appointment': {
-                'start_time': appointment.inicio,
-                'end_time': appointment.fin,
-                'state': appointment.estado
-            }
+            'appointments': [{
+                'start_time': a.inicio,
+                'end_time': a.fin,
+                'state': a.estado
+            } for a in appointments]
         }
     else:
         response_data = {'success': False, 'errors': form.errors}
