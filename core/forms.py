@@ -10,10 +10,20 @@ import phonenumbers
 CARACTERISTICA_TELEFONO_DEFAULT = settings.CARACTERISTICA_TELEFONO_DEFAULT
 
 USERNAME_PATTERNS = {
-    'twitter': re.compile(r'^((?:https?://(www\.)?twitter\.com/)|@)?(?P<username>\w{1,15})/?$'),
-    'instagram': re.compile(r'^((?:https?://(www\.)?instagram\.com/)|@)?(?P<username>\w{3,20})/?$'),
-    'facebook': re.compile(r'^(?:https?://(www\.)?facebook\.com/)?/?(?P<username>[\w\.]{3,50})/?(\?.*)?$'),
-    'youtube': re.compile(r'^(?:https?://(www\.)?youtube\.com/(user/)?)?(?P<username>\w{3,40})/?$')
+    'twitter': re.compile(
+        r'^((?:https?://(www\.)?twitter\.com/)|@)?(?P<username>\w{1,15})/?$'
+    ),
+    'instagram': re.compile(
+        r'^((?:https?://(www\.)?instagram\.com/)|@)?(?P<username>\w{3,20})/?$'
+    ),
+    'facebook': re.compile(
+        r'^(?:https?://(www\.)?facebook\.com/)?/?(?P<username>[\w\.]{3,50})'
+        r'/?(\?.*)?$'
+    ),
+    'youtube': re.compile(
+        r'^(?:https?://(www\.)?youtube\.com/(user/)?)?(?P<username>\w{3,40})'
+        r'/?$'
+    )
 }
 
 
@@ -53,7 +63,9 @@ class DatoDeContactoModelForm(forms.ModelForm):
         try:
             return re.match(USERNAME_PATTERNS[tipo], valor).group('username')
         except AttributeError:
-            self.add_error('valor', f'No es un nombre de usuario de {tipo} válido')
+            self.add_error(
+                'valor', f'No es un nombre de usuario de {tipo} válido'
+            )
 
     def clean_url(self, valor):
         validator = URLValidator()
@@ -78,9 +90,14 @@ class DatoDeContactoModelForm(forms.ModelForm):
         self.cleaned_data['valor'] = valor
 
 
-ContactoInlineFormset = generic_inlineformset_factory(DatoDeContacto, form=DatoDeContactoModelForm, can_delete=True)
+ContactoInlineFormset = generic_inlineformset_factory(
+    DatoDeContacto,
+    form=DatoDeContactoModelForm,
+    can_delete=True
+)
 
-MinimoContactoInlineFormset = generic_inlineformset_factory(DatoDeContacto,
+MinimoContactoInlineFormset = generic_inlineformset_factory(
+    DatoDeContacto,
     form=DatoDeContactoModelForm,
     extra=2, can_delete=False
 )

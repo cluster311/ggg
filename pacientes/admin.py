@@ -24,8 +24,10 @@ class ConsultaInLine(admin.StackedInline):
     model = Consulta
     extra = 1
 
+
 class HistoriaClinicaAdmin(admin.ModelAdmin):
     inlines = (ConsultaInLine, )
+
 
 class PacienteAdmin(admin.ModelAdmin):
     inlines = [
