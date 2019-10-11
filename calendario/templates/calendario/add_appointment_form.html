@@ -1,8 +1,39 @@
-<form
-  onsubmit="event.preventDefault(); customAppointmentFormSubmit();" 
-  id="appointmentForm"
->
+<form id="appointmentForm">
   {% csrf_token %}
-  {{ form.as_p }}
-  <input type="submit" name="submit" value="Agregar">
+  <div class="row">
+    <div class="col-12 col-md-5">
+      <p>{{ form.fields.inicio.label }}</p>
+      {{ form.inicio }}
+    </div>
+    <div class="col-12 col-md-5">
+      <p>{{ form.fields.fin.label }}</p>
+      {{ form.fin }}
+    </div>
+    <div class="col-12 col-md-2">
+      <p>{{ form.fields.bulk.label }}</p>
+      {{ form.bulk }}
+    </div>
+
+    <div class="col-12 col-md-5">
+      <p>{{ form.fields.servicio.label }}</p>
+      {{ form.servicio }}
+    </div>
+    <div class="col-12 col-md-5">
+      <p>{{ form.fields.profesional.label }}</p>
+      {{ form.profesional }}
+    </div>
+    <div class="col-12 col-md-2">
+      <p>{{ form.fields.duration.label }}</p>
+      {{ form.duration }}
+    </div>
+
+    <div class="col-12 col-md-6">
+      <p>{{ form.fields.estado.label }}</p>
+      {{ form.estado }}
+    </div>
+    <div class="col-12 col-md-6">
+      <p>{{ form.fields.paciente.label }}</p>
+      {{ form.paciente }}
+    </div>
+  </div>
 </form>

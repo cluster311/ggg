@@ -10,8 +10,17 @@ class FeedForm(forms.Form):
 
 
 class TurnoForm(forms.ModelForm):
-    bulk = forms.BooleanField(required=False)
-    duration = forms.IntegerField(initial=10)
+    bulk = forms.BooleanField(required=False, label='En masa')
+    duration = forms.IntegerField(initial=10, label='Duración')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.keys():
+            classes_to_ad = 'form-control'
+            if isinstance(self.fields[field].widget, forms.widgets.Select):
+                classes_to_ad += ' custom-select'
+
+            self.fields[field].widget.attrs.update({'class': classes_to_ad})
 
     def save(self, *args, **kwargs):
         if not self.cleaned_data['bulk']:

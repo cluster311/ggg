@@ -1,3 +1,16 @@
 .modal-open-btn {
     margin-left: 20px;
 }
+
+.modal p {
+    margin-bottom: 0px;
+    margin-top: 5px;
+}
+
+#modalForm .modal-footer, .action-buttons-container {
+    justify-content: space-between;
+}
+
+.action-buttons-container {
+    padding: 10px 15px;
+}

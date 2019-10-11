@@ -52,7 +52,7 @@
         header: {
           left: 'prev,next today',
           center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+          right: 'dayGridMonth,dayGridWeek,dayGridDay'
         },
         locale: 'es',
         weekMode: 'liquid',
@@ -85,17 +85,16 @@
         data: formData
       })
         .then(response => {
-          console.log(response);
           if (!response.data.success) {
-            showErrors(response.data.errors);
+            showFormErrors(response.data.errors);
           } else {
             calendar.refetchEvents();
-            dismissErrors();
+            dismissFormErrors();
             $('#modalForm').modal('hide');
           }
         })
         .catch(error => {
-          showErrors({Error: [error.toString().slice(7)]});
+          showFormErrors({Error: [error.toString().slice(7)]});
         });
     }
 
@@ -116,7 +115,7 @@
     }
 
 
-    function showErrors(fields) {
+    function showFormErrors(fields) {
       const errorsList = getOrCreateErrorsList();
       const errorItems = getErrorItems(fields);
       errorsList.innerHTML = errorItems;
@@ -125,7 +124,7 @@
       );
     }
 
-    function dismissErrors() {
+    function dismissFormErrors() {
       const errorsList = document.getElementById('errorsList');
       if (errorsList) errorsList.remove();
     }
@@ -180,10 +179,65 @@
       return text.charAt(0).toUpperCase() + text.slice(1);
     }
   </script>
+
+  <script>
+    'use strict';
+    function copyPreviousWeek() {
+      if (calendar.state.viewType.indexOf('Week') === -1) {
+        showCopyWeekErrors('Selecciona la vista semanal primero.');
+      }
+      axios({
+        method: 'get',
+        url: "{% url 'copy_appointments' %}",
+        params: {
+          start: calendar.state.dateProfile.currentRange.start,
+          end: calendar.state.dateProfile.currentRange.end
+        }
+      })
+        .then(response => {
+          if (response.data.appointments.length === 0) {
+            showCopyWeekErrors(
+              'No hay turnos cargados para la semana anterior.'
+            );
+          } else {
+            dismissCopyWeekErrors();
+            calendar.refetchEvents();
+          }
+        })
+        .catch(error => {
+          showCopyWeekErrors(error.toString());
+        });
+    }
+
+
+    function showCopyWeekErrors(errorText) {
+      const copyWeekErrors = getOrCreateCopyWeekErrors();
+      copyWeekErrors.innerHTML = errorText;
+    }
+
+    function getOrCreateCopyWeekErrors() {
+      let copyWeekErrors = document.getElementById('copyWeekErrors');
+      if (!copyWeekErrors) {
+        copyWeekErrors = document.createElement('div');
+        copyWeekErrors.setAttribute('id', 'copyWeekErrors');
+        copyWeekErrors.classList.add('errors', 'alert', 'alert-danger');
+        calendar.el.prepend(copyWeekErrors);
+      }
+      return copyWeekErrors;
+    }
+
+    function dismissCopyWeekErrors() {
+      const errorsDiv = document.getElementById('copyWeekErrors');
+      if (errorsDiv) errorsDiv.remove();
+    }
+  </script>
 {% endblock js_footer %}
 
 {% block content %}
-  {% include 'base_modal_button.html' with button_text=modal_title %}
+  <div class="row action-buttons-container">
+    {% include 'base_button.html' with button_text="Cargar semana anterior" attrs='class="btn btn-info" onclick="copyPreviousWeek();"'%}
+    {% include 'base_modal_button.html' with button_text=modal_title %}
+  </div>
   <div id='calendar'></div>
 {% endblock %}
 

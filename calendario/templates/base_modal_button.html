@@ -1,6 +1,6 @@
-<button
-  type="button" class="btn btn-info float-right modal-open-btn"
+{% extends 'base_button.html' %}
+
+{% block attrs %}
+  class="btn btn-info float-right modal-open-btn"
   data-toggle="modal" data-target="#modalForm"
->
-  {{ button_text }}
-</button>
+{% endblock %}
