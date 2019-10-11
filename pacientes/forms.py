@@ -7,11 +7,20 @@ from pacientes.models import Consulta, Paciente
 class ConsultaForm(forms.ModelForm):
     paciente = forms.ModelChoiceField(
         queryset=Paciente.objects.all(),
-        widget=autocomplete.ModelSelect2(url='paciente-autocomplete')
+        widget=autocomplete.ModelSelect2(url='paciente-autocomplete',
+                                         attrs={
+                                                'data-placeholder': 'Ingrese número de documento',
+                                                'data-minimum-input-length': 3,
+                                        },
+        )
     )
-    codigo = forms.ModelChoiceField(
+    codigo = forms.ModelMultipleChoiceField(
         queryset=CIE10.objects.all(),
-        widget=autocomplete.ModelSelect2Multiple(url='cie10-autocomplete')
+        widget=autocomplete.ModelSelect2Multiple(url='cie10-autocomplete',
+                                                 attrs={
+                                                        'data-placeholder': 'Ejemplo: A00',
+                                                },
+        )
     )
 
     class Meta:

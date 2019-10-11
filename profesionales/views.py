@@ -3,6 +3,8 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from django.db.models import Count
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.http import Http404
@@ -153,20 +155,17 @@ class ConsultaDetailView(PermissionRequiredMixin, DetailView):
         return context
 
 
-class ConsultaCreateView(PermissionRequiredMixin, CreateView):
+class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin, CreateView):
     """
     Crea un objeto Consulta
     """
-    model = Consulta
+    # model = Consulta
     permission_required = ('can_view_tablero', )
     template_name = 'profesionales/consulta_createview.html'
     form_class = ConsultaForm
+    success_message = "Datos guardados con éxito."
 
-    # def form_valid(self, form):
-    #     messages.success(self.request, 'form is valid')
-    #     form.instance.user = self.request.user
-    #     form.save()
-
-    # def get_success_url(self):
-    #     messages.success(self.request, 'Business Added Successfully')
-    #     return reverse('business:list')
+    def get_success_url(self):
+        # messages.success(self.request, 'Consulta guardada con éxito.')
+        return reverse('profesionales.consulta.lista',
+                        kwargs=({'dni': self.object.paciente.numero_documento}))
