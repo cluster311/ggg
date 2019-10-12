@@ -1,7 +1,11 @@
+import pytz
 from datetime import timedelta
 from django import forms
 from tempus_dominus.widgets import DateTimePicker
 from calendario.models import Turno
+
+
+LOCAL_TZ = pytz.timezone('America/Argentina/Buenos_Aires')
 
 
 class FeedForm(forms.Form):
@@ -12,6 +16,8 @@ class FeedForm(forms.Form):
 class TurnoForm(forms.ModelForm):
     bulk = forms.BooleanField(required=False, label='En masa')
     duration = forms.IntegerField(initial=10, label='Duración')
+    id = forms.IntegerField(required=False)
+    delete = forms.BooleanField(required=False, initial=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -22,9 +28,31 @@ class TurnoForm(forms.ModelForm):
 
             self.fields[field].widget.attrs.update({'class': classes_to_ad})
 
+    def clean(self, *args, **kwargs):
+        cleaned_data = super().clean(*args, **kwargs)
+        for field in ('inicio', 'fin'):
+            cleaned_data[field] = LOCAL_TZ.localize(
+                cleaned_data[field].replace(tzinfo=None)
+            )
+        return cleaned_data
+
     def save(self, *args, **kwargs):
+        if self.cleaned_data['id']:
+            appointment = Turno.objects.get(id=self.cleaned_data['id'])
+
+            if self.cleaned_data['delete']:
+                appointment.delete()
+                return ()
+
+            for field in (f for f in self.cleaned_data if f != 'id'):
+                setattr(appointment, field, self.cleaned_data[field])
+            appointment.save()
+            appointment = Turno.objects.get(pk=appointment.pk)
+            print(appointment.inicio, appointment.inicio.tzinfo)
+            return (appointment, )
+
         if not self.cleaned_data['bulk']:
-            return [super().save(*args, **kwargs)]
+            return (super().save(*args, **kwargs), )
 
         appointments = []
         current_time = self.cleaned_data['inicio']

@@ -61,7 +61,8 @@
         minTime: 8,
         maxTime: 20,
         editable: true,
-        themeSystem: 'bootstrap'
+        themeSystem: 'bootstrap',
+        eventClick: showModalEvent
       });
 
       calendar.render();
@@ -185,6 +186,7 @@
     function copyPreviousWeek() {
       if (calendar.state.viewType.indexOf('Week') === -1) {
         showCopyWeekErrors('Selecciona la vista semanal primero.');
+        return;
       }
       axios({
         method: 'get',
@@ -229,6 +231,99 @@
     function dismissCopyWeekErrors() {
       const errorsDiv = document.getElementById('copyWeekErrors');
       if (errorsDiv) errorsDiv.remove();
+    }
+  </script>
+
+  <script>
+    'use strict';
+    $('#modalForm').on('hidden.bs.modal', () => {
+      document.getElementById('appointmentId').value = null;
+      document.getElementById('deleteAppointment').value = null;
+      document.getElementById('closeModalButton').hidden = false;
+      getOrCreateDeleteButton().hidden = true;
+      document.getElementById('addAppointmentButton').innerHTML = 'Agregar';
+      document.getElementById('id_duration').disabled = false;
+      $('#id_bulk').bootstrapSwitch('disabled', false);
+    });
+  </script>
+
+  <script>
+    'use strict';
+    function showModalEvent(eventInfo) {
+      setModalFormValues(eventInfo.event);
+      setModalFormButtons();
+      $('#modalForm').modal();
+    }
+
+
+    function setModalFormValues(event) {
+      document.getElementById('id_inicio').value = formatDatetime(event.start);
+      document.getElementById('id_fin').value = formatDatetime(event.end);
+      document.getElementById('id_servicio').value = event.extendedProps.service;
+      document.getElementById(
+        'id_profesional'
+      ).value = event.extendedProps.professional;
+      document.getElementById('id_paciente').value = event.extendedProps.patient;
+      document.getElementById('id_estado').value = event.extendedProps.status;
+      document.getElementById('id_duration').disabled = true;
+      $('#id_bulk').bootstrapSwitch('disabled', true);
+      document.getElementById('appointmentId').value = event.id;
+    }
+
+
+    function setModalFormButtons() {
+      const addButton = document.getElementById('addAppointmentButton');
+      if (addButton.innerText === 'Editar') {
+        addButton.innerText = 'Agregar';
+      } else {
+        addButton.innerText = 'Editar';
+      }
+
+      const closeButton = document.getElementById('closeModalButton');
+      toggleElementAttribute(closeButton, 'hidden');
+
+      const deleteButton = getOrCreateDeleteButton();
+      toggleElementAttribute(deleteButton, 'hidden');
+    }
+
+    function getOrCreateDeleteButton() {
+      let deleteButton = document.getElementById('deleteAppointmentButton');
+
+      if (!deleteButton) {
+        deleteButton = document.createElement('button');
+        deleteButton.setAttribute('id', 'deleteAppointmentButton');
+        deleteButton.addEventListener('click', () => {
+          document.getElementById("deleteAppointment").value = true;
+          customAppointmentFormSubmit();
+        });
+        deleteButton.setAttribute('hidden', true);
+        deleteButton.classList.add('btn', 'btn-danger');
+        deleteButton.innerHTML = 'Eliminar';
+        const closeButton = document.getElementById('closeModalButton');
+        closeButton.parentNode.insertBefore(deleteButton, closeButton);
+      }
+
+      return deleteButton;
+    }
+
+
+    function formatDatetime(dateTime) {
+      const year = dateTime.getFullYear();
+      // If number has 2 digits, add leading zero but don't use it
+      const month = `0${dateTime.getMonth()+1}`.slice(-2);
+      const day = `0${dateTime.getDate()}`.slice(-2);
+      const hour = `0${dateTime.getHours()}`.slice(-2);
+      const minutes = `0${dateTime.getMinutes()}`.slice(-2);
+      const seconds = `0${dateTime.getSeconds()}`.slice(-2);
+      return `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`;
+    }
+
+    function toggleElementAttribute(el, attribute) {
+      if (el[attribute]) {
+        el[attribute] = false;
+      } else {
+        el[attribute] = true;
+      }
     }
   </script>
 {% endblock js_footer %}

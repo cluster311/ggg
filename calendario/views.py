@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from django import forms
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.utils.dateparse import parse_datetime
 import json
 from calendario.models import Turno
@@ -16,6 +16,7 @@ def index(request):
         'modal_size': 'modal-lg',
         'modal_buttons': (
             '<button type="button" class="btn btn-success" '
+            'id="addAppointmentButton" '
             'onclick="customAppointmentFormSubmit();">Agregar</button>'
         ),
         'form': TurnoForm()
@@ -92,14 +93,22 @@ def feed(request):
     turnos = [{
         'id': t.id,
         'title': str(t),
-        'start': t.inicio.isoformat(), 
+        'start': t.inicio.isoformat(),
         'end': t.fin.isoformat(),
+        'service': t.servicio.pk,
+        'status': t.estado,
+        'professional': t.profesional,
+        'patient': t.paciente
     } for t in turnos]
 
     return JsonResponse(turnos, safe=False)
 
 
 def get_appointments_list(**kwargs):
+    if 'id' in kwargs:
+        pk = kwargs['id'][0] if isinstance(kwargs['id'], list) else \
+             kwargs['id']
+        return [get_object_or_404(Turno, pk=pk)]
     kw = {}
     if 'start' in kwargs:
         start = kwargs['start'][0] if isinstance(kwargs['start'], list) else \
@@ -107,6 +116,6 @@ def get_appointments_list(**kwargs):
         kw['inicio__gte'] = parse_datetime(start)
     if 'end' in kwargs:
         end = kwargs['end'][0] if isinstance(kwargs['end'], list) else \
-                kwargs['end']
+              kwargs['end']
         kw['fin__lte'] = parse_datetime(end)
     return Turno.objects.filter(**kw)

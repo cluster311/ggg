@@ -16,7 +16,10 @@
 
       <div class="modal-footer">
         {{ modal_buttons|safe }}
-        <button type="button" class="btn btn-danger" data-dismiss="modal">
+        <button
+          type="button" class="btn btn-danger" data-dismiss="modal"
+          id="closeModalButton"
+        >
           {{ modal_close }}
         </button>
       </div>
