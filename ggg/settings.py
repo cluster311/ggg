@@ -35,19 +35,28 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.gis',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
+    'tinymce',
     'address',
+    'cie10_django',
+    
+    # our apps
     'core',
+    'obras_sociales',
+    'pacientes',
     'profesionales',
     'centros_de_salud',
     'django_extensions',
     'cie10_django',
     'nhpgd_django',  # nomenclador de hostpitales publicos de gestion descentralizada
-    'recupero',
-    
+    'calendario',
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -85,23 +94,6 @@ WSGI_APPLICATION = 'ggg.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
-""" SI SE CANSAN DE ESTA BASE pueden hacer esto en local_settings
-
-sudo su - postgres
-psql
-
-CREATE USER ggg_user WITH PASSWORD 'ggg_pass';
-ALTER ROLE ggg_user SUPERUSER;
-CREATE EXTENSION postgis;
-CREATE DATABASE ggg_db OWNER ggg_user;
-
-DATABASES = {
-    'default': {
          'ENGINE': 'django.contrib.gis.db.backends.postgis',
          'NAME': 'ggg_db',
          'USER': 'ggg_user',
@@ -109,7 +101,6 @@ DATABASES = {
          # 'HOST': 'localhost'  # SIN ESTA PORONGA, NO ANDA EN PROD
     },
 }
-"""
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -154,6 +145,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -193,6 +185,19 @@ LOGGING = {
         }
     }
 }
+
+# contacto settings
+CARACTERISTICA_TELEFONO_DEFAULT = '351'     # CORDOBA
+CARACTERISTICA_DEFAULT = '351'
+
+# para obtener datos oficiales de las obras sociales de las personas vía SISA
+# https://pypi.org/project/sisa/
+os.environ['USER_SISA'] = ''
+os.environ['PASS_SISA'] = ''
+CACHED_OSS_INFO_SISA_SECONDS = 60 * 60 * 24 * 30  # 30 dias de cache para info de las OSS de los pacientes
+
+SOURCE_OSS_SISA = 'SISA'
+SOURCE_OSS_SSSALUD = 'SSSalud'
 
 try:
     from .local_settings import *
