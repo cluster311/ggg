@@ -16,11 +16,13 @@ class TableroObraSocialPorPorvinciaView(PermissionRequiredMixin, TemplateView):
     permission_required = ('can_view_tablero', )
     template_name = 'profesionales/tableros.html'
     # https://bootstrapious.com/tutorial/sidebar/index5.html
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         oss = ObraSocial.objects.all()
-        por_provincia = oss.values('provincia').annotate(total=Count('provincia')).order_by('-total')
+        por_provincia = oss.values('provincia').annotate(
+            total=Count('provincia')
+        ).order_by('-total')
 
         cols = [
             {'id': 'provincia', 'label': 'Provincia', 'type': 'string'},
@@ -56,5 +58,5 @@ class TableroObraSocialPorPorvinciaView(PermissionRequiredMixin, TemplateView):
                 chart_1,
                 chart_2
             ]
-        
+
         return context

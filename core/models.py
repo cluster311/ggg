@@ -11,10 +11,10 @@ logger = logging.getLogger(__name__)
 
 class Persona(models.Model):
     VINCULO_TYPE = Choices(
-        ('Padre','Padre'),
-        ('Hijo/a','Hijo/a'),
-        ('Madre','Madre'),
-        ('Abuelo/a','Abuelo/a'),
+        ('Padre', 'Padre'),
+        ('Hijo/a', 'Hijo/a'),
+        ('Madre', 'Madre'),
+        ('Abuelo/a', 'Abuelo/a'),
         ('Primo/a', 'Primo/a'),
         ('Nuera/Yerno', 'Nuera/Yerno'),
         ('Nieto/a', 'Nieto/a'),
@@ -28,8 +28,8 @@ class Persona(models.Model):
         'argentina',
         'boliviana',
         'brasilera',
-        'chilena', 
-        'colombiana', 
+        'chilena',
+        'colombiana',
         'ecuatoriana',
         'paraguaya',
         'peruana',
@@ -40,15 +40,28 @@ class Persona(models.Model):
 
     nombres = models.CharField(max_length=50)
     apellidos = models.CharField(max_length=30)
-    sexo = models.CharField(max_length=20,
-                    choices=Choices('masculino', 'femenino', 'otro'),
-                    default='masculino')
+    sexo = models.CharField(
+        max_length=20,
+        choices=Choices('masculino', 'femenino', 'otro'),
+        default='masculino'
+    )
     fecha_nacimiento = models.DateField(null=True, blank=True)
-    tipo_documento = models.CharField(max_length=20, default='DNI',
-                        choices=Choices('DNI', 'LC', 'LE', 'PASAPORTE', 'OTRO'))
-    numero_documento = models.CharField(max_length=30, null=True, blank=True, help_text='Deje en blanco si está indocumentado')
-    nacionalidad = models.CharField(max_length=50, choices=NACIONALIDAD_CHOICES,
-                    default=NACIONALIDAD_CHOICES.argentina)
+    tipo_documento = models.CharField(
+        max_length=20,
+        default='DNI',
+        choices=Choices('DNI', 'LC', 'LE', 'PASAPORTE', 'OTRO')
+    )
+    numero_documento = models.CharField(
+        max_length=30,
+        null=True,
+        blank=True,
+        help_text='Deje en blanco si está indocumentado'
+    )
+    nacionalidad = models.CharField(
+        max_length=50,
+        choices=NACIONALIDAD_CHOICES,
+        default=NACIONALIDAD_CHOICES.argentina
+    )
 
     @property
     def edad(self):

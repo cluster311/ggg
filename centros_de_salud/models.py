@@ -27,7 +27,7 @@ class Especialidad(models.Model):
     nombre = models.CharField(max_length=290)
 
     def __str__(self):
-        return self.nombre     
+        return self.nombre
 
 
 class Servicio(models.Model):
@@ -39,5 +39,3 @@ class Servicio(models.Model):
 
     def __str__(self):
         return f'{self.especialidad} - {self.centro}'
-
-

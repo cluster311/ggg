@@ -1,7 +1,9 @@
 from django.db import models
 import logging
-logger = logging.getLogger(__name__)
 from oss_ar.oss import ObrasSocialesArgentinas
+
+
+logger = logging.getLogger(__name__)
 
 
 class ObraSocial(models.Model):
@@ -36,7 +38,10 @@ class ObraSocial(models.Model):
                 'web': oss['web'],
                 # telefonos y emails
                 }
-            o = ObraSocial.objects.get_or_create(codigo=rnos, defaults=defaults)
+            o = ObraSocial.objects.get_or_create(
+                codigo=rnos,
+                defaults=defaults
+            )
 
     class Meta:
         verbose_name = "Obra Social"
@@ -44,11 +49,20 @@ class ObraSocial(models.Model):
 
 
 class ObraSocialPaciente(models.Model):
-    paciente = models.ForeignKey('pacientes.Paciente', on_delete=models.CASCADE, related_name='m2m_obras_sociales')
-    obra_social = models.ForeignKey('ObraSocial', on_delete=models.CASCADE, related_name='pacientes')
-    # las llamadas al sistema SISA son limitadas y tienen costo
-    # es por esto que tenemos que considerar un cache para no repetir consultas
+    paciente = models.ForeignKey(
+        'pacientes.Paciente',
+        on_delete=models.CASCADE,
+        related_name='m2m_obras_sociales'
+    )
+    obra_social = models.ForeignKey(
+        'ObraSocial',
+        on_delete=models.CASCADE,
+        related_name='pacientes'
+    )
+    # las llamadas al sistema SISA son limitadas y tienen costo es por esto
+    # que tenemos que considerar un cache para no repetir consultas
 
     obra_social_updated = models.DateTimeField(null=True, blank=True)
-    # los datos pueden venir de SISA, de SSSalud y quizas en el futuro desde otros lugares
+    # los datos pueden venir de SISA, de SSSalud y quizas en el futuro desde
+    # otros lugares
     data_source = models.CharField(max_length=90)
