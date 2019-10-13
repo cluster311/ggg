@@ -293,8 +293,10 @@
         deleteButton = document.createElement('button');
         deleteButton.setAttribute('id', 'deleteAppointmentButton');
         deleteButton.addEventListener('click', () => {
-          document.getElementById("deleteAppointment").value = true;
-          customAppointmentFormSubmit();
+          if (confirm('¿Realmente quieres eliminar este evento?')) {
+            document.getElementById("deleteAppointment").value = true;
+            customAppointmentFormSubmit();
+          }
         });
         deleteButton.setAttribute('hidden', true);
         deleteButton.classList.add('btn', 'btn-danger');
