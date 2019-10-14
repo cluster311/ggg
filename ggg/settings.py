@@ -50,8 +50,6 @@ INSTALLED_APPS = [
     'pacientes',
     'profesionales',
     'centros_de_salud',
-    'django_extensions',
-    'cie10_django',
     'nhpgd_django',  # nomenclador de hostpitales publicos de gestion descentralizada
     'calendario',
 ]
