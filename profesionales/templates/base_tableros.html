@@ -43,8 +43,8 @@
       <ul class="list-unstyled components">
         <!--titulo agrupador sin link <p>Profesionales</p>-->
         <li class="active">
-          <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Profesionales</a>
-          <ul class="collapse list-unstyled" id="homeSubmenu">
+          <a href="#menu_profesionales" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Profesionales</a>
+          <ul class="collapse list-unstyled" id="menu_profesionales">
             <li>
               <a href="{% url 'profesionales.tablero.por_profesion' %}">Por profesion</a>
             </li>
@@ -57,8 +57,8 @@
         <!--titulo agrupador sin link <p>Atenciones</p> -->
         <li>
           <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
-          <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Obras sociales</a>
-          <ul class="collapse list-unstyled" id="pageSubmenu">
+          <a href="#menu_oss" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Obras sociales</a>
+          <ul class="collapse list-unstyled" id="menu_oss">
             <li>
               <a href="#">Por provincia</a>
             </li>
@@ -72,9 +72,9 @@
         <!--titulo agrupador sin link <p>Atenciones</p> -->
         <li>
           <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
-          <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Centros de
+          <a href="#menu_centros_de_salud" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Centros de
             salud</a>
-          <ul class="collapse list-unstyled" id="pageSubmenu">
+          <ul class="collapse list-unstyled" id="menu_centros_de_salud">
             <li>
               <a href="#">Por area programática</a>
             </li>
@@ -88,15 +88,11 @@
         <!--titulo agrupador sin link <p>Atenciones</p> -->
         <li>
           <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
-          <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Turnos</a>
-          <ul class="collapse list-unstyled" id="pageSubmenu">
+          <a href="#menu_turnos" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Turnos</a>
+          <ul class="collapse list-unstyled" id="menu_turnos">
             <li>
-              <a href="#">Por centro de salud</a>
+              <a href="{% url 'calendario.index' %}">Definir turnos</a>
             </li>
-            <li>
-              <a href="#">Por especialidad</a>
-            </li>
-
           </ul>
         </li>
       </ul>
