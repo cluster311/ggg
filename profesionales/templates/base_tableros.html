@@ -32,81 +32,80 @@
 </head>
 
 <body>
+    <div class="wrapper">
+        <!-- Sidebar Holder -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>Tableros</h3>
+            </div>
 
-  <div class="wrapper">
-    <!-- Sidebar Holder -->
-    <nav id="sidebar">
-      <div class="sidebar-header">
-        <h3>Tableros</h3>
-      </div>
+            <ul class="list-unstyled components">
+                <!--titulo agrupador sin link <p>Profesionales</p>-->
+                <li class="active">
+                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Profesionales</a>
+                    <ul class="collapse list-unstyled" id="homeSubmenu">
+                        <li>
+                            <a href="{% url 'profesionales.tablero.por_profesion' %}">Por profesion</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'profesionales.tablero.por_departamento' %}">Por departamento</a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!--titulo agrupador sin link <p>Atenciones</p> -->
+                <li>
+                    <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
+                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Obras sociales</a>
+                    <ul class="collapse list-unstyled" id="pageSubmenu">
+                        <li>
+                            <a href="{% url 'obras-sociales.tablero.por_provincia' %}">Por provincia</a>
+                        </li>
+                        <li>
+                            <a href="#">Por especialidad</a>
+                        </li>
+                        
+                    </ul>
+                </li>
 
-      <ul class="list-unstyled components">
-        <!--titulo agrupador sin link <p>Profesionales</p>-->
-        <li class="active">
-          <a href="#menu_profesionales" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Profesionales</a>
-          <ul class="collapse list-unstyled" id="menu_profesionales">
-            <li>
-              <a href="{% url 'profesionales.tablero.por_profesion' %}">Por profesion</a>
-            </li>
-            <li>
-              <a href="{% url 'profesionales.tablero.por_departamento' %}">Por departamento</a>
-            </li>
+                <!--titulo agrupador sin link <p>Atenciones</p> -->
+                <li>
+                    <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
+                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Centros de salud</a>
+                    <ul class="collapse list-unstyled" id="pageSubmenu">
+                        <li>
+                            <a href="#">Por area programática</a>
+                        </li>
+                        <li>
+                            <a href="#">Por especialidad</a>
+                        </li>
+                        
+                    </ul>
+                </li>
+
+                <!--titulo agrupador sin link <p>Atenciones</p> -->
+                 <li>
+                  <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
+                  <a href="#menu_turnos" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Turnos</a>
+                  <ul class="collapse list-unstyled" id="menu_turnos">
+                    <li>
+                      <a href="{% url 'calendario.index' %}">Definir turnos</a>
+                    </li>
+                  </ul>
+                </li>
+            </ul>
+          
+          <ul class="list-unstyled CTAs">
+            <li><a href="#" class="download">+ info</a></li>
+            <li><a href="#" class="download">OPS</a></li>
+            <li><a href="#" class="download">Municipalidad de Córdoba</a></li>
+            <!--<li><a href="#" class="article">Menu lindo 2</a></li>-->
           </ul>
-        </li>
+          </div>
+        </div>
+      </nav>
 
-        <!--titulo agrupador sin link <p>Atenciones</p> -->
-        <li>
-          <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
-          <a href="#menu_oss" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Obras sociales</a>
-          <ul class="collapse list-unstyled" id="menu_oss">
-            <li>
-              <a href="#">Por provincia</a>
-            </li>
-            <li>
-              <a href="#">Por especialidad</a>
-            </li>
-
-          </ul>
-        </li>
-
-        <!--titulo agrupador sin link <p>Atenciones</p> -->
-        <li>
-          <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
-          <a href="#menu_centros_de_salud" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Centros de
-            salud</a>
-          <ul class="collapse list-unstyled" id="menu_centros_de_salud">
-            <li>
-              <a href="#">Por area programática</a>
-            </li>
-            <li>
-              <a href="#">Por especialidad</a>
-            </li>
-
-          </ul>
-        </li>
-
-        <!--titulo agrupador sin link <p>Atenciones</p> -->
-        <li>
-          <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
-          <a href="#menu_turnos" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Turnos</a>
-          <ul class="collapse list-unstyled" id="menu_turnos">
-            <li>
-              <a href="{% url 'calendario.index' %}">Definir turnos</a>
-            </li>
-          </ul>
-        </li>
-      </ul>
-
-      <ul class="list-unstyled CTAs">
-        <li><a href="#" class="download">+ info</a></li>
-        <li><a href="#" class="download">OPS</a></li>
-        <li><a href="#" class="download">Municipalidad de Córdoba</a></li>
-        <!--<li><a href="#" class="article">Menu lindo 2</a></li>-->
-      </ul>
-    </nav>
-
-    <!-- Page Content Holder -->
-    <div id="content">
+      <div id="content">
 
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">

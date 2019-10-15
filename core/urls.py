@@ -1,7 +1,11 @@
-# from django.conf.urls import url, include
-# from .views import TableroObraSocialPorPorvinciaView
+from django.conf.urls import url
+from core.views import CIE10Autocomplete
 
 
-# urlpatterns = [
-#     url(r'^obra-social-por-provincia.html$', TableroObraSocialPorPorvinciaView.as_view(), name='obras-sociales.tablero.por_provincia'),
-#     ]
+urlpatterns = [
+    url(
+        r'^cie10-autocomplete/$',
+        CIE10Autocomplete.as_view(),
+        name='cie10-autocomplete',
+    ),
+]
