@@ -9,6 +9,7 @@ urlpatterns = [
     path('accounts/', admin.site.urls),
     url(r'^tinymce/', include('tinymce.urls')),
     path('', admin.site.urls),
+    url(r'^core/', include('core.urls')),
     url(r'^profesionales/', include('profesionales.urls')),
     url(r'^turnos/', include('calendario.urls')),
     url(r'^obras-sociales/', include('obras_sociales.urls')),
