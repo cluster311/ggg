@@ -32,4 +32,4 @@ class PacienteAutocomplete(autocomplete.Select2QuerySetView):
         if self.q:
             qs = qs.filter(numero_documento__istartswith=self.q)
 
-        return qs
+        return qs.order_by('apellidos', 'nombres')
