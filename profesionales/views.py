@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from django.db.models import Count
@@ -8,18 +8,12 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render, render_to_response
+from django.shortcuts import get_object_or_404, render, redirect
+from django.template import RequestContext
 from django.conf import settings
 from .models import Profesional
 from pacientes.models import Consulta
 from pacientes.forms import ConsultaForm
-
-
-def index (request):
-    """
-    Interfaz principal para un profesional
-    """
-    return render_to_response('index.html')
 
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
@@ -159,13 +153,26 @@ class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin, CreateVie
     """
     Crea un objeto Consulta
     """
-    # model = Consulta
     permission_required = ('can_view_tablero', )
     template_name = 'profesionales/consulta_createview.html'
     form_class = ConsultaForm
     success_message = "Datos guardados con éxito."
 
     def get_success_url(self):
-        # messages.success(self.request, 'Consulta guardada con éxito.')
+        return reverse('profesionales.consulta.lista',
+                        kwargs=({'dni': self.object.paciente.numero_documento}))
+
+
+class ConsultaUpdateView(PermissionRequiredMixin, UpdateView):
+    """
+    Actualiza un objeto Consulta
+    """
+    model = Consulta
+    form_class = ConsultaForm
+    permission_required = ('can_view_tablero')
+    template_name = 'profesionales/consulta_updateview.html'
+    success_message = 'Datos actualizados con éxito.'
+
+    def get_success_url(self):
         return reverse('profesionales.consulta.lista',
                         kwargs=({'dni': self.object.paciente.numero_documento}))

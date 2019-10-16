@@ -1,19 +1,16 @@
 from django.conf.urls import url, include
 from django.urls import path
-from .views import (index,
+from .views import (
                     TableroProfesionalesPorEspecialidadView,
                     TableroProfesionalesPorLocalidadView,
                     ConsultaListView,
                     ConsultaDetailView,
-                    ConsultaCreateView
+                    ConsultaCreateView,
+                    ConsultaUpdateView
                     )
 
 
 urlpatterns = [
-    path(r'main',
-         index,
-         name='profesionales.index'
-        ),
     url(r'^por-profesion.html$',
         TableroProfesionalesPorEspecialidadView.as_view(),
         name='profesionales.tablero.por_profesion'
@@ -33,5 +30,9 @@ urlpatterns = [
     path(r'paciente/nueva-consulta',
          ConsultaCreateView.as_view(),
          name='profesionales.crear.consulta'
+        ),
+    path(r'paciente/<int:dni>/actualizar-consulta/<int:pk>',
+         ConsultaUpdateView.as_view(),
+         name='profesionales.actualizar.consulta'
         )
 ]

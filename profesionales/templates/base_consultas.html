@@ -30,22 +30,12 @@
                 <h3>Consultas</h3>
             </div>
 
-            <ul class="list-unstyled components">
-    <!--titulo agrupador sin link <p>Profesionales</p>-->
-                <li class="active">
-                    <a href="{% url 'profesionales.crear.consulta' %}" aria-expanded="false" class="dropdown-toggle">Nueva Consulta</a>
-                </li>
-
-            </ul>
-
-
             {% block sidebar %}{% endblock %}
 
             <ul class="list-unstyled CTAs">
                 <li><a href="#" class="download">+ info</a></li>
                 <li><a href="#" class="download">OPS</a></li>
                 <li><a href="#" class="download">Municipalidad de Córdoba</a></li>
-                <!--<li><a href="#" class="article">Menu lindo 2</a></li>-->
             </ul>
         </nav>
 
@@ -61,8 +51,6 @@
     </div>
 
     {% block js_footer %}
-        
-    
     <!-- jQuery CDN - Slim version (=without AJAX) -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <!-- Popper.JS -->

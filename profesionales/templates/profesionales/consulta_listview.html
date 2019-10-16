@@ -8,23 +8,30 @@
 {% endblock %}
 
 {% block content %}
+    {% if messages %}
+        <div class="col-lg-3 color03">
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
     <h2>Listado de consultas</h2>
     {% for consulta in consultas %}
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
-
-    <!--             <button type="button" id="sidebarCollapse" class="navbar-btn">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button> -->
-    <!--             <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <i class="fas fa-align-justify"></i>
-                </button> -->
                 <button>
                     <li class="nav-link">
                         <a href="{% url 'profesionales.consulta.detalle' dni=consulta.paciente.numero_documento pk=consulta.id %}">
                             Ver detalle
+                        </a>
+                    </li>
+                </button>
+                <button>
+                    <li class="nav-link">
+                        <a href="{% url 'profesionales.actualizar.consulta' dni=consulta.paciente.numero_documento pk=consulta.id %}">
+                            Actualizar datos
                         </a>
                     </li>
                 </button>
