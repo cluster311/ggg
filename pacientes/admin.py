@@ -34,7 +34,6 @@ class ConsultaInLine(admin.StackedInline):
 class PacienteAdmin(admin.ModelAdmin):
     inlines = [
         ContactoAdminInline,
-        ConsultaInLine
     ]
 
 

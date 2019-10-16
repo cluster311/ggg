@@ -61,6 +61,25 @@ class Paciente(Persona):
         ('Esposo/a', 'Esposo/a'),
     )
 
+    GRUPO_CERO_MENOS = '0-'
+    GRUPO_CERO_MAS = '0+'
+    GRUPO_A_MENOS = 'A-'
+    GRUPO_A_MAS = 'A+'
+    GRUPO_B_MENOS = 'B-'
+    GRUPO_B_MAS = 'B+'
+    GRUPO_AB_MENOS = 'AB-'
+    GRUPO_AB_MAS = 'AB+'
+    grupos_sanguineos = (
+        (GRUPO_CERO_MENOS, '0-'),
+        (GRUPO_CERO_MAS, '0+'),
+        (GRUPO_A_MENOS, 'A-'),
+        (GRUPO_A_MAS, 'A+'),
+        (GRUPO_B_MENOS, 'B-'),
+        (GRUPO_B_MAS, 'B+'),
+        (GRUPO_AB_MENOS, 'AB-'),
+        (GRUPO_AB_MAS, 'AB+')
+        ) 
+
     carpeta_familiar = models.ForeignKey('CarpetaFamiliar', null=True,
                                          related_name='miembros',
                                          on_delete=models.SET_NULL)
@@ -71,10 +90,7 @@ class Paciente(Persona):
                                )
     es_jefe_familia = models.BooleanField(default=False)
     grupo_sanguineo = models.CharField(max_length=20, null=True,
-                                       choices=Choices('0-', '0+', 'A-', 'A+',
-                                                       'B-', 'B+', 'AB-',
-                                                       'AB+'
-                                                       )
+                                       choices=grupos_sanguineos
                                        )
     observaciones = models.TextField(blank=True, null=True)
     datos_de_contacto = GenericRelation('core.DatoDeContacto',
@@ -209,6 +225,5 @@ class Consulta(TimeStampedModel):
 
     def __str__(self):
         fecha = self.created.strftime('%d/%m/%Y')
-        return 'fecha: {} - Paciente: {} {}'.format(fecha,
-                                                    self.paciente.nombres,
-                                                    self.paciente.apellidos)
+        paciente = f'paciente: {self.paciente.nombres}, {self.paciente.apellido}'
+        return f'{self.id} - fecha: {fecha} - {paciente}'
