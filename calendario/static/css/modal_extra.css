@@ -14,3 +14,8 @@
 .action-buttons-container {
     padding: 10px 15px;
 }
+
+.select2-selection.select2-selection--single.form-control {
+    height: auto;
+    min-height: 35px;
+}

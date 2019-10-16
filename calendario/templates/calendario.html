@@ -267,6 +267,7 @@
       document.getElementById('id_estado').value = event.extendedProps.status;
       document.getElementById('id_duration').disabled = true;
       $('#id_bulk').bootstrapSwitch('disabled', true);
+      $('#id_bulk').bootstrapSwitch('state', false);
       document.getElementById('appointmentId').value = event.id;
     }
 

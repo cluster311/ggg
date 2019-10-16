@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, render
 from django.utils.dateparse import parse_datetime
 import json
 from calendario.models import Turno
-from calendario.forms import FeedForm, TurnoForm
+from calendario.forms import BulkTurnoForm, FeedForm, TurnoForm
 
 
 def index(request):
@@ -25,9 +25,26 @@ def index(request):
 
 
 def add_appointment(request):
-    form = TurnoForm(json.loads(request.body))
-    if form.is_valid():
+    form_data = json.loads(request.body)
+    print(form_data)
+    if form_data['bulk']:
+        form = BulkTurnoForm(form_data)
+    elif form_data['id']:
+        instance = Turno.objects.get(pk=form_data['id'])
+        if form_data['delete']:
+            instance.delete()
+            form = None
+        else:
+            form = TurnoForm(form_data, instance=instance)
+    else:
+        form = TurnoForm(form_data)
+
+    if form is None:
+        response_data = {'success': True, 'appointments': []}
+    elif form.is_valid():
         appointments = form.save()
+        if not isinstance(appointments, list):
+            appointments = [appointments]
         response_data = {
             'success': True,
             'appointments': [{
@@ -39,6 +56,7 @@ def add_appointment(request):
         }
     else:
         response_data = {'success': False, 'errors': form.errors}
+
     return JsonResponse(response_data)
 
 
