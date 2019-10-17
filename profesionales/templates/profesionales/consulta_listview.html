@@ -38,10 +38,12 @@
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="nav navbar-nav ml-auto">
-    <!--                     <li class="nav-item">
-                            <a class="nav-link" href="#">Historia clínica</a>
-                        </li>-->
-                        <li class="nav-item">{{ consulta }}</li>
+                        <li class="nav-item">
+                            {{consulta.created}}
+                            {% if consulta.profesional %}
+                                {{ consulta.profesional }}
+                            {% endif %}
+                        </li>
                     </ul>
                 </div>
             </div>

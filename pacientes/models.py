@@ -214,6 +214,13 @@ class Consulta(TimeStampedModel):
         on_delete=models.CASCADE,
         default="",
     )
+    profesional = models.ForeignKey(
+        "profesionales.Profesional",
+        related_name="historial_clinico",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     diagnostico = models.TextField()
     indicaciones = models.TextField(null=True, blank=True)
     # podria ser un manytomany a un modelo de medicamentos
@@ -224,5 +231,5 @@ class Consulta(TimeStampedModel):
 
     def __str__(self):
         fecha = self.created.strftime("%d/%m/%Y")
-        paciente = f"paciente: {self.paciente.nombres}, {self.paciente.apellido}"
+        paciente = f"paciente: {self.paciente.nombres}, {self.paciente.apellidos}"
         return f"{self.id} - fecha: {fecha} - {paciente}"

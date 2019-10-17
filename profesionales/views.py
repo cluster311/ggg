@@ -14,6 +14,7 @@ from django.conf import settings
 from .models import Profesional
 from pacientes.models import Consulta
 from pacientes.forms import ConsultaForm
+from crispy_forms.utils import render_crispy_form
 
 
 @method_decorator(cache_page(60 * 5), name="dispatch")
@@ -145,7 +146,13 @@ class ConsultaDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["fecha"] = self.object.modified.strftime("%d/%m/%Y")
+
+        context["codigos"] = self.object.codigo.all()
+        context["derivaciones"] = self.object.derivaciones.values_list(
+            "nombre", flat=True
+        )
+        context["fecha"] = self.object.created.strftime("%d/%m/%Y")
+
         return context
 
 

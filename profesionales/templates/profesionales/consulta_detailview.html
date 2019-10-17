@@ -1,20 +1,64 @@
 {% extends "base_consultas.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
 
 {% block extra_head %}
 {% endblock %}
 
 {% block content %}
-    <h2>Detalle</h2>
-    Paciente: {{object.paciente.nombres}} {{object.paciente.apellidos}}<br>
-    Número de documento: {{object.paciente.numero_documento}}<br>
-    Fecha: {{fecha}}<br>
-    Diagnóstico: {{object.diagnostico}}<br>
-    Indicaciones: {{oject.indicaciones}}<br>
-    Receta: {{object.receta}}<br>
-    Practicas: {{object.practicas}}<br>
-<!--     derivaciones = models.ManyToManyField('centros_de_salud.Especialidad',
-                                          blank=True)
-    codigo = models.ManyToManyField(CIE10, blank=True)
- -->    <div class="line"></div>
-    <a class="btn btn-primary" href="{% url 'profesionales.consulta.lista' dni=object.paciente.numero_documento %}" role="button">LISTADO</a>
+    <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                    <div class="modal-header">
+                            <h3>Detalle</h3>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                          <div class="col-lg-4">
+                            <label>PACIENTE:</label>
+                            <p>{{object.paciente.nombres}} {{object.paciente.apellidos}}</p>
+                            <label>NÚMERO DE DOCUMENTO:</label>
+                            <p>{{object.paciente.numero_documento}}</p>
+                            <label>FECHA:</label>
+                            <p>{{fecha}}</p>
+                            <label>ATENDIDO POR DR:</label>
+                            <p>{{object.profesional}}</p>
+                            {% if object.diagnostico %}
+                                <label>DIÁGNOSTICO:</label>
+                                <p>{{object.diagnostico}}</p>
+                            {% endif %}
+                            {% if object.indicaciones %}
+                                <label>INDICACIONES:</label>
+                                <p>{{object.indicaciones}}</p>
+                            {% endif %}
+                            {% if object.receta %}
+                                <label>RECETA:</label>
+                                <p>{{object.receta}}</p>
+                            {% endif %}
+                            {% if object.practicas %}
+                                <label>PRACTICAS:</label>
+                                <p>{{object.practicas}}</p>
+                            {% endif %}
+                            <!-- derivaciones puede ser null -->
+                            {% if derivaciones.count > 0 %}
+                                <label>DERIVACIONES:</label>
+                                {% for derivacion in derivaciones %}
+                                    <p>{{derivacion}}</p>
+                                {% endfor %}
+                            {% endif %}
+                            <label>CÓDIGO:</label>
+                            {% for codigo in codigos%}
+                                <p>{{codigo.code}} - {{codigo.description}}</p>
+                            {% endfor %}
+                          </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                            <div class="col-lg-12 text-right">
+                                <a class="btn btn-primary" href="{% url 'profesionales.consulta.lista' dni=object.paciente.numero_documento %}" role="button">VOLVER AL LISTADO</a>
+                            </div>
+                    </div>
+            </div>
+    </div>
+    <div class="line"></div>
+
 {% endblock %}
