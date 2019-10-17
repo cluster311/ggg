@@ -2,11 +2,12 @@ import pytz
 from dal import autocomplete
 from datetime import timedelta
 from django import forms
+from django.conf import settings
 from tempus_dominus.widgets import DateTimePicker
 from calendario.models import Turno
 
 
-LOCAL_TZ = pytz.timezone('America/Argentina/Buenos_Aires')
+LOCAL_TZ = pytz.timezone(settings.TIME_ZONE)
 
 
 class FeedForm(forms.Form):
