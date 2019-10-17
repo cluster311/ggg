@@ -1,8 +1,7 @@
 from django.db import models
 from core.models import Persona
 from address.models import AddressField
-from django.contrib.contenttypes.fields import (GenericForeignKey,
-    GenericRelation)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 
 
@@ -10,21 +9,21 @@ class Profesional(Persona):
     matricula_profesional = models.CharField(max_length=20, null=True, blank=True)
     profesion = models.CharField(max_length=190, null=True, blank=True)
     direccion = AddressField(null=True, on_delete=models.SET_NULL)
-    datos_de_contacto = GenericRelation('core.DatoDeContacto',
-                        related_query_name='pacientes',
-                        null=True,
-                        blank=True
-                        )
+    datos_de_contacto = GenericRelation(
+        "core.DatoDeContacto", related_query_name="pacientes", null=True, blank=True
+    )
     # TODO: importar datos desde el sistema municipal
 
     def __str__(self):
-        apellidos = '' if self.apellidos is None else self.apellidos
-        return f'{self.nombres, apellidos}'
+        apellidos = "" if self.apellidos is None else self.apellidos
+        return f"{self.nombres, apellidos}"
 
     def agregar_dato_de_contacto(self, tipo, valor):
         type_ = ContentType.objects.get_for_model(self)
         try:
-            DatoDeContacto.objects.get(content_type__pk=type_.id, object_id=self.id, tipo=tipo, valor=valor)
+            DatoDeContacto.objects.get(
+                content_type__pk=type_.id, object_id=self.id, tipo=tipo, valor=valor
+            )
         except DatoDeContacto.DoesNotExist:
             DatoDeContacto.objects.create(content_object=self, tipo=tipo, valor=valor)
 
@@ -42,11 +41,11 @@ class Profesional(Persona):
             DEPARTAMENTO: COLON	
             VOTA: S
         """
-        self.nombres = row['NOMBRE'].strip()
-        self.matricula_profesional = str(row['AFILIADO'])
-        self.profesion = row['PROFESION'].strip()
-        self.numero_documento = str(row['DOCUMENTO'])
-        tel = row.get('TELEFONO', '')
+        self.nombres = row["NOMBRE"].strip()
+        self.matricula_profesional = str(row["AFILIADO"])
+        self.profesion = row["PROFESION"].strip()
+        self.numero_documento = str(row["DOCUMENTO"])
+        tel = row.get("TELEFONO", "")
         tel = str(tel) if type(tel) == int else tel.strip()
         # self.localidad = row.get('LOCALIDAD', '').strip()
         # self.departamento = row.get('DEPARTAMENTO', '').strip()
@@ -56,13 +55,13 @@ class Profesional(Persona):
         #                                              self.departamento
         #                                              )
         # self.domicilio = domicilio
-        self.datos_de_contacto = self.agregar_dato_de_contacto(self,
-                                        'teléfono',
-                                        tel
-                                        )
+        self.datos_de_contacto = self.agregar_dato_de_contacto(self, "teléfono", tel)
 
     class Meta:
         permissions = [
-            ('can_view_tablero', 'Puede ver los tableros de comandos sobre profesionales'),
-            ]
-        verbose_name_plural = 'Profesionales'
+            (
+                "can_view_tablero",
+                "Puede ver los tableros de comandos sobre profesionales",
+            )
+        ]
+        verbose_name_plural = "Profesionales"

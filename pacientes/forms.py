@@ -9,25 +9,24 @@ from crispy_forms.layout import Submit
 class ConsultaForm(forms.ModelForm):
     paciente = forms.ModelChoiceField(
         queryset=Paciente.objects.all(),
-        widget=autocomplete.ModelSelect2(url='paciente-autocomplete',
-                                         attrs={
-                                                'data-placeholder': 'Ingrese número de documento',
-                                                'data-minimum-input-length': 3,
-                                        },
-        )
+        widget=autocomplete.ModelSelect2(
+            url="paciente-autocomplete",
+            attrs={
+                "data-placeholder": "Ingrese número de documento",
+                "data-minimum-input-length": 3,
+            },
+        ),
     )
     codigo = forms.ModelMultipleChoiceField(
         queryset=CIE10.objects.all(),
-        widget=autocomplete.ModelSelect2Multiple(url='cie10-autocomplete',
-                                                 attrs={
-                                                        'data-placeholder': 'Ejemplo: A00',
-                                                },
-        )
+        widget=autocomplete.ModelSelect2Multiple(
+            url="cie10-autocomplete", attrs={"data-placeholder": "Ejemplo: A00"}
+        ),
     )
 
     class Meta:
         model = Consulta
-        fields = ('__all__')
+        fields = "__all__"
 
     def __init__(self, *args, **kwargs):
         """
@@ -35,21 +34,22 @@ class ConsultaForm(forms.ModelForm):
         """
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.add_input(Submit('submit', 'Actualizar'))
+        self.helper.form_method = "post"
+        self.helper.add_input(Submit("submit", "Actualizar"))
 
 
 class PacienteForm(forms.ModelForm):
     numero_documento = forms.ModelChoiceField(
         queryset=Paciente.objects.all(),
-        widget=autocomplete.ModelSelect2(url='paciente-autocomplete',
-                                         attrs={
-                                                'data-placeholder': 'Ingrese número de documento',
-                                                'data-minimum-input-length': 3,
-                                        },
-        )
+        widget=autocomplete.ModelSelect2(
+            url="paciente-autocomplete",
+            attrs={
+                "data-placeholder": "Ingrese número de documento",
+                "data-minimum-input-length": 3,
+            },
+        ),
     )
 
     class Meta:
         model = Paciente
-        fields = ('numero_documento', )
+        fields = ("numero_documento",)
