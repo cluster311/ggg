@@ -91,7 +91,7 @@ class Command(BaseCommand):
                 dnis.append(dni)
                 matriculas.append(matricula)
 
-                p, created = Profesional.objects.get_or_create(dni=dni)
+                p, created = Profesional.objects.get_or_create(numero_documento=dni)
                 p.importar_matriculado(row=row)
                 p.save()
 
