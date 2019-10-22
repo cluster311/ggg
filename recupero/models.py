@@ -17,7 +17,7 @@ class Factura(models.Model):
                     'diagnostico_ingreso_cie10': {'principal': 'W020', 'otros': ['w021', 'A189']}}
         """
     fecha = models.DateField(default=timezone.now)
-    obra_social = models.ForeignKey('core.ObraSocial', on_delete=models.CASCADE, related_name='facturas')
+    obra_social = models.ForeignKey('obras_sociales.ObraSocial', on_delete=models.CASCADE, related_name='facturas')
     centro_de_salud = models.ForeignKey('centros_de_salud.CentroDeSalud',
                                         on_delete=models.CASCADE, related_name='facturas')
     profesional = models.ForeignKey('profesionales.Profesional', null=True, blank=True,
@@ -29,6 +29,42 @@ class Factura(models.Model):
                                              null=True, blank=True,
                                              related_name='facturas')
     cies_extras = models.ManyToManyField(CIE10, blank=True, related_name='extras_facturas')
+
+    def __str__(self):
+        return f'Factura {self.id}'
+
+
+class TipoDocumentoAnexo(models.Model):
+    """ Cada uno de los documentos que se pueden adjuntar a una prestacion """
+    nombre = models.CharField(max_length=30, help_text='Tipo de documento')
+
+    """
+    Posibles valores usados en Córdoba/Argentina
+    (definir un espacio desde donde crearlos cuando el usuario sea de esta zona)
+    Parece algo dinamíco y cambiante segun regulaciones, mejor es que esto no sea fijo por ahora
+
+     - comprobante_de_cobertura: Documento comprobante de que el paciente tiene cobertura social vigente
+     - solicitud_medica: solicitud del médico para esta prestación
+     - informe_de_resultados: resultados del estudio
+     - denuncia_internacion: Documento que notifica que se comienza una internacion
+     - odontograma: Documento específico de tratamientos dentales
+     - formulario_de_atencion: formulario de atención con diagnóstico y firma del médico que traslada y el que recibe
+     - registro_de_sesiones: registro de sesiones diarias con firma del paciente
+    """
+
+    def __str__(self):
+        return self.nombre
+
+
+class DocumentoAnexo(models.Model):
+    """ Cada uno de los documentos que se pueden adjuntar a una prestacion """
+    tipo = models.ForeignKey(TipoDocumentoAnexo, on_delete=models.CASCADE)
+
+    # TODO definir un destino seguro y privado!
+    documento_adjunto = models.FileField(upload_to='documentos_anexos')
+
+    def __str__(self):
+        return f'DOC {self.tipo} {self.id}'
 
 
 class TipoPrestacion(models.Model):
@@ -51,15 +87,9 @@ class TipoPrestacion(models.Model):
     tipo = models.PositiveIntegerField(choices=tipos, default=TIPO_CONSULTA)
 
     # DOCUMENTOS que deben generarse segun la atencion
-    requiere_anexo_ii = models.BooleanField(default=True, help_text='Requiere Anexo II')
-    requiere_comprobante_de_cobertura = models.BooleanField(default=True, help_text='Requiere anexar documento de comprobante a pertura')
-    requiere_solicitud_medica = models.BooleanField(default=False, help_text='Requiere original o copia de la solicitud del médico')
-    requiere_informe_de_resultados = models.BooleanField(default=False, help_text='Requiere Informe de resultados del estudio')
-    requiere_denuncia_internacion = models.BooleanField(default=False, help_text='Requiere Anexo A: Denuncia de internación')
-    requiere_odontograma = models.BooleanField(default=False, help_text='Requiere Odontograma')
-    requiere_formulario_de_atencion = models.BooleanField(default=False, help_text='Requiere formulario de atención con diagnóstico y firma del médico que traslada y el que recibe.')
-    requiere_registro_de_sesiones = models.BooleanField(default=False, help_text='Requiere registro de sesiones diarias con firma del paciente')
-
+    documentos_requeridos = models.ManyToManyField(TipoDocumentoAnexo, blank=True, related_name='requerido_en_tipos')
+    documentos_sugeridos = models.ManyToManyField(TipoDocumentoAnexo, blank=True, related_name='sugerido_en_tipos')
+    
     def __str__(self):
         return self.nombre
 
@@ -77,3 +107,4 @@ class Prestacion(models.Model):
                                     related_name='prestaciones',
                                     help_text='Servicio realizado o entregado')
     
+    documentos_adjuntados = models.ManyToManyField(DocumentoAnexo, blank=True)
