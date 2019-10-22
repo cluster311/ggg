@@ -5,30 +5,29 @@ from model_utils import Choices
 from model_utils.models import TimeStampedModel
 from address.models import AddressField
 from cie10_django.models import CIE10
-from django.contrib.contenttypes.fields import (GenericForeignKey,
-                                                GenericRelation)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 import logging
+
 logger = logging.getLogger(__name__)
 
 
 class CarpetaFamiliar(models.Model):
     OPCIONES_TIPO_FAMILIA = Choices(
-        ('nuclear', 'Nuclear'),
-        ('nuclear_ampliada', 'Nuclear Ampliada'),
-        ('binuclear', 'Binuclear'),
-        ('monoparental', 'Monoparental'),
-        ('extensa', 'Extensa'),
-        ('unipersonal', 'Unipersonal'),
-        ('equivalentes', 'Equivalentes Familiares')
+        ("nuclear", "Nuclear"),
+        ("nuclear_ampliada", "Nuclear Ampliada"),
+        ("binuclear", "Binuclear"),
+        ("monoparental", "Monoparental"),
+        ("extensa", "Extensa"),
+        ("unipersonal", "Unipersonal"),
+        ("equivalentes", "Equivalentes Familiares"),
     )
     direccion = AddressField(null=True, on_delete=models.SET_NULL)
-    tipo_familia = models.CharField(max_length=50,
-                                    choices=OPCIONES_TIPO_FAMILIA)
+    tipo_familia = models.CharField(max_length=50, choices=OPCIONES_TIPO_FAMILIA)
     apellido_principal = models.CharField(max_length=100)
 
     def __str__(self):
-        return 'Familia {0.apellido_principal} ({0.direccion})'.format(self)
+        return "Familia {0.apellido_principal} ({0.direccion})".format(self)
 
     @property
     def jefe_familia(self):
@@ -46,58 +45,58 @@ class Paciente(Persona):
     """
     Datos de una persona en particular
     """
+
     VINCULO_TYPE = Choices(
-        ('Padre', 'Padre'),
-        ('Hijo/a', 'Hijo/a'),
-        ('Madre', 'Madre'),
-        ('Abuelo/a', 'Abuelo/a'),
-        ('Primo/a', 'Primo/a'),
-        ('Nuera/Yerno', 'Nuera/Yerno'),
-        ('Nieto/a', 'Nieto/a'),
-        ('Cuñado/a', 'Cuñado/a'),
-        ('Concuñado/a', 'Concuñado/a'),
-        ('Tio/a', 'Tio/a'),
-        ('Sobrino/a', 'Sobrino/a'),
-        ('Esposo/a', 'Esposo/a'),
+        ("Padre", "Padre"),
+        ("Hijo/a", "Hijo/a"),
+        ("Madre", "Madre"),
+        ("Abuelo/a", "Abuelo/a"),
+        ("Primo/a", "Primo/a"),
+        ("Nuera/Yerno", "Nuera/Yerno"),
+        ("Nieto/a", "Nieto/a"),
+        ("Cuñado/a", "Cuñado/a"),
+        ("Concuñado/a", "Concuñado/a"),
+        ("Tio/a", "Tio/a"),
+        ("Sobrino/a", "Sobrino/a"),
+        ("Esposo/a", "Esposo/a"),
     )
 
-    GRUPO_CERO_MENOS = '0-'
-    GRUPO_CERO_MAS = '0+'
-    GRUPO_A_MENOS = 'A-'
-    GRUPO_A_MAS = 'A+'
-    GRUPO_B_MENOS = 'B-'
-    GRUPO_B_MAS = 'B+'
-    GRUPO_AB_MENOS = 'AB-'
-    GRUPO_AB_MAS = 'AB+'
+    GRUPO_CERO_MENOS = "0-"
+    GRUPO_CERO_MAS = "0+"
+    GRUPO_A_MENOS = "A-"
+    GRUPO_A_MAS = "A+"
+    GRUPO_B_MENOS = "B-"
+    GRUPO_B_MAS = "B+"
+    GRUPO_AB_MENOS = "AB-"
+    GRUPO_AB_MAS = "AB+"
     grupos_sanguineos = (
-        (GRUPO_CERO_MENOS, '0-'),
-        (GRUPO_CERO_MAS, '0+'),
-        (GRUPO_A_MENOS, 'A-'),
-        (GRUPO_A_MAS, 'A+'),
-        (GRUPO_B_MENOS, 'B-'),
-        (GRUPO_B_MAS, 'B+'),
-        (GRUPO_AB_MENOS, 'AB-'),
-        (GRUPO_AB_MAS, 'AB+')
-        ) 
+        (GRUPO_CERO_MENOS, "0-"),
+        (GRUPO_CERO_MAS, "0+"),
+        (GRUPO_A_MENOS, "A-"),
+        (GRUPO_A_MAS, "A+"),
+        (GRUPO_B_MENOS, "B-"),
+        (GRUPO_B_MAS, "B+"),
+        (GRUPO_AB_MENOS, "AB-"),
+        (GRUPO_AB_MAS, "AB+"),
+    )
 
-    carpeta_familiar = models.ForeignKey('CarpetaFamiliar', null=True,
-                                         related_name='miembros',
-                                         on_delete=models.SET_NULL)
-    vinculo = models.CharField(max_length=50, null=True, choices=VINCULO_TYPE,
-                               help_text=('Relación parental relativa a jefe'
-                                          ' de familia'
-                                          )
-                               )
+    carpeta_familiar = models.ForeignKey(
+        "CarpetaFamiliar", null=True, related_name="miembros", on_delete=models.SET_NULL
+    )
+    vinculo = models.CharField(
+        max_length=50,
+        null=True,
+        choices=VINCULO_TYPE,
+        help_text=("Relación parental relativa a jefe" " de familia"),
+    )
     es_jefe_familia = models.BooleanField(default=False)
-    grupo_sanguineo = models.CharField(max_length=20, null=True,
-                                       choices=grupos_sanguineos
-                                       )
+    grupo_sanguineo = models.CharField(
+        max_length=20, null=True, choices=grupos_sanguineos
+    )
     observaciones = models.TextField(blank=True, null=True)
-    datos_de_contacto = GenericRelation('core.DatoDeContacto',
-                                        related_query_name='pacientes',
-                                        null=True,
-                                        blank=True
-                                        )
+    datos_de_contacto = GenericRelation(
+        "core.DatoDeContacto", related_query_name="pacientes", null=True, blank=True
+    )
 
     @property
     def edad(self):
@@ -106,23 +105,18 @@ class Paciente(Persona):
     def agregar_dato_de_contacto(self, tipo, valor):
         type_ = ContentType.objects.get_for_model(self)
         try:
-            DatoDeContacto.objects.get(content_type__pk=type_.id,
-                                       object_id=self.id,
-                                       tipo=tipo,
-                                       valor=valor
-                                       )
+            DatoDeContacto.objects.get(
+                content_type__pk=type_.id, object_id=self.id, tipo=tipo, valor=valor
+            )
         except DatoDeContacto.DoesNotExist:
-            DatoDeContacto.objects.create(content_object=self,
-                                          tipo=tipo,
-                                          valor=valor
-                                          )
+            DatoDeContacto.objects.create(content_object=self, tipo=tipo, valor=valor)
 
     class Meta:
         verbose_name = "Paciente"
         verbose_name_plural = "Pacientes"
 
     def __str__(self):
-        return f'{self.apellido}, {self.nombres}'
+        return f"{self.apellidos}, {self.nombres}"
 
     def get_obras_sociales_from_sisa(self, force_update=False):
         """ Obtener la obra social de este paciente segun SISA
@@ -130,9 +124,9 @@ class Paciente(Persona):
              - primero si encontro o no los datos
              - segundo el error si es que hubo uno
             """
-        oss_paciente = self.m2m_obras_sociales.filter(data_source=settings.
-                                                      SOURCE_OSS_SISA
-                                                      )
+        oss_paciente = self.m2m_obras_sociales.filter(
+            data_source=settings.SOURCE_OSS_SISA
+        )
         last_updated = None
         for os in oss_paciente:
             if os.obra_social_updated is not None:
@@ -148,24 +142,25 @@ class Paciente(Persona):
             diff = now() - last_updated
             seconds_diff = diff.days * 86400 + diff.seconds
             if seconds_diff < settings.CACHED_OSS_INFO_SISA_SECONDS:
-                return True, f'Cache valido aún {seconds_diff}'
+                return True, f"Cache valido aún {seconds_diff}"
 
-        logger.info('Consultando PUCO')
+        logger.info("Consultando PUCO")
         puco = Puco(dni=self.numero_documento)
         resp = puco.get_info_ciudadano()
-        if not resp['ok']:
-            error = f'Error de sistema: {puco.last_error}'
+        if not resp["ok"]:
+            error = f"Error de sistema: {puco.last_error}"
             logger.info(error)
             return False, error
 
-        if not resp['persona_encontrada']:
-            logger.info('Persona no encontrada')
-            return False, f'Persona no encontrada: {puco.last_error}'
+        if not resp["persona_encontrada"]:
+            logger.info("Persona no encontrada")
+            return False, f"Persona no encontrada: {puco.last_error}"
 
-        logger.info('Persona encontrada')
-        value_default = {'nombre': puco.cobertura_social}
-        oss, created = ObraSocial.objects.get_or_create(codigo=puco.rnos,
-                                                        defaults=value_default)
+        logger.info("Persona encontrada")
+        value_default = {"nombre": puco.cobertura_social}
+        oss, created = ObraSocial.objects.get_or_create(
+            codigo=puco.rnos, defaults=value_default
+        )
 
         found = False
         for os in oss_paciente:
@@ -178,11 +173,11 @@ class Paciente(Persona):
             # para tableros de control y estadísticas este dato puede ser
             # valioso de grabar
             new_oss = ObraSocialPaciente.objects.create(
-                                            data_source=settings.
-                                            SOURCE_OSS_SISA,
-                                            paciente=self,
-                                            obra_social_updated=now(),
-                                            obra_social=oss)
+                data_source=settings.SOURCE_OSS_SISA,
+                paciente=self,
+                obra_social_updated=now(),
+                obra_social=oss,
+            )
 
         return True, None
         # tengo aqui algunos datos que podría usar para verificar
@@ -212,17 +207,29 @@ class Consulta(TimeStampedModel):
     """
     Observaciones que realiza el médico al paciente en una consulta.
     """
-    paciente = models.ForeignKey('Paciente', related_name='historial_clinico',
-                                 on_delete=models.CASCADE, default='')
+
+    paciente = models.ForeignKey(
+        "Paciente",
+        related_name="historial_clinico",
+        on_delete=models.CASCADE,
+        default="",
+    )
+    profesional = models.ForeignKey(
+        "profesionales.Profesional",
+        related_name="historial_clinico",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     diagnostico = models.TextField()
     indicaciones = models.TextField(null=True, blank=True)
     # podria ser un manytomany a un modelo de medicamentos
     receta = models.TextField(null=True, blank=True)
     practicas = models.TextField(null=True, blank=True)
-    derivaciones = models.ManyToManyField('centros_de_salud.Especialidad',
-                                          blank=True)
+    derivaciones = models.ManyToManyField("centros_de_salud.Especialidad", blank=True)
     codigo = models.ManyToManyField(CIE10, blank=True)
 
     def __str__(self):
-        paciente = f'paciente: {self.paciente.nombres}, {self.paciente.apellido}'
-        return f'{self.id} - fecha: {self.fecha} - {paciente}'
+        fecha = self.created.strftime("%d/%m/%Y")
+        paciente = f"paciente: {self.paciente.nombres}, {self.paciente.apellidos}"
+        return f"{self.id} - fecha: {fecha} - {paciente}"

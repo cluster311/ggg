@@ -19,59 +19,85 @@ class Command(BaseCommand):
     help = """Comando para importar profesionales de la salud"""
 
     def add_arguments(self, parser):
-        parser.add_argument('--path', type=str, help='Path del archivo XLS local',
-                                default='profesionales/resources/PADRONACTIVOS2.xls')
+        parser.add_argument(
+            "--path",
+            type=str,
+            help="Path del archivo XLS local",
+            default="profesionales/resources/PADRONACTIVOS2.xls",
+        )
 
     def handle(self, *args, **options):
-        self.stdout.write(self.style.SUCCESS('--- Comenzando carga, por favor espere ---'))
-        fieldnames = ['AFILIADO', 'NOMBRE', 'PROFESION', 'DOCUMENTO', 'ESTADO',
-                      'TELEFONO', 'DOMICILIO', 'BARRIO', 'LOCALIDAD', 'DEPARTAMENTO',
-                      'VOTA']
-        
-        path = options['path']
-        
+        self.stdout.write(
+            self.style.SUCCESS("--- Comenzando carga, por favor espere ---")
+        )
+        fieldnames = [
+            "AFILIADO",
+            "NOMBRE",
+            "PROFESION",
+            "DOCUMENTO",
+            "ESTADO",
+            "TELEFONO",
+            "DOMICILIO",
+            "BARRIO",
+            "LOCALIDAD",
+            "DEPARTAMENTO",
+            "VOTA",
+        ]
+
+        path = options["path"]
+
         count = 0
         matriculas = []
         dnis = []
         errores = []
-        
+
         book = pe.get_book(file_name=path)
-        
+
         for sheet in book:
-            
+
             for fila in sheet:
-                self.stdout.write(self.style.SUCCESS(f'importando {fila}'))
-                row = {'AFILIADO': fila[0], 'NOMBRE': fila[1], 'PROFESION': fila[2], 'DOCUMENTO': fila[3], 'ESTADO': fila[4], 'TELEFONO': fila[5], 'DOMICILIO': fila[6], 'BARRIO': fila[7], 'LOCALIDAD': fila[8], 'DEPARTAMENTO': fila[9]}
+                self.stdout.write(self.style.SUCCESS(f"importando {fila}"))
+                row = {
+                    "AFILIADO": fila[0],
+                    "NOMBRE": fila[1],
+                    "PROFESION": fila[2],
+                    "DOCUMENTO": fila[3],
+                    "ESTADO": fila[4],
+                    "TELEFONO": fila[5],
+                    "DOMICILIO": fila[6],
+                    "BARRIO": fila[7],
+                    "LOCALIDAD": fila[8],
+                    "DEPARTAMENTO": fila[9],
+                }
 
-                self.stdout.write(self.style.SUCCESS(f'importando {row}'))
+                self.stdout.write(self.style.SUCCESS(f"importando {row}"))
 
-                dni = row['DOCUMENTO'] # es un numero! .strip().replace('.', '')
+                dni = row["DOCUMENTO"]  # es un numero! .strip().replace('.', '')
                 if dni in dnis:
-                    error = f'DNI DUPLICADO: {dni} en {row}'
+                    error = f"DNI DUPLICADO: {dni} en {row}"
                     self.stdout.write(self.style.ERROR(error))
                     # sys.exit(1)
                     errores.append(error)
                     continue
 
-                matricula = row['AFILIADO']
+                matricula = row["AFILIADO"]
                 if matricula in matriculas:
-                    error = f'Matricula DUPLICADa: {matricula} en {row}'
+                    error = f"Matricula DUPLICADa: {matricula} en {row}"
                     self.stdout.write(self.style.ERROR(error))
                     # sys.exit(1)
                     errores.append(error)
                     continue
-                
+
                 dnis.append(dni)
                 matriculas.append(matricula)
-                
-                p, created = Profesional.objects.get_or_create(dni=dni)
+
+                p, created = Profesional.objects.get_or_create(numero_documento=dni)
                 p.importar_matriculado(row=row)
                 p.save()
-                
+
                 count += 1
-                    
-            txt = f'Se procesaron {count} profesionales'
+
+            txt = f"Se procesaron {count} profesionales"
             self.stdout.write(self.style.SUCCESS(txt))
-            txt = f'Errores: {errores}'
+            txt = f"Errores: {errores}"
             self.stdout.write(self.style.ERROR(txt))
-        

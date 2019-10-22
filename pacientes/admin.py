@@ -12,13 +12,7 @@ class CarpetaFamiliarAdmin(admin.ModelAdmin):
     exclude = []
 
     formfield_overrides = {
-        AddressField: {
-            'widget': AddressWidget(
-                attrs={
-                    'style': 'width: 300px;'
-                }
-            )
-        }
+        AddressField: {"widget": AddressWidget(attrs={"style": "width: 300px;"})}
     }
 
 
@@ -32,9 +26,7 @@ class ConsultaInLine(admin.StackedInline):
 
 
 class PacienteAdmin(admin.ModelAdmin):
-    inlines = [
-        ContactoAdminInline,
-    ]
+    inlines = [ContactoAdminInline]
 
 
 admin.site.register(Consulta, ConsultaAdmin)
