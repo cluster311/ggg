@@ -3,11 +3,14 @@ version: '3'
 services:
   db:
     image: mdillon/postgis
+    volumes:
+      - /var/run/postgresql/:/var/run/postgresql/
   web:
     build: .
     command: bash ./docker_entrypoint.sh
     volumes:
       - .:/code
+      - /var/run/postgresql/:/var/run/postgresql/
     ports:
       - "8000:8000"
       - "5555:5555"

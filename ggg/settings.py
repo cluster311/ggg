@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'address',
     'cie10_django',
     'crispy_forms',
+    'tempus_dominus',
 
     # our apps
     'core',
@@ -55,6 +56,7 @@ INSTALLED_APPS = [
     'centros_de_salud',
     'nhpgd_django',  # nomenclador de hostpitales publicos de gestion descentralizada
     'calendario',
+    'recupero',
 ]
 
 
@@ -127,7 +129,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Argentina/Buenos_Aires'
 
 USE_I18N = True
 
