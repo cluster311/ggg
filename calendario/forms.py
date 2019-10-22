@@ -1,10 +1,10 @@
 import pytz
 from dal import autocomplete
-from datetime import timedelta
+from datetime import datetime, timedelta
 from django import forms
 from django.conf import settings
-from tempus_dominus.widgets import DateTimePicker
 from calendario.models import Turno
+from calendario.widgets import DateTimePicker
 
 
 LOCAL_TZ = pytz.timezone(settings.TIME_ZONE)
@@ -29,42 +29,24 @@ class TurnoForm(forms.ModelForm):
                 classes_to_ad += ' custom-select'
             self.fields[field].widget.attrs.update({'class': classes_to_ad})
 
+    def clean_field_inicio(self):
+        print(self.fields['inicio'])
+
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)
-        for field in ('inicio', 'fin'):
+        print(cleaned_data)
+        """for field in ('inicio', 'fin'):
             cleaned_data[field] = LOCAL_TZ.localize(
                 cleaned_data[field].replace(tzinfo=None)
-            )
+            )"""
         return cleaned_data
 
     class Meta:
         model = Turno
         fields = '__all__'
         widgets = {
-            'inicio': DateTimePicker(
-                options={
-                    'icons': {
-                        'time': 'fa fa-clock',
-                    }
-                },
-                attrs={
-                    'append': 'fa fa-calendar',
-                    'input_toggle': False,
-                    'icon_toggle': True,
-                }
-            ),
-            'fin': DateTimePicker(
-                options={
-                    'icons': {
-                        'time': 'fa fa-clock',
-                    }
-                },
-                attrs={
-                    'append': 'fa fa-calendar',
-                    'input_toggle': False,
-                    'icon_toggle': True,
-                }
-            ),
+            'inicio': DateTimePicker(),
+            'fin': DateTimePicker(),
             'servicio': autocomplete.ModelSelect2(),
             'profesional': autocomplete.ModelSelect2(),
             'paciente': autocomplete.ModelSelect2(),

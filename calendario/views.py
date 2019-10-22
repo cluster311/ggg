@@ -19,7 +19,7 @@ def index(request):
             'id="addAppointmentButton" '
             'onclick="customAppointmentFormSubmit();">Agregar</button>'
         ),
-        'form': TurnoForm()
+        'form': TurnoForm
     }
     return render(request, 'calendario.html', context)
 

@@ -6,7 +6,6 @@ django-crispy-forms==1.7.2
 django-model-utils==3.2.0
 django-annoying==0.10.4
 django_extensions>=2.2.1
-django-tempus-dominus==5.1.2.8
 psycopg2>=2.8.3
 nhpgd>=0.204
 phonenumbers==8.10.19
