@@ -29,16 +29,12 @@ class TurnoForm(forms.ModelForm):
                 classes_to_ad += ' custom-select'
             self.fields[field].widget.attrs.update({'class': classes_to_ad})
 
-    def clean_field_inicio(self):
-        print(self.fields['inicio'])
-
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)
-        print(cleaned_data)
-        """for field in ('inicio', 'fin'):
+        for field in ('inicio', 'fin'):
             cleaned_data[field] = LOCAL_TZ.localize(
                 cleaned_data[field].replace(tzinfo=None)
-            )"""
+            )
         return cleaned_data
 
     class Meta:
