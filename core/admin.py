@@ -14,7 +14,8 @@ class GeoAdmin(gisadmin.GeoModelAdmin):
     """
     admin para modelos con GIS
     """
-    map_template = 'gis/admin/fixed_openlayers.html'
+
+    map_template = "gis/admin/fixed_openlayers.html"
     default_lon = -71.44296
     default_lat = -36.82101
     openlayers_url = (

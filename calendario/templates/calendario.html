@@ -1,57 +1,344 @@
 {% extends "base_tableros.html" %}
+{% load static %}
 
 {% block extra_head %}
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.css' rel='stylesheet' />
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.css' rel='stylesheet' />
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.css' rel='stylesheet' />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.css" rel="stylesheet" />
 
-    <link href='https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.css' rel='stylesheet' />
-	 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/css/bootstrap2/bootstrap-switch.min.css">
 
+  <link href="https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.css" rel="stylesheet" />
+
+  <!-- DateTime Picker's assets -->
+  {{ form.media }}
+
+  <link href="{% static 'css/modal_extra.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block js_footer %}
-	
 	{{ block.super }}
+
+  <!-- Import axios and configure it to send csrf tokens -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    'use strict';
+    axios.defaults.xsrfCookieName = 'csrftoken'
+    axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+  </script>
 
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.js'></script>
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.js'></script>
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.js'></script>
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/locales/es.js'></script>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
+
   <script src='https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.js'></script>
 
-	<script type="text/javascript">
-	document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
+  <script type="text/javascript">
+    'use strict';
+    let calendar;
 
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-          plugins: [ 'dayGrid', 'timeGrid' ],
-          eventSources: [{
-              url: '{% url 'calendario.feed' %}',
-          }],
-          defaultView: 'dayGridWeek',
-          header: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-          },
-          locale: 'es',
-          weekMode: 'liquid',
-    	    slotMinutes: 15,
-          defaultEventMinutes: 30,
-          minTime: 8,
-          maxTime: 20,
-          editable: true,
-          themeSystem: 'bootstrap'
-        });
+    document.addEventListener('DOMContentLoaded', function() {
+      const calendarEl = document.getElementById('calendar');
 
-        calendar.render();
+      calendar = new FullCalendar.Calendar(calendarEl, {
+        plugins: [ 'dayGrid', 'timeGrid' ],
+        eventSources: [{
+            url: '{% url "calendario.feed" %}',
+        }],
+        defaultView: 'dayGridWeek',
+        header: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,dayGridWeek,dayGridDay'
+        },
+        locale: 'es',
+        weekMode: 'liquid',
+        slotMinutes: 15,
+        defaultEventMinutes: 30,
+        minTime: 8,
+        maxTime: 20,
+        editable: true,
+        themeSystem: 'bootstrap',
+        eventClick: showModalEvent
+      });
+
+      calendar.render();
     });
-    
-	</script>
+  </script>
+
+  <script>
+    'use strict';
+    $('#id_bulk').bootstrapSwitch();
+  </script>
+
+  <script>
+    'use strict';
+    function customAppointmentFormSubmit() {
+      const formData = getFormData();
+
+      axios({
+        method: 'post',
+        url: "{% url 'add_appointments' %}",
+        headers: {'Content-Type': 'application/json'},
+        data: formData
+      })
+        .then(response => {
+          if (!response.data.success) {
+            showFormErrors(response.data.errors);
+          } else {
+            calendar.refetchEvents();
+            dismissFormErrors();
+            $('#modalForm').modal('hide');
+          }
+        })
+        .catch(error => {
+          showFormErrors({Error: [error.toString().slice(7)]});
+        });
+    }
+
+
+    function getFormData() {
+      const appointmentForm = document.getElementById('appointmentForm');
+
+      const formData = {};
+      for (const field of appointmentForm) {
+        if (field.type === 'checkbox') {
+          formData[field.name] = field.checked;
+        } else {
+          formData[field.name] = field.value;
+        }
+      }
+
+      return formData;
+    }
+
+
+    function showFormErrors(fields) {
+      const errorsList = getOrCreateErrorsList();
+      const errorItems = getErrorItems(fields);
+      errorsList.innerHTML = errorItems;
+      document.getElementById('modalForm').scroll(
+        {top: 0, behavior: 'smooth'}
+      );
+    }
+
+    function dismissFormErrors() {
+      const errorsList = document.getElementById('errorsList');
+      if (errorsList) errorsList.remove();
+    }
+
+    function getOrCreateErrorsList() {
+      let errorsList = document.getElementById('errorsList');
+
+      if (!errorsList) {
+        errorsList = document.createElement('ul');
+        errorsList.setAttribute('id', 'errorsList');
+        errorsList.classList.add('errors', 'list-group');
+        const form = document.getElementById('appointmentForm');
+        form.insertBefore(errorsList, form.firstChild);
+      }
+
+      return errorsList;
+    }
+
+    function getErrorItems(errors) {
+      let errorItems = '';
+      for (const field in errors) {
+        errorItems += `
+          <li class="list-group-item list-group-item-action
+            flex-column align-items-start list-group-item-danger"
+          >
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">
+                ${capitalize(field)}
+              </h5>
+              <span class="badge badge-danger badge-pill mb-2">
+                ${errors[field].length}
+              </span>
+            </div>
+            <ul class="list-group mb-1">
+              ${getFieldErrorsListItems(errors[field])}
+            </ul>
+          </li>`;
+      }
+      return errorItems;
+    }
+
+    function getFieldErrorsListItems(fieldErrors) {
+      let errorsUL = '';
+      for (const error of fieldErrors) {
+        errorsUL += `<li>${error}</li>`;
+      }
+      return errorsUL;
+    }
+
+
+    function capitalize(text) {
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+  </script>
+
+  <script>
+    'use strict';
+    function copyPreviousWeek() {
+      if (calendar.state.viewType.indexOf('Week') === -1) {
+        showCopyWeekErrors('Selecciona la vista semanal primero.');
+        return;
+      }
+      axios({
+        method: 'get',
+        url: "{% url 'copy_appointments' %}",
+        params: {
+          start: calendar.state.dateProfile.currentRange.start,
+          end: calendar.state.dateProfile.currentRange.end
+        }
+      })
+        .then(response => {
+          if (response.data.appointments.length === 0) {
+            showCopyWeekErrors(
+              'No hay turnos cargados para la semana anterior.'
+            );
+          } else {
+            dismissCopyWeekErrors();
+            calendar.refetchEvents();
+          }
+        })
+        .catch(error => {
+          showCopyWeekErrors(error.toString());
+        });
+    }
+
+
+    function showCopyWeekErrors(errorText) {
+      const copyWeekErrors = getOrCreateCopyWeekErrors();
+      copyWeekErrors.innerHTML = errorText;
+    }
+
+    function getOrCreateCopyWeekErrors() {
+      let copyWeekErrors = document.getElementById('copyWeekErrors');
+      if (!copyWeekErrors) {
+        copyWeekErrors = document.createElement('div');
+        copyWeekErrors.setAttribute('id', 'copyWeekErrors');
+        copyWeekErrors.classList.add('errors', 'alert', 'alert-danger');
+        calendar.el.prepend(copyWeekErrors);
+      }
+      return copyWeekErrors;
+    }
+
+    function dismissCopyWeekErrors() {
+      const errorsDiv = document.getElementById('copyWeekErrors');
+      if (errorsDiv) errorsDiv.remove();
+    }
+  </script>
+
+  <script>
+    'use strict';
+    $('#modalForm').on('hidden.bs.modal', () => {
+      document.getElementById('appointmentId').value = null;
+      document.getElementById('deleteAppointment').value = null;
+      document.getElementById('closeModalButton').hidden = false;
+      getOrCreateDeleteButton().hidden = true;
+      document.getElementById('addAppointmentButton').innerHTML = 'Agregar';
+      document.getElementById('id_duration').disabled = false;
+      $('#id_bulk').bootstrapSwitch('disabled', false);
+    });
+  </script>
+
+  <script>
+    'use strict';
+    function showModalEvent(eventInfo) {
+      setModalFormValues(eventInfo.event);
+      setModalFormButtons();
+      $('#modalForm').modal();
+    }
+
+
+    function setModalFormValues(event) {
+      document.getElementById('id_inicio').value = formatDatetime(event.start);
+      document.getElementById('id_fin').value = formatDatetime(event.end);
+      document.getElementById('id_servicio').value = event.extendedProps.service;
+      document.getElementById(
+        'id_profesional'
+      ).value = event.extendedProps.professional;
+      document.getElementById('id_paciente').value = event.extendedProps.patient;
+      document.getElementById('id_estado').value = event.extendedProps.status;
+      document.getElementById('id_duration').disabled = true;
+      $('#id_bulk').bootstrapSwitch('disabled', true);
+      $('#id_bulk').bootstrapSwitch('state', false);
+      document.getElementById('appointmentId').value = event.id;
+    }
+
+
+    function setModalFormButtons() {
+      const addButton = document.getElementById('addAppointmentButton');
+      if (addButton.innerText === 'Editar') {
+        addButton.innerText = 'Agregar';
+      } else {
+        addButton.innerText = 'Editar';
+      }
+
+      const closeButton = document.getElementById('closeModalButton');
+      toggleElementAttribute(closeButton, 'hidden');
+
+      const deleteButton = getOrCreateDeleteButton();
+      toggleElementAttribute(deleteButton, 'hidden');
+    }
+
+    function getOrCreateDeleteButton() {
+      let deleteButton = document.getElementById('deleteAppointmentButton');
+
+      if (!deleteButton) {
+        deleteButton = document.createElement('button');
+        deleteButton.setAttribute('id', 'deleteAppointmentButton');
+        deleteButton.addEventListener('click', () => {
+          if (confirm('¿Realmente quieres eliminar este evento?')) {
+            document.getElementById("deleteAppointment").value = true;
+            customAppointmentFormSubmit();
+          }
+        });
+        deleteButton.setAttribute('hidden', true);
+        deleteButton.classList.add('btn', 'btn-danger');
+        deleteButton.innerHTML = 'Eliminar';
+        const closeButton = document.getElementById('closeModalButton');
+        closeButton.parentNode.insertBefore(deleteButton, closeButton);
+      }
+
+      return deleteButton;
+    }
+
+
+    function formatDatetime(dateTime) {
+      const year = dateTime.getFullYear();
+      // If number has 2 digits, add leading zero but don't use it
+      const month = `0${dateTime.getMonth()+1}`.slice(-2);
+      const day = `0${dateTime.getDate()}`.slice(-2);
+      const hour = `0${dateTime.getHours()}`.slice(-2);
+      const minutes = `0${dateTime.getMinutes()}`.slice(-2);
+      const seconds = `0${dateTime.getSeconds()}`.slice(-2);
+      return `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`;
+    }
+
+    function toggleElementAttribute(el, attribute) {
+      if (el[attribute]) {
+        el[attribute] = false;
+      } else {
+        el[attribute] = true;
+      }
+    }
+  </script>
 {% endblock js_footer %}
 
 {% block content %}
-    <div id='calendar'></div>
+  <div class="row action-buttons-container">
+    {% include 'base_button.html' with button_text="Cargar semana anterior" attrs='class="btn btn-info" onclick="copyPreviousWeek();"'%}
+    {% include 'base_modal_button.html' with button_text=modal_title %}
+  </div>
+  <div id='calendar'></div>
+{% endblock %}
+
+{% block unwrapped_content %}
+  {% include 'base_modal.html' %}
 {% endblock %}

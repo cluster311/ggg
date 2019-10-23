@@ -8,10 +8,10 @@ class ProfesionalSite(admin.AdminSite):
         urls = super(CustomAdminSite, self).get_urls()
         custom_urls = [
             url(
-                r'calendario$',
+                r"calendario$",
                 self.admin_view(organization_admin.calendario),
-                name="preview"
-            ),
+                name="preview",
+            )
         ]
         return urls + custom_urls
 
@@ -19,8 +19,14 @@ class ProfesionalSite(admin.AdminSite):
 @admin.register(Profesional)
 class ProfesionalAdmin(admin.ModelAdmin):
     list_display = [
-        'nombres', 'apellidos', 'numero_documento', 'matricula_profesional'
+        "nombres",
+        "apellidos",
+        "numero_documento",
+        "matricula_profesional"
     ]
     search_fields = [
-        'nombres', 'apellidos', 'numero_documento', 'matricula_profesional'
+        "nombres",
+        "apellidos",
+        "numero_documento",
+        "matricula_profesional",
     ]

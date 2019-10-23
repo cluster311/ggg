@@ -1,0 +1,53 @@
+{% extends "base_consultas.html" %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block sidebar %}
+    {% include "sidebar_paciente.html" %}
+{% endblock %}
+
+{% block content %}
+    {% if messages %}
+        <div class="col-lg-3 color03">
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <h2>Listado de consultas</h2>
+    {% for consulta in consultas %}
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <button>
+                    <li class="nav-link">
+                        <a href="{% url 'profesionales.consulta.detalle' dni=consulta.paciente.numero_documento pk=consulta.id %}">
+                            Ver detalle
+                        </a>
+                    </li>
+                </button>
+                <button>
+                    <li class="nav-link">
+                        <a href="{% url 'profesionales.actualizar.consulta' dni=consulta.paciente.numero_documento pk=consulta.id %}">
+                            Actualizar datos
+                        </a>
+                    </li>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            {{consulta.created}}
+                            {% if consulta.profesional %}
+                                {{ consulta.profesional }}
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    {% endfor %}
+    <div class="line"></div>
+{% endblock %}

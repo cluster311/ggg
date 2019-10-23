@@ -31,7 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'jet',
+    'dal',
+    'dal_select2',
+    # 'jet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,14 +45,18 @@ INSTALLED_APPS = [
     'tinymce',
     'address',
     'cie10_django',
-    
+    'crispy_forms',
+    'tempus_dominus',
+
     # our apps
     'core',
     'obras_sociales',
     'pacientes',
     'profesionales',
     'centros_de_salud',
+    'nhpgd_django',  # nomenclador de hostpitales publicos de gestion descentralizada
     'calendario',
+    'recupero',
 ]
 
 
@@ -123,7 +129,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Argentina/Buenos_Aires'
 
 USE_I18N = True
 
@@ -195,6 +201,8 @@ CACHED_OSS_INFO_SISA_SECONDS = 60 * 60 * 24 * 30  # 30 dias de cache para info d
 
 SOURCE_OSS_SISA = 'SISA'
 SOURCE_OSS_SSSALUD = 'SSSalud'
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 try:
     from .local_settings import *

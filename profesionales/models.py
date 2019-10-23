@@ -5,9 +5,11 @@ from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation
 )
 from django.contrib.contenttypes.models import ContentType
+from core.models import DatoDeContacto
 
 
 class Profesional(Persona):
+    dni = models.CharField(max_length=20, null=True, blank=True)
     matricula_profesional = models.CharField(
         max_length=20,
         null=True,
@@ -17,15 +19,14 @@ class Profesional(Persona):
     direccion = AddressField(null=True, on_delete=models.SET_NULL)
     datos_de_contacto = GenericRelation(
         'core.DatoDeContacto',
-        related_query_name='pacientes',
+        related_query_name='profesionales',
         null=True,
         blank=True
     )
-    # TODO: importar datos desde el sistema municipal
 
     def __str__(self):
-        apellidos = '' if self.apellidos is None else self.apellidos
-        return f'{self.nombres, apellidos}'
+        apellidos = "" if self.apellidos is None else self.apellidos
+        return f"{self.nombres, apellidos}"
 
     def agregar_dato_de_contacto(self, tipo, valor):
         type_ = ContentType.objects.get_for_model(self)
@@ -57,11 +58,11 @@ class Profesional(Persona):
             DEPARTAMENTO: COLON
             VOTA: S
         """
-        self.nombres = row['NOMBRE'].strip()
-        self.matricula_profesional = str(row['AFILIADO'])
-        self.profesion = row['PROFESION'].strip()
-        self.numero_documento = str(row['DOCUMENTO'])
-        tel = row.get('TELEFONO', '')
+        self.nombres = row["NOMBRE"].strip()
+        self.matricula_profesional = str(row["AFILIADO"])
+        self.profesion = row["PROFESION"].strip()
+        self.numero_documento = str(row["DOCUMENTO"])
+        tel = row.get("TELEFONO", "")
         tel = str(tel) if type(tel) == int else tel.strip()
         # self.localidad = row.get('LOCALIDAD', '').strip()
         # self.departamento = row.get('DEPARTAMENTO', '').strip()
@@ -72,16 +73,13 @@ class Profesional(Persona):
         #   self.departamento
         # )
         # self.domicilio = domicilio
-        self.datos_de_contacto = self.agregar_dato_de_contacto(
-            'teléfono',
-            tel
-        )
+        self.agregar_dato_de_contacto('teléfono', tel)
 
     class Meta:
         permissions = [
             (
-                'can_view_tablero',
-                'Puede ver los tableros de comandos sobre profesionales'
-            ),
-            ]
-        verbose_name_plural = 'Profesionales'
+                "can_view_tablero",
+                "Puede ver los tableros de comandos sobre profesionales",
+            )
+        ]
+        verbose_name_plural = "Profesionales"

@@ -1,0 +1,21 @@
+{% extends "base_consultas.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block content %}
+    <h2>Nueva Consulta</h2>
+    <form method="post" novalidate>
+    {% csrf_token %}
+        {{ form|crispy}}
+        <button type="submit" class="btn btn-success">Guardar Consulta</button>
+    </form>
+    <div class="line"></div>
+
+{% endblock %}
+{% block js_footer %}
+    <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+    {{ form.media }}
+{% endblock js_footer %}
