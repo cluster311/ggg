@@ -1,10 +1,10 @@
 import pytz
 from dal import autocomplete
-from datetime import timedelta
+from datetime import datetime, timedelta
 from django import forms
 from django.conf import settings
-from tempus_dominus.widgets import DateTimePicker
 from calendario.models import Turno
+from calendario.widgets import DateTimePicker
 
 
 LOCAL_TZ = pytz.timezone(settings.TIME_ZONE)
@@ -41,30 +41,8 @@ class TurnoForm(forms.ModelForm):
         model = Turno
         fields = '__all__'
         widgets = {
-            'inicio': DateTimePicker(
-                options={
-                    'icons': {
-                        'time': 'fa fa-clock',
-                    }
-                },
-                attrs={
-                    'append': 'fa fa-calendar',
-                    'input_toggle': False,
-                    'icon_toggle': True,
-                }
-            ),
-            'fin': DateTimePicker(
-                options={
-                    'icons': {
-                        'time': 'fa fa-clock',
-                    }
-                },
-                attrs={
-                    'append': 'fa fa-calendar',
-                    'input_toggle': False,
-                    'icon_toggle': True,
-                }
-            ),
+            'inicio': DateTimePicker(),
+            'fin': DateTimePicker(),
             'servicio': autocomplete.ModelSelect2(),
             'profesional': autocomplete.ModelSelect2(),
             'paciente': autocomplete.ModelSelect2(),

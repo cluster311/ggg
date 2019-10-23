@@ -26,7 +26,6 @@ def index(request):
 
 def add_appointment(request):
     form_data = json.loads(request.body)
-    print(form_data)
     if form_data['bulk']:
         form = BulkTurnoForm(form_data)
     elif form_data['id']:
