@@ -4,7 +4,8 @@ from tinymce.models import HTMLField
 
 
 class Institucion(models.Model):
-    """ Las instituciones son las administradoras finales de los centros de salud
+    """Las instituciones son las administradoras finales de los centros
+    de salud.
     """
     nombre = models.CharField(max_length=290)
 
@@ -14,13 +15,23 @@ class Institucion(models.Model):
 
 class CentroDeSalud(models.Model):
     nombre = models.CharField(max_length=290)
-    institucion = models.ForeignKey(Institucion, on_delete=models.SET_NULL, 
-                                      null=True, blank=True,
-                                      related_name='centros')
-    codigo_hpgd = models.CharField(max_length=30,
-                                   null=True, blank=True,
-                                   help_text='Código de Hospital Público de Gestión Descentralizada. Requerido para recupero')
-    
+    institucion = models.ForeignKey(
+        Institucion,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='centros'
+    )
+    codigo_hpgd = models.CharField(
+        max_length=30,
+        null=True,
+        blank=True,
+        help_text=(
+            'Código de Hospital Público de Gestión Descentralizada. '
+            'Requerido para recupero'
+        )
+    )
+
     descripcion = HTMLField(null=True, blank=True)
     horario_de_atencion = models.TextField(null=True, blank=True)
     direccion = AddressField(null=True, on_delete=models.SET_NULL)

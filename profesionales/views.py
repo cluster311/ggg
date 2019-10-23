@@ -68,7 +68,6 @@ class TableroProfesionalesPorEspecialidadView(
         return context
 
 
-
 class TableroProfesionalesPorLocalidadView(
         PermissionRequiredMixin, TemplateView):
     """ mostrar datos de los profesionales """
@@ -159,10 +158,9 @@ class ConsultaDetailView(PermissionRequiredMixin, DetailView):
         return context
 
 
-class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin, CreateView):
-    """
-    Crea un objeto Consulta
-    """
+class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin,
+                         CreateView):
+    """Crea un objeto Consulta."""
 
     permission_required = ("can_view_tablero",)
     template_name = "profesionales/consulta_createview.html"

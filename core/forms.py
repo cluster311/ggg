@@ -10,22 +10,6 @@ import phonenumbers
 CARACTERISTICA_TELEFONO_DEFAULT = settings.CARACTERISTICA_TELEFONO_DEFAULT
 
 USERNAME_PATTERNS = {
-<<<<<<< HEAD
-    'twitter': re.compile(
-        r'^((?:https?://(www\.)?twitter\.com/)|@)?(?P<username>\w{1,15})/?$'
-    ),
-    'instagram': re.compile(
-        r'^((?:https?://(www\.)?instagram\.com/)|@)?(?P<username>\w{3,20})/?$'
-    ),
-    'facebook': re.compile(
-        r'^(?:https?://(www\.)?facebook\.com/)?/?(?P<username>[\w\.]{3,50})'
-        r'/?(\?.*)?$'
-    ),
-    'youtube': re.compile(
-        r'^(?:https?://(www\.)?youtube\.com/(user/)?)?(?P<username>\w{3,40})'
-        r'/?$'
-    )
-=======
     "twitter": re.compile(
         r"^((?:https?://(www\.)?twitter\.com/)|@)?(?P<username>\w{1,15})/?$"
     ),
@@ -33,12 +17,13 @@ USERNAME_PATTERNS = {
         r"^((?:https?://(www\.)?instagram\.com/)|@)?(?P<username>\w{3,20})/?$"
     ),
     "facebook": re.compile(
-        r"^(?:https?://(www\.)?facebook\.com/)?/?(?P<username>[\w\.]{3,50})/?(\?.*)?$"
+        r"^(?:https?://(www\.)?facebook\.com/)?/?(?P<username>[\w\.]{3,50})/"
+        r"?(\?.*)?$"
     ),
     "youtube": re.compile(
-        r"^(?:https?://(www\.)?youtube\.com/(user/)?)?(?P<username>\w{3,40})/?$"
+        r"^(?:https?://(www\.)?youtube\.com/(user/)?)?(?P<username>\w{3,40})"
+        "/?$"
     ),
->>>>>>> master
 }
 
 
@@ -106,21 +91,9 @@ class DatoDeContactoModelForm(forms.ModelForm):
 
 
 ContactoInlineFormset = generic_inlineformset_factory(
-<<<<<<< HEAD
-    DatoDeContacto,
-    form=DatoDeContactoModelForm,
-    can_delete=True
-)
-
-MinimoContactoInlineFormset = generic_inlineformset_factory(
-    DatoDeContacto,
-    form=DatoDeContactoModelForm,
-    extra=2, can_delete=False
-=======
     DatoDeContacto, form=DatoDeContactoModelForm, can_delete=True
 )
 
 MinimoContactoInlineFormset = generic_inlineformset_factory(
     DatoDeContacto, form=DatoDeContactoModelForm, extra=2, can_delete=False
->>>>>>> master
 )

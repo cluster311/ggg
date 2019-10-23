@@ -12,7 +12,9 @@ class CarpetaFamiliarAdmin(admin.ModelAdmin):
     exclude = []
 
     formfield_overrides = {
-        AddressField: {"widget": AddressWidget(attrs={"style": "width: 300px;"})}
+        AddressField: {
+            "widget": AddressWidget(attrs={"style": "width: 300px;"})
+        }
     }
 
 
