@@ -17,10 +17,12 @@ USERNAME_PATTERNS = {
         r"^((?:https?://(www\.)?instagram\.com/)|@)?(?P<username>\w{3,20})/?$"
     ),
     "facebook": re.compile(
-        r"^(?:https?://(www\.)?facebook\.com/)?/?(?P<username>[\w\.]{3,50})/?(\?.*)?$"
+        r"^(?:https?://(www\.)?facebook\.com/)?/?(?P<username>[\w\.]{3,50})/"
+        r"?(\?.*)?$"
     ),
     "youtube": re.compile(
-        r"^(?:https?://(www\.)?youtube\.com/(user/)?)?(?P<username>\w{3,40})/?$"
+        r"^(?:https?://(www\.)?youtube\.com/(user/)?)?(?P<username>\w{3,40})"
+        "/?$"
     ),
 }
 
@@ -61,7 +63,9 @@ class DatoDeContactoModelForm(forms.ModelForm):
         try:
             return re.match(USERNAME_PATTERNS[tipo], valor).group("username")
         except AttributeError:
-            self.add_error("valor", f"No es un nombre de usuario de {tipo} válido")
+            self.add_error(
+                'valor', f'No es un nombre de usuario de {tipo} válido'
+            )
 
     def clean_url(self, valor):
         validator = URLValidator()

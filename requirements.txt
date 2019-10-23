@@ -12,6 +12,7 @@ nhpgd>=0.204
 phonenumbers==8.10.19
 psycopg2-binary>=2.8.3
 sisa>=0.918
+pycodestyle==2.5.0
 pyexcel>=0.5.15
 pyexcel_xls>=0.5.8
 cie>=0.204

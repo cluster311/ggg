@@ -12,31 +12,31 @@ logger = logging.getLogger(__name__)
 
 class Persona(models.Model):
     VINCULO_TYPE = Choices(
-        ("Padre", "Padre"),
-        ("Hijo/a", "Hijo/a"),
-        ("Madre", "Madre"),
-        ("Abuelo/a", "Abuelo/a"),
-        ("Primo/a", "Primo/a"),
-        ("Nuera/Yerno", "Nuera/Yerno"),
-        ("Nieto/a", "Nieto/a"),
-        ("Cuñado/a", "Cuñado/a"),
-        ("Concuñado/a", "Concuñado/a"),
-        ("Tio/a", "Tio/a"),
-        ("Sobrino/a", "Sobrino/a"),
-        ("Esposo/a", "Esposo/a"),
+        ('Padre', 'Padre'),
+        ('Hijo/a', 'Hijo/a'),
+        ('Madre', 'Madre'),
+        ('Abuelo/a', 'Abuelo/a'),
+        ('Primo/a', 'Primo/a'),
+        ('Nuera/Yerno', 'Nuera/Yerno'),
+        ('Nieto/a', 'Nieto/a'),
+        ('Cuñado/a', 'Cuñado/a'),
+        ('Concuñado/a', 'Concuñado/a'),
+        ('Tio/a', 'Tio/a'),
+        ('Sobrino/a', 'Sobrino/a'),
+        ('Esposo/a', 'Esposo/a'),
     )
     NACIONALIDAD_CHOICES = Choices(
-        "argentina",
-        "boliviana",
-        "brasilera",
-        "chilena",
-        "colombiana",
-        "ecuatoriana",
-        "paraguaya",
-        "peruana",
-        "uruguaya",
-        "venezolana",
-        "otra",
+        'argentina',
+        'boliviana',
+        'brasilera',
+        'chilena',
+        'colombiana',
+        'ecuatoriana',
+        'paraguaya',
+        'peruana',
+        'uruguaya',
+        'venezolana',
+        'otra',
     )
 
     nombres = models.CharField(max_length=50)
@@ -61,7 +61,7 @@ class Persona(models.Model):
     nacionalidad = models.CharField(
         max_length=50,
         choices=NACIONALIDAD_CHOICES,
-        default=NACIONALIDAD_CHOICES.argentina,
+        default=NACIONALIDAD_CHOICES.argentina
     )
 
     @property

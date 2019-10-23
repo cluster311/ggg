@@ -5,7 +5,9 @@ from model_utils import Choices
 from model_utils.models import TimeStampedModel
 from address.models import AddressField
 from cie10_django.models import CIE10
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
 from django.contrib.contenttypes.models import ContentType
 import logging
 
@@ -23,7 +25,10 @@ class CarpetaFamiliar(models.Model):
         ("equivalentes", "Equivalentes Familiares"),
     )
     direccion = AddressField(null=True, on_delete=models.SET_NULL)
-    tipo_familia = models.CharField(max_length=50, choices=OPCIONES_TIPO_FAMILIA)
+    tipo_familia = models.CharField(
+        max_length=50,
+        choices=OPCIONES_TIPO_FAMILIA
+    )
     apellido_principal = models.CharField(max_length=100)
 
     def __str__(self):
@@ -81,13 +86,16 @@ class Paciente(Persona):
     )
 
     carpeta_familiar = models.ForeignKey(
-        "CarpetaFamiliar", null=True, related_name="miembros", on_delete=models.SET_NULL
+        "CarpetaFamiliar",
+        null=True,
+        related_name="miembros",
+        on_delete=models.SET_NULL
     )
     vinculo = models.CharField(
         max_length=50,
         null=True,
         choices=VINCULO_TYPE,
-        help_text=("Relación parental relativa a jefe" " de familia"),
+        help_text="Relación parental relativa a jefe de familia",
     )
     es_jefe_familia = models.BooleanField(default=False)
     grupo_sanguineo = models.CharField(
@@ -95,7 +103,10 @@ class Paciente(Persona):
     )
     observaciones = models.TextField(blank=True, null=True)
     datos_de_contacto = GenericRelation(
-        "core.DatoDeContacto", related_query_name="pacientes", null=True, blank=True
+        "core.DatoDeContacto",
+        related_query_name="pacientes",
+        null=True,
+        blank=True
     )
 
     @property
@@ -106,10 +117,17 @@ class Paciente(Persona):
         type_ = ContentType.objects.get_for_model(self)
         try:
             DatoDeContacto.objects.get(
-                content_type__pk=type_.id, object_id=self.id, tipo=tipo, valor=valor
+                content_type__pk=type_.id,
+                object_id=self.id,
+                tipo=tipo,
+                valor=valor
             )
         except DatoDeContacto.DoesNotExist:
-            DatoDeContacto.objects.create(content_object=self, tipo=tipo, valor=valor)
+            DatoDeContacto.objects.create(
+                content_object=self,
+                tipo=tipo,
+                valor=valor
+            )
 
     class Meta:
         verbose_name = "Paciente"
@@ -170,8 +188,8 @@ class Paciente(Persona):
                 os.save()
         if not found:
             # TODO: estamos detectando un cambio de OSS.
-            # para tableros de control y estadísticas este dato puede ser
-            # valioso de grabar
+            # para tableros de control y estadísticas este dato puede
+            # ser valioso de grabar
             new_oss = ObraSocialPaciente.objects.create(
                 data_source=settings.SOURCE_OSS_SISA,
                 paciente=self,
@@ -188,7 +206,9 @@ class Paciente(Persona):
         puco.oss = {
             'rnos': '112301',
             'exists': True,
-            'nombre': 'OBRA SOC DEL PERSONAL DE MICROS Y OMNIBUS DE MENDOZA',
+            'nombre': (
+                'OBRA SOCIAL DEL PERSONAL DE MICROS Y OMNIBUS DE MENDOZA'
+            ),
             'tipo_de_cobertura': 'Obra social',
             'sigla': 'OSPEMOM',
             'provincia': 'Mendoza',
@@ -226,10 +246,15 @@ class Consulta(TimeStampedModel):
     # podria ser un manytomany a un modelo de medicamentos
     receta = models.TextField(null=True, blank=True)
     practicas = models.TextField(null=True, blank=True)
-    derivaciones = models.ManyToManyField("centros_de_salud.Especialidad", blank=True)
+    derivaciones = models.ManyToManyField(
+        "centros_de_salud.Especialidad",
+        blank=True
+    )
     codigo = models.ManyToManyField(CIE10, blank=True)
 
     def __str__(self):
         fecha = self.created.strftime("%d/%m/%Y")
-        paciente = f"paciente: {self.paciente.nombres}, {self.paciente.apellidos}"
+        paciente = (
+            f"paciente: {self.paciente.nombres}, {self.paciente.apellidos}"
+        )
         return f"{self.id} - fecha: {fecha} - {paciente}"

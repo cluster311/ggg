@@ -37,4 +37,4 @@ class Turno(models.Model):
     estado = models.IntegerField(choices=OPCIONES_ESTADO, default=DISPONIBLE)
 
     def __str__(self):
-        return f'{self.servicio.especialidad} '
+        return f'{self.servicio.especialidad}'

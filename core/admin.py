@@ -19,7 +19,8 @@ class GeoAdmin(gisadmin.GeoModelAdmin):
     default_lon = -71.44296
     default_lat = -36.82101
     openlayers_url = (
-        "https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/OpenLayers.js"
+        "https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/"
+        "OpenLayers.js"
     )
     default_zoom = 4
     map_width = 1200

@@ -20,7 +20,8 @@ class ConsultaForm(forms.ModelForm):
     codigo = forms.ModelMultipleChoiceField(
         queryset=CIE10.objects.all(),
         widget=autocomplete.ModelSelect2Multiple(
-            url="cie10-autocomplete", attrs={"data-placeholder": "Ejemplo: A00"}
+            url="cie10-autocomplete",
+            attrs={"data-placeholder": "Ejemplo: A00"}
         ),
     )
 

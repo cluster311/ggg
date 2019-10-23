@@ -17,8 +17,9 @@ from pacientes.forms import ConsultaForm
 from crispy_forms.utils import render_crispy_form
 
 
-@method_decorator(cache_page(60 * 5), name="dispatch")
-class TableroProfesionalesPorEspecialidadView(PermissionRequiredMixin, TemplateView):
+@method_decorator(cache_page(60 * 5), name='dispatch')
+class TableroProfesionalesPorEspecialidadView(
+        PermissionRequiredMixin, TemplateView):
     """ mostrar datos de los profesionales """
 
     model = Profesional
@@ -67,7 +68,8 @@ class TableroProfesionalesPorEspecialidadView(PermissionRequiredMixin, TemplateV
         return context
 
 
-class TableroProfesionalesPorLocalidadView(PermissionRequiredMixin, TemplateView):
+class TableroProfesionalesPorLocalidadView(
+        PermissionRequiredMixin, TemplateView):
     """ mostrar datos de los profesionales """
 
     model = Profesional
@@ -156,10 +158,9 @@ class ConsultaDetailView(PermissionRequiredMixin, DetailView):
         return context
 
 
-class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin, CreateView):
-    """
-    Crea un objeto Consulta
-    """
+class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin,
+                         CreateView):
+    """Crea un objeto Consulta."""
 
     permission_required = ("can_view_tablero",)
     template_name = "profesionales/consulta_createview.html"

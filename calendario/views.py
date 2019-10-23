@@ -50,7 +50,7 @@ def add_appointment(request):
             'appointments': [{
                 'id': a.id,
                 'title': str(a),
-                'start': a.inicio.isoformat(), 
+                'start': a.inicio.isoformat(),
                 'end': a.fin.isoformat(),
             } for a in appointments]
         }
@@ -97,7 +97,7 @@ def copy_appointments(request):
     response_appointments = [{
         'id': a.id,
         'title': str(a),
-        'start': a.inicio.isoformat(), 
+        'start': a.inicio.isoformat(),
         'end': a.fin.isoformat(),
     } for a in appointments]
     return JsonResponse({

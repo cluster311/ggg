@@ -2,11 +2,15 @@
 Importar la base de datos de profesionales que nos proveen desde excel
 
 Muestra de los datos
-AFILIADO	NOMBRE	PROFESION	DOCUMENTO	ESTADO	TELEFONO	DOMICILIO	BARRIO	LOCALIDAD	DEPARTAMENTO	VOTA
-42000	JUAN PEREZ       	MEDICO VETERINARIO            	5556460	OBLIGADO                      	03555-555555   	CHACO 31                                	MARINO              	RIO CEBALLOS                  	COLON                         	S
-15000	JUANA PEREZ             	MEDICO                        	55553961	OBLIGADO                      	               	SAAVEDRA 1069                            	                    	RIO CEBALLOS                  	COLON                         	S
+AFILIADO    NOMBRE	    PROFESION           DOCUMENTO	ESTADO
+42000	    JUAN PEREZ  MEDICO VETERINARIO  5556460     OBLIGADO
+15000	    JUANA PEREZ MEDICO              55553961	OBLIGADO
+
+TELEFONO	    DOMICILIO	    BARRIO  LOCALIDAD	    DEPARTAMENTO    VOTA
+03555-555555   	CHACO 31        MARINO  RIO CEBALLOS    COLON           S
+                SAAVEDRA 1069           RIO CEBALLOS    COLON           S
 """
-#!/usr/bin/python
+# !/usr/bin/python
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
@@ -72,7 +76,8 @@ class Command(BaseCommand):
 
                 self.stdout.write(self.style.SUCCESS(f"importando {row}"))
 
-                dni = row["DOCUMENTO"]  # es un numero! .strip().replace('.', '')
+                # Es un número!
+                dni = row['DOCUMENTO']  # .strip().replace('.', '')
                 if dni in dnis:
                     error = f"DNI DUPLICADO: {dni} en {row}"
                     self.stdout.write(self.style.ERROR(error))
@@ -91,7 +96,9 @@ class Command(BaseCommand):
                 dnis.append(dni)
                 matriculas.append(matricula)
 
-                p, created = Profesional.objects.get_or_create(numero_documento=dni)
+                p, created = Profesional.objects.get_or_create(
+                    numero_documento=dni
+                )
                 p.importar_matriculado(row=row)
                 p.save()
 
