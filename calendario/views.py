@@ -114,8 +114,8 @@ def feed(request):
         'end': t.fin.isoformat(),
         'service': t.servicio.pk,
         'status': t.estado,
-        'professional': t.profesional,
-        'patient': t.paciente
+        'professional': t.profesional.pk,
+        'patient': t.paciente.pk
     } for t in turnos]
 
     return JsonResponse(turnos, safe=False)
