@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-  <title>{% block title %}Tableros de control{% endblock %}</title>
+  <title>{% block title %}{{ title }}{% endblock %}</title>
 
   <!-- Bootstrap CSS CDN -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
@@ -40,10 +40,10 @@
         <!-- Sidebar Holder -->
         <nav id="sidebar">
             <div class="sidebar-header">
-                <h3>Tableros</h3>
+                <h3>{{ short_title }}</h3>
             </div>
-
-            <ul class="list-unstyled components">
+{% if user.is_authenticated %}
+          <ul class="list-unstyled components">
                 <!--titulo agrupador sin link <p>Profesionales</p>-->
                 <li class="active">
                     <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Profesionales</a>
@@ -98,11 +98,9 @@
                   </ul>
                 </li>
             </ul>
-          
+{% endif %}          
           <ul class="list-unstyled CTAs">
-            <li><a href="#" class="download">+ info</a></li>
-            <li><a href="#" class="download">OPS</a></li>
-            <li><a href="#" class="download">Municipalidad de Córdoba</a></li>
+            <li><a href="https://github.com/cluster311/ggg" class="download">+ info</a></li>
             <!--<li><a href="#" class="article">Menu lindo 2</a></li>-->
           </ul>
       </nav>
@@ -125,6 +123,8 @@
 
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="nav navbar-nav ml-auto">
+
+          {% if user.is_authenticated %}
               <li class="nav-item active">
                 <a class="nav-link" href="#">Profesionales</a>
               </li>
@@ -137,8 +137,12 @@
               <li class="nav-item">
                 <a class="nav-link" href="#">Historia clínica</a>
               </li>
+            {% endif %}
+
             </ul>
           </div>
+
+
         </div>
       </nav>
 
