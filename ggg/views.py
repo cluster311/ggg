@@ -13,7 +13,8 @@ class HomeView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["short_title"] = settings.SYS_SHORT_TITLE
-        context["title"] = settings.SYS_TITLE
+        context["site_short_title"] = settings.SYS_SHORT_TITLE
+        context["site_title"] = settings.SYS_TITLE
+        context["site_description"] = settings.SYS_DESCRIPTION
 
         return context

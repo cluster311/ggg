@@ -207,6 +207,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # Titulo o nombre de este sistema
 SYS_SHORT_TITLE = 'OPS/Cba'
 SYS_TITLE = 'OPS/Córdoba'
+SYS_DESCRIPTION = 'Sistema de información para la salud'
 
 try:
     from .local_settings import *
