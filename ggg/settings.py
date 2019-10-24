@@ -59,8 +59,6 @@ INSTALLED_APPS = [
     'recupero',
 ]
 
-
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -76,7 +74,9 @@ ROOT_URLCONF = 'ggg.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'ggg', 'templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -203,6 +203,11 @@ SOURCE_OSS_SISA = 'SISA'
 SOURCE_OSS_SSSALUD = 'SSSalud'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# Titulo o nombre de este sistema
+SYS_SHORT_TITLE = 'OPS/Cba'
+SYS_TITLE = 'OPS/Córdoba'
+SYS_DESCRIPTION = 'Sistema de información para la salud'
 
 try:
     from .local_settings import *
