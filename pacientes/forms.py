@@ -38,7 +38,8 @@ class ConsultaForm(forms.ModelForm):
 
     class Meta:
         model = Consulta
-        fields = "__all__"
+        fields = ('paciente', 'profesional', 'codigo', 'diagnostico',
+                  'indicaciones', 'receta', 'practicas', 'derivaciones')
 
     def __init__(self, *args, **kwargs):
         """
