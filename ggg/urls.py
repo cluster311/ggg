@@ -14,7 +14,7 @@ urlpatterns = [
     url(r'^turnos/', include('calendario.urls')),
     url(r'^obras-sociales/', include('obras_sociales.urls')),
     url(
-        '',
+        r'^$',
         HomeView.as_view(),
         name="admin.home",
     ),
