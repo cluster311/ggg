@@ -32,7 +32,7 @@ class ConsultaForm(forms.ModelForm):
         queryset=CIE10.objects.all(),
         widget=autocomplete.ModelSelect2Multiple(
             url="cie10-autocomplete",
-            attrs={"data-placeholder": "Ejemplo: A00 o ingrese descripción"}
+            attrs={"data-placeholder": "Ingrese código o descripción"}
         ),
     )
 

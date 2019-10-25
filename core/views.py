@@ -10,6 +10,12 @@ class CIE10Autocomplete(autocomplete.Select2QuerySetView):
     Base de autompletado para códigos de diagnósticos.
     """
 
+    def get_result_label(self, item):
+        return f"{item.code} - {item.description}"
+
+    def get_selected_result_label(self, item):
+        return item.code
+
     def get_queryset(self):
         if not self.request.user.is_authenticated:
             return CIE10.objects.none()
