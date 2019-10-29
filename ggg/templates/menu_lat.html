@@ -73,6 +73,18 @@
         <li>
             <a href="{% url 'calendario.index' %}">Definir turnos</a>
         </li>
+
+        <li>
+            <a href="{# TODO #}">Agendar un turno</a>
+        </li>
+        {% endif %}
+        
+        {% if perms.profesionales.add_consulta %}
+        <li>
+            <a href="{% url 'profesionales.crear.consulta' %}">Nueva consulta</a>
+        </li>
+        
+
         {% endif %}
         </ul>
     </li>
