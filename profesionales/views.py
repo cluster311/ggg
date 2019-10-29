@@ -19,8 +19,9 @@ from crispy_forms.utils import render_crispy_form
 
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
-class ProfesionalListView(ListView):
+class ProfesionalListView(PermissionRequiredMixin, ListView):
     model = Profesional
+    permission_required = ("view_profesional",)
     paginate_by = 10  # pagination
 
     def get_queryset(self):        
