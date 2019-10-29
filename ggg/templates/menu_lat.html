@@ -69,9 +69,11 @@
         <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
         <a href="#menu_turnos" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Turnos</a>
         <ul class="collapse list-unstyled" id="menu_turnos">
+        {% if perms.calendario.add_turno %}
         <li>
             <a href="{% url 'calendario.index' %}">Definir turnos</a>
         </li>
+        {% endif %}
         </ul>
     </li>
 </ul>
