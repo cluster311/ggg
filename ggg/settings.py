@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+SITE_ID = 1
 
 # Application definition
 
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
     'django_extensions',
     'tinymce',
@@ -47,6 +49,10 @@ INSTALLED_APPS = [
     'cie10_django',
     'crispy_forms',
     'tempus_dominus',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
 
     # our apps
     'core',
@@ -124,6 +130,20 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+# Ver https://django-allauth.readthedocs.io/en/latest/configuration.html
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+
+# LOGIN_URL = 'una-url'
+LOGIN_REDIRECT_URL = 'admin.home'
+
+SOCIALACCOUNT_QUERY_EMAIL = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
