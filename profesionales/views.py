@@ -21,7 +21,7 @@ from crispy_forms.utils import render_crispy_form
 @method_decorator(cache_page(60 * 5), name='dispatch')
 class ProfesionalListView(ListView):
     model = Profesional
-    paginate_by = 100  # if pagination is desired
+    paginate_by = 10  # pagination
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
