@@ -20,5 +20,9 @@
         {% endfor %}
 </table>
 
+{% if is_paginated %}
+Pagina {{ page_obj.number }} de {{ paginator.num_pages }}
+{% endif %}
+
 {% endblock %}
 
