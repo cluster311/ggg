@@ -2,7 +2,7 @@ from django.views.generic import TemplateView, ListView, UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
@@ -23,9 +23,23 @@ class ProfesionalListView(ListView):
     model = Profesional
     paginate_by = 10  # pagination
 
+    def get_queryset(self):        
+        if 'search' in self.request.GET:
+            q = self.request.GET['search']
+            objects = Profesional.objects.filter(
+                Q(nombres__icontains=q) |
+                Q(apellidos__icontains=q) |
+                Q(matricula_profesional__icontains=q) |
+                Q(profesion__icontains=q)
+                )
+        else:
+            objects = Profesional.objects.all()
+        
+        return objects
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['extras'] = []
+        context['search_txt'] = self.request.GET.get('search', '')
         return context
 
 

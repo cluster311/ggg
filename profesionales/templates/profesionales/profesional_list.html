@@ -3,26 +3,52 @@
 {% block content %}
 <h2>Lista de profesionales</h2>
 
-<table>
+<form class="navbar-form" method="get">
+     <div class="form-group">
+        <input name="search" type="text" placeholder="buscar" class="form-control" value="{{ search_txt }}">
+     </div>
+     <button type="submit" class="btn btn-success">Search</button>
+ </form>
+
+{% if is_paginated %}
+
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a style="color:blue" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% else %}
+        <span class="disabled">Anterior</span>
+    {% endif %}
+
+    - Pagina {{ page_obj.number }} de {{ paginator.num_pages }} - 
+    
+    {% if page_obj.has_next %}
+        <a style="color:blue" href="?page={{ page_obj.next_page_number }}">siguiente</a>
+    {% else %}
+        <span class="disabled">Siguiente</span>
+    {% endif %}
+</div>
+{% endif %}
+
+<table class="table">
+    <thead>
     <tr>
-            <th>Profesional</th>
-            <th>Matrícula</th>
-            <th>Profesión</th>
-        </tr>
-        {% for profesional in object_list %}
+        <th scope="col">Profesional</th>
+        <th scope="col">Matrícula</th>
+        <th scope="col">Profesión</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for profesional in object_list %}
 <tr>
-    <td>{{ profesional.nombres }} {{ profesional.apellidos }}</td>
+    <th scope="row">{{ profesional.nombres }} {{ profesional.apellidos }}</th>
     <td>{{ profesional.matricula_profesional }}</td>
     <td>{{ profesional.profesion }}</td>
 </tr>
         {% empty %}
         <td>Sin datos</td><td></td><td></td>
         {% endfor %}
+    </tbody>
 </table>
-
-{% if is_paginated %}
-Pagina {{ page_obj.number }} de {{ paginator.num_pages }}
-{% endif %}
 
 {% endblock %}
 
