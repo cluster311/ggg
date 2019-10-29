@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView, ListView, UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
+from django.views.generic.list import ListView
 from django.db.models import Count
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -15,6 +16,17 @@ from .models import Profesional
 from pacientes.models import Consulta
 from pacientes.forms import ConsultaForm
 from crispy_forms.utils import render_crispy_form
+
+
+@method_decorator(cache_page(60 * 5), name='dispatch')
+class ProfesionalListView(ListView):
+    model = Profesional
+    paginate_by = 100  # if pagination is desired
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['now'] = timezone.now()
+        return context
 
 
 @method_decorator(cache_page(60 * 5), name='dispatch')

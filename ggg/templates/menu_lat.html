@@ -1,55 +1,63 @@
 <ul class="list-unstyled components">
-        <!--titulo agrupador sin link <p>Profesionales</p>-->
-        <li class="active">
-            <a href="#menu_profesionales" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Profesionales</a>
-            <ul class="collapse list-unstyled" id="menu_profesionales">
-                <li>
-                    <a href="{% url 'profesionales.tablero.por_profesion' %}">Por profesion</a>
-                </li>
-                <li>
-                    <a href="{% url 'profesionales.tablero.por_departamento' %}">Por departamento</a>
-                </li>
-            </ul>
-        </li>
-        
-        <!--titulo agrupador sin link <p>Atenciones</p> -->
-        <li>
-            <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
-            <a href="#menu_oss" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Obras sociales</a>
-            <ul class="collapse list-unstyled" id="menu_oss">
-                <li>
-                    <a href="{% url 'obras-sociales.tablero.por_provincia' %}">Por provincia</a>
-                </li>
-                <li>
-                    <a href="#">Por especialidad</a>
-                </li>
-                
-            </ul>
-        </li>
-
-        <!--titulo agrupador sin link <p>Atenciones</p> -->
-        <li>
-            <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
-            <a href="#menu_centros" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Centros de salud</a>
-            <ul class="collapse list-unstyled" id="menu_centros">
-                <li>
-                    <a href="#">Por area programática</a>
-                </li>
-                <li>
-                    <a href="#">Por especialidad</a>
-                </li>
-                
-            </ul>
-        </li>
-
-        <!--titulo agrupador sin link <p>Atenciones</p> -->
-         <li>
-          <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
-          <a href="#menu_turnos" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Turnos</a>
-          <ul class="collapse list-unstyled" id="menu_turnos">
+    <!--titulo agrupador sin link <p>Profesionales</p>-->
+    <li class="active">
+        <a href="#menu_profesionales" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Profesionales</a>
+        <ul class="collapse list-unstyled" id="menu_profesionales">
+            {% if perms.profesionales.view_profesional %}
             <li>
-              <a href="{% url 'calendario.index' %}">Definir turnos</a>
+                <a href="{% url 'profesionales.lista' %}">Lista</a>
             </li>
-          </ul>
+            {% endif %}
+            
+            {% if perms.profesionales.can_view_tablero %}
+            <li>
+                <a href="{% url 'profesionales.tablero.por_profesion' %}">Por profesion</a>
+            </li>
+            <li>
+                <a href="{% url 'profesionales.tablero.por_departamento' %}">Por departamento</a>
+            </li>
+            {% endif %}
+        </ul>
+    </li>
+    
+    <!--titulo agrupador sin link <p>Atenciones</p> -->
+    <li>
+        <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
+        <a href="#menu_oss" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Obras sociales</a>
+        <ul class="collapse list-unstyled" id="menu_oss">
+            <li>
+                <a href="{% url 'obras-sociales.tablero.por_provincia' %}">Por provincia</a>
+            </li>
+            <li>
+                <a href="#">Por especialidad</a>
+            </li>
+            
+        </ul>
+    </li>
+
+    <!--titulo agrupador sin link <p>Atenciones</p> -->
+    <li>
+        <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
+        <a href="#menu_centros" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Centros de salud</a>
+        <ul class="collapse list-unstyled" id="menu_centros">
+            <li>
+                <a href="#">Por area programática</a>
+            </li>
+            <li>
+                <a href="#">Por especialidad</a>
+            </li>
+            
+        </ul>
+    </li>
+
+    <!--titulo agrupador sin link <p>Atenciones</p> -->
+        <li>
+        <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
+        <a href="#menu_turnos" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Turnos</a>
+        <ul class="collapse list-unstyled" id="menu_turnos">
+        <li>
+            <a href="{% url 'calendario.index' %}">Definir turnos</a>
         </li>
-    </ul>
+        </ul>
+    </li>
+</ul>

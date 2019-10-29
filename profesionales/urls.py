@@ -7,6 +7,7 @@ from .views import (
     ConsultaDetailView,
     ConsultaCreateView,
     ConsultaUpdateView,
+    ProfesionalListView,
 )
 
 
@@ -15,6 +16,11 @@ urlpatterns = [
         r"^por-profesion.html$",
         TableroProfesionalesPorEspecialidadView.as_view(),
         name="profesionales.tablero.por_profesion",
+    ),
+    url(
+        r"^lista.html$",
+        ProfesionalListView.as_view(),
+        name="profesionales.lista",
     ),
     url(
         r"^por-departamento.html$",

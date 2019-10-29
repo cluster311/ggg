@@ -1,0 +1,24 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+<h2>Lista de profesionales</h2>
+
+<table>
+    <tr>
+            <th>Profesional</th>
+            <th>Matrícula</th>
+            <th>Profesión</th>
+        </tr>
+        {% for profesional in object_list %}
+<tr>
+    <td>{{ profesional.nombres }} {{ profesional.apellidos }}</td>
+    <td>{{ profesional.matricula_profesional }}</td>
+    <td>{{ profesional.profesion }}</td>
+</tr>
+        {% empty %}
+        <td>Sin datos</td><td></td><td></td>
+        {% endfor %}
+</table>
+
+{% endblock %}
+
