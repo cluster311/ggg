@@ -46,6 +46,12 @@ class ObraSocial(models.Model):
     class Meta:
         verbose_name = "Obra Social"
         verbose_name_plural = "Obras Sociales"
+        permissions = [
+            (
+                "can_view_tablero",
+                "Puede ver los tableros de comandos sobre obras sociales",
+            )
+        ]
 
 
 class ObraSocialPaciente(models.Model):
