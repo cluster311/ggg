@@ -1,5 +1,6 @@
 from django.views.generic import TemplateView
-from django.db.models import Count
+from django.views.generic.list import ListView
+from django.db.models import Count, Q
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -7,6 +8,31 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from .models import ObraSocial
+
+
+@method_decorator(cache_page(60 * 5), name='dispatch')
+class ObraSocialListView(PermissionRequiredMixin, ListView):
+    model = ObraSocial
+    permission_required = ("view_obrasocial",)
+    paginate_by = 10  # pagination
+
+    def get_queryset(self):        
+        if 'search' in self.request.GET:
+            q = self.request.GET['search']
+            objects = ObraSocial.objects.filter(
+                Q(nombre__icontains=q) |
+                Q(codigo__icontains=q) |
+                Q(siglas__icontains=q)
+                )
+        else:
+            objects = ObraSocial.objects.all()
+        
+        return objects
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_txt'] = self.request.GET.get('search', '')
+        return context
 
 
 @method_decorator(cache_page(60 * 5), name='dispatch')

@@ -25,12 +25,19 @@
         <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
         <a href="#menu_oss" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Obras sociales</a>
         <ul class="collapse list-unstyled" id="menu_oss">
+            {% if perms.obras_sociales.view_obrasocial %}
+            <li>
+                <a href="{% url 'obras-sociales.lista' %}">Lista</a>
+            </li>
+            {% endif %}
+            {% if perms.obras_sociales.can_view_tablero %}
             <li>
                 <a href="{% url 'obras-sociales.tablero.por_provincia' %}">Por provincia</a>
             </li>
             <li>
                 <a href="#">Por especialidad</a>
             </li>
+            {% endif %}
             
         </ul>
     </li>
