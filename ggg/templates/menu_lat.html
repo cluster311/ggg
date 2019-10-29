@@ -47,12 +47,19 @@
         <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
         <a href="#menu_centros" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Centros de salud</a>
         <ul class="collapse list-unstyled" id="menu_centros">
+            {% if perms.centros_de_salud.view_centrodesalud %}
+            <li>
+                <a href="{% url 'centros-de-salud.lista' %}">Lista</a>
+            </li>
+            {% endif %}
+            {% if perms.centros_de_salud.can_view_tablero %}
             <li>
                 <a href="#">Por area programática</a>
             </li>
             <li>
                 <a href="#">Por especialidad</a>
             </li>
+            {% endif %}
             
         </ul>
     </li>
