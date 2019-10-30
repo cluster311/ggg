@@ -71,7 +71,9 @@ class Command(BaseCommand):
                     self.stdout.write(" -- - Descr: {}".format(
                         place.description
                     ))
-
+                    lista_descripcion = place.description.split('<br>')
+                    # lista_descripcion ejemplo 
+                    # => ['Calle Pedro Naon 1330', 'Atención 7 - 21 hs', 'TE: 4335102 / 5428']
                     pt = place.geometry
                     # es un pygeoif.geometry.Point
                     # POINT (-64.136987 -31.417331 0.0)
@@ -80,6 +82,22 @@ class Command(BaseCommand):
                     cs, created = CentroDeSalud.objects.get_or_create(
                         nombre=place.name
                     )
+                    if len(lista_descripcion) == 3:
+                        #hay error en los datos
+
+                        address_str = (f"{lista_descripcion[0].strip()}, Córdoba, "
+                                        "Córdoba, Argentina"
+                                      )
+                        adds_dict = {
+                                     'raw': address_str,
+                                     'formatted': address_str,
+                                     'locality': 'Córdoba',
+                                     'state': 'Córdoba',
+                                     'country': 'Argentina'
+                        }
+                        cs.direccion = adds_dict
+                        cs.horario_de_atencion = lista_descripcion[1].strip()
+
                     cs.descripcion = place.description
                     # esto tampoco funca
                     # ubicacion = GEOSGeometry(pt.wkt)

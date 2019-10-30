@@ -1,6 +1,11 @@
 from django.contrib.gis.db import models
 from address.models import AddressField
 from tinymce.models import HTMLField
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
+from django.contrib.contenttypes.models import ContentType
+from core.models import DatoDeContacto
 
 
 class Institucion(models.Model):
@@ -35,12 +40,33 @@ class CentroDeSalud(models.Model):
     descripcion = HTMLField(null=True, blank=True)
     horario_de_atencion = models.TextField(null=True, blank=True)
     direccion = AddressField(null=True, on_delete=models.SET_NULL)
-    telefonos = models.TextField(null=True, blank=True)
+    datos_de_contacto = GenericRelation(
+        'core.DatoDeContacto',
+        related_query_name='centrosdesalud',
+        null=True,
+        blank=True
+    )
 
     ubicacion = models.PointField(null=True, blank=True)
 
     def __str__(self):
         return self.nombre
+
+    def agregar_dato_de_contacto(self, tipo, valor):
+        type_ = ContentType.objects.get_for_model(self)
+        try:
+            DatoDeContacto.objects.get(
+                content_type__pk=type_.id,
+                object_id=self.id,
+                tipo=tipo,
+                valor=valor
+            )
+        except DatoDeContacto.DoesNotExist:
+            DatoDeContacto.objects.create(
+                content_object=self,
+                tipo=tipo,
+                valor=valor
+            )
 
     class Meta:
         verbose_name = 'Centro de Salud'

@@ -7,7 +7,7 @@ from core.admin import GeoAdmin
 # class CentroDeSaludAdmin(gisadmin.OSMGeoAdmin):
 class CentroDeSaludAdmin(GeoAdmin):
 
-    list_display = ['nombre', 'direccion', 'horario_de_atencion', 'telefonos']
+    list_display = ['nombre', 'direccion', 'horario_de_atencion']
     # list_display = ['nombre', 'descripcion', 'direccion',
     #                 'horario_de_atencion', 'telefonos']
     search_fields = ['nombre', 'descripcion']
