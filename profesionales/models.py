@@ -1,6 +1,6 @@
 from django.db import models
 from core.models import Persona
-from address.models import AddressField
+from address.models import AddressField, Address
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation
 )
@@ -9,7 +9,6 @@ from core.models import DatoDeContacto
 
 
 class Profesional(Persona):
-    dni = models.CharField(max_length=20, null=True, blank=True)
     matricula_profesional = models.CharField(
         max_length=20,
         null=True,
@@ -64,15 +63,29 @@ class Profesional(Persona):
         self.numero_documento = str(row["DOCUMENTO"])
         tel = row.get("TELEFONO", "")
         tel = str(tel) if type(tel) == int else tel.strip()
-        # self.localidad = row.get('LOCALIDAD', '').strip()
+        self.localidad = row.get('LOCALIDAD', '').strip()
         # self.departamento = row.get('DEPARTAMENTO', '').strip()
-        # domicilio = '{}, {}, {}, {}, Córdoba'.format(
-        #   row.get('DOMICILIO', '').strip(),
-        #   row.get('BARRIO', ''),
-        #   self.localidad,
-        #   self.departamento
-        # )
-        # self.domicilio = domicilio
+        # adds = Address('{}, {}, Córdoba, Argentina'.format(
+        #           row["DOMICILIO"].strip(),
+        #           self.localidad,
+        #         ))
+        domicilio = row.get('DOMICILIO').strip()
+        domicilio_str = domicilio if domicilio is not '' else 'Domicilio desconocido 0'
+        address_str = (f"{domicilio_str}, {self.localidad}, Córdoba,"
+                        " Argentina"
+                      )
+        adds_dict = {
+                     'raw': address_str,
+                     'formatted': address_str,
+                     'locality': self.localidad,
+                     'state': 'Córdoba',
+                     'country': 'Argentina'
+        }
+        try:
+            self.direccion = adds_dict
+        except ValueError:
+            print(f"Error con {address_str}")
+            #ver que hacer con las direcciones que no se agregan
         self.agregar_dato_de_contacto('teléfono', tel)
 
     class Meta:
