@@ -139,7 +139,8 @@ AUTHENTICATION_BACKENDS = (
 
 # Ver https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+# for prod env ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
 
 # LOGIN_URL = 'una-url'
 LOGIN_REDIRECT_URL = 'admin.home'
@@ -230,6 +231,17 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 SYS_SHORT_TITLE = 'OPS/Cba'
 SYS_TITLE = 'OPS/Córdoba'
 SYS_DESCRIPTION = 'Sistema de información para la salud'
+
+# dummy to avoid errors
+EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+
+# Option: django-ses with AWS
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'email-smtp.us-west-2.amazonaws.com'
+# EMAIL_PORT = 2587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = <my-ses-smtp-username>
+# EMAIL_HOST_PASSWORD = <my-ses-smtp-password>
 
 try:
     from .local_settings import *
