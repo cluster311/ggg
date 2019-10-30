@@ -64,8 +64,7 @@
         </ul>
     </li>
 
-    <!--titulo agrupador sin link <p>Atenciones</p> -->
-        <li>
+    <li>
         <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
         <a href="#menu_turnos" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Turnos</a>
         <ul class="collapse list-unstyled" id="menu_turnos">
@@ -85,6 +84,33 @@
         </li>
         
 
+        {% endif %}
+        </ul>
+    </li>
+
+    <li>
+        <a href="#menu_recupero" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Recupero</a>
+        <ul class="collapse list-unstyled" id="menu_recupero">
+        {% if perms.recupero.change_factura %}
+        <li>
+            <a href="{% url 'recupero.factura.lista-pendientes-envio' %}">Facturación pendiente de envío</a>
+        </li>
+            
+        <li>
+            <a href="{% url 'recupero.factura.lista-pendientes-cobro' %}">Facturación pendiente de cobro</a>
+        </li>
+        {% endif %}
+        
+        {% if perms.recupero.add_tipodocumentoanexo %}
+        <li>
+            <a href="{% url 'recupero.tipos-doc-anexo' %}">Tipos de documentos anexos</a>
+        </li>
+        {% endif %}
+
+        {% if perms.recupero.add_tipoprestacion %}
+        <li>
+            <a href="{% url 'recupero.tipos-prestacion' %}">Tipos de prestación</a>
+        </li>
         {% endif %}
         </ul>
     </li>
