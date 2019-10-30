@@ -1,0 +1,55 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+<h2>Facturación de recupero pendiente de envío a la obra social</h2>
+
+<form class="navbar-form" method="get">
+     <div class="form-group">
+        <input name="search" type="text" placeholder="buscar" class="form-control" value="{{ search_txt }}">
+     </div>
+     <button type="submit" class="btn btn-success">Buscar</button>
+ </form>
+
+{% if is_paginated %}
+
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a style="color:blue" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% else %}
+        <span class="disabled">Anterior</span>
+    {% endif %}
+
+    - Pagina {{ page_obj.number }} de {{ paginator.num_pages }} - 
+    
+    {% if page_obj.has_next %}
+        <a style="color:blue" href="?page={{ page_obj.next_page_number }}">siguiente</a>
+    {% else %}
+        <span class="disabled">Siguiente</span>
+    {% endif %}
+</div>
+{% endif %}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Nombre</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for cs in object_list %}
+<tr>
+    <th scope="row">{{ cs.fecha }}</th>
+    <td scope="row">{{ cs.obra_social }}</td>
+    <td scope="row">{{ cs.centro_de_salud }}</td>
+    <td scope="row">{{ cs.profesional }}</td>
+    <td scope="row">{{ cs.especialidad }}</td>
+    <td scope="row">{{ cs.codigo_cie_principal }}</td>
+</tr>
+        {% empty %}
+        <td>Sin datos</td><td></td><td></td>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
+

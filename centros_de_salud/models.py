@@ -45,6 +45,12 @@ class CentroDeSalud(models.Model):
     class Meta:
         verbose_name = 'Centro de Salud'
         verbose_name_plural = 'Centros de Salud'
+        permissions = [
+            (
+                "can_view_tablero",
+                "Puede ver los tableros de comandos sobre centros de salud",
+            )
+        ]
 
 
 class Especialidad(models.Model):

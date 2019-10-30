@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+SITE_ID = 1
 
 # Application definition
 
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
     'django_extensions',
     'tinymce',
@@ -47,6 +49,10 @@ INSTALLED_APPS = [
     'cie10_django',
     'crispy_forms',
     'tempus_dominus',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
 
     # our apps
     'core',
@@ -76,6 +82,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'ggg', 'templates'),
+            os.path.join(BASE_DIR, 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -124,6 +131,21 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+# Ver https://django-allauth.readthedocs.io/en/latest/configuration.html
+ACCOUNT_EMAIL_REQUIRED = True
+# for prod env ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
+
+# LOGIN_URL = 'una-url'
+LOGIN_REDIRECT_URL = 'admin.home'
+
+SOCIALACCOUNT_QUERY_EMAIL = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
@@ -209,6 +231,17 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 SYS_SHORT_TITLE = 'OPS/Cba'
 SYS_TITLE = 'OPS/Córdoba'
 SYS_DESCRIPTION = 'Sistema de información para la salud'
+
+# dummy to avoid errors
+EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+
+# Option: django-ses with AWS
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'email-smtp.us-west-2.amazonaws.com'
+# EMAIL_PORT = 2587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = <my-ses-smtp-username>
+# EMAIL_HOST_PASSWORD = <my-ses-smtp-password>
 
 try:
     from .local_settings import *

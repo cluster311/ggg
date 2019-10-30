@@ -1,0 +1,56 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+<h2>Lista de Obras sociales</h2>
+
+<form class="navbar-form" method="get">
+     <div class="form-group">
+        <input name="search" type="text" placeholder="buscar" class="form-control" value="{{ search_txt }}">
+     </div>
+     <button type="submit" class="btn btn-success">Buscar</button>
+ </form>
+
+{% if is_paginated %}
+
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a style="color:blue" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% else %}
+        <span class="disabled">Anterior</span>
+    {% endif %}
+
+    - Pagina {{ page_obj.number }} de {{ paginator.num_pages }} - 
+    
+    {% if page_obj.has_next %}
+        <a style="color:blue" href="?page={{ page_obj.next_page_number }}">siguiente</a>
+    {% else %}
+        <span class="disabled">Siguiente</span>
+    {% endif %}
+</div>
+{% endif %}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Nombre</th>
+        <th scope="col">Codigo</th>
+        <th scope="col">Siglas</th>
+        <th scope="col">Provincia</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for oss in object_list %}
+<tr>
+    <th scope="row">{{ oss.nombre }}</th>
+    <td>{{ oss.codigo }}</td>
+    <td>{{ oss.siglas }}</td>
+    <td>{{ oss.provincia }}</td>
+</tr>
+        {% empty %}
+        <td>Sin datos</td><td></td><td></td>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
+

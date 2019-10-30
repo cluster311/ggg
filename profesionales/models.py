@@ -25,7 +25,7 @@ class Profesional(Persona):
 
     def __str__(self):
         apellidos = "" if self.apellidos is None else self.apellidos
-        return f"{self.nombres, apellidos}"
+        return f"{apellidos}, {self.nombres}"
 
     def agregar_dato_de_contacto(self, tipo, valor):
         type_ = ContentType.objects.get_for_model(self)
