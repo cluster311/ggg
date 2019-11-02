@@ -6,16 +6,29 @@
 {% include 'admin_search_bar.html' %}
 {% include 'admin_paginate.html' %}
 
+{% if perms.recupero.add_tipoprestacion %}
+{% include 'admin_add_button.html' with add_url='recupero.tipos-prestacion.create'%}
+{% endif %}
+
 <table class="table">
     <thead>
     <tr>
         <th scope="col">Nombre</th>
+        <th scope="col">Tipo</th>
+        <th scope="col">Acciones</th>
     </tr>
     </thead>
     <tbody>
     {% for cs in object_list %}
 <tr>
     <th scope="row">{{ cs.nombre }}</th>
+    <th scope="row">{{ cs.get_tipo_display }}</th>
+    <th scope="row">
+        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'recupero.tipos-prestacion.detail' pk=cs.id %}">Detalles</a>
+        {% if perms.recupero.change_tipoprestacion %}
+        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'recupero.tipos-prestacion.edit' pk=cs.id %}">Editar</a>
+        {% endif %}
+    </th>
 </tr>
         {% empty %}
         <td>Sin datos</td><td></td><td></td>
