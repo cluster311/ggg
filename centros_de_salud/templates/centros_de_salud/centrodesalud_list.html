@@ -3,31 +3,8 @@
 {% block content %}
 <h2>Lista de Centros de salud</h2>
 
-<form class="navbar-form" method="get">
-     <div class="form-group">
-        <input name="search" type="text" placeholder="buscar" class="form-control" value="{{ search_txt }}">
-     </div>
-     <button type="submit" class="btn btn-success">Buscar</button>
- </form>
-
-{% if is_paginated %}
-
-<div class="pagination">
-    {% if page_obj.has_previous %}
-        <a style="color:blue" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-    {% else %}
-        <span class="disabled">Anterior</span>
-    {% endif %}
-
-    - Pagina {{ page_obj.number }} de {{ paginator.num_pages }} - 
-    
-    {% if page_obj.has_next %}
-        <a style="color:blue" href="?page={{ page_obj.next_page_number }}">siguiente</a>
-    {% else %}
-        <span class="disabled">Siguiente</span>
-    {% endif %}
-</div>
-{% endif %}
+{% include 'admin_search_bar.html' %}
+{% include 'admin_paginate.html' %}
 
 <table class="table">
     <thead>

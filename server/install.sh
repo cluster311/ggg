@@ -67,3 +67,5 @@ sudo certbot --nginx -d lala.com
 
 # etapa 2, GeoDjango
 sudo apt install binutils libproj-dev gdal-bin
+
+# obtener un API KEY de google y agregarlo a local_settings como GOOGLE_API_KEY
