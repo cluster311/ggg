@@ -10,7 +10,7 @@ from crispy_forms.utils import render_crispy_form
 from .models import TipoPrestacion
 
 
-class TipoPrestacioListView(PermissionRequiredMixin, ListView):
+class TipoPrestacionListView(PermissionRequiredMixin, ListView):
     """
     Lista de tipos de prestaciones habilitadas para recuperar
     """

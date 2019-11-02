@@ -63,31 +63,3 @@ class FacturaPendCobroView(
         context = super().get_context_data(**kwargs)
         context['search_txt'] = self.request.GET.get('search', '')
         return context
-
-
-class TipoDocAnexoView(
-        PermissionRequiredMixin, ListView):
-    """
-    Lista de tipos de documentacion anexa que se pueden pedir en las prestaciones
-    """
-
-    model = TipoDocumentoAnexo
-    permission_required = ("add_tipodocumentoanexo",)
-    paginate_by = 10  # pagination
-
-    def get_queryset(self):        
-        if 'search' in self.request.GET:
-            q = self.request.GET['search']
-            objects = TipoDocumentoAnexo.objects.filter(
-                nombre__icontains=q)
-        else:
-            objects = TipoDocumentoAnexo.objects.all()
-        
-        return objects
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['search_txt'] = self.request.GET.get('search', '')
-        return context
-
-
