@@ -1,0 +1,25 @@
+{% extends "base_admin.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+
+<h2>{{ object.nombre }}</h2>
+<p>Tipo: {{ object.get_tipo_display }}</p>
+<p>Documentos requeridos</p>
+<ul>
+    {% for doc in object.documentos_requeridos.all %}
+    <li>{{ doc.nombre }}</li>
+    {% empty %}
+    <li>Sin documentos requeridos</li>
+    {% endfor %}
+</ul>
+<p>Documentos sugeridos</p>
+<ul>
+    {% for doc in object.documentos_sugeridos.all %}
+    <li>{{ doc.nombre }}</li>
+    {% empty %}
+    <li>Sin documentos sugeridos</li>
+    {% endfor %}
+</ul>
+{% endblock %}

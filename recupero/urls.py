@@ -3,9 +3,12 @@ from django.urls import path
 from .views import (
     FacturaPendEnvioView,
     FacturaPendCobroView,
-    TipoDocAnexoView,
-    TipoPrestacioView
+    TipoDocAnexoView
 )
+from .views_tipo_prestacion import (TipoPrestacioListView,
+                                    TipoPrestacionCreateView,
+                                    TipoPrestacionDetailView,
+                                    TipoPrestacionUpdateView)
 
 
 urlpatterns = [
@@ -26,7 +29,23 @@ urlpatterns = [
     ),
     path(
         r"tipo-de-prestacio.html",
-        TipoPrestacioView.as_view(),
+        TipoPrestacioListView.as_view(),
         name="recupero.tipos-prestacion",
     ),
+    path(
+        r"crear-tipo-de-prestacio.html",
+        TipoPrestacionCreateView.as_view(),
+        name="recupero.tipos-prestacion.create",
+    ),
+    path(
+        r"detalle-tipo-de-prestacion/<int:pk>",
+        TipoPrestacionDetailView.as_view(),
+        name="recupero.tipos-prestacion.detail",
+    ),
+    path(
+        r"editar-tipo-de-prestacion/<int:pk>",
+        TipoPrestacionUpdateView.as_view(),
+        name="recupero.tipos-prestacion.edit",
+    ),
 ]
+

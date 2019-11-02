@@ -91,27 +91,3 @@ class TipoDocAnexoView(
         return context
 
 
-class TipoPrestacioView(PermissionRequiredMixin, ListView):
-    """
-    Lista de tipos de prestaciones habilitadas para recuperar
-    """
-
-    model = TipoPrestacion
-    permission_required = ("add_tipoprestacion",)
-    paginate_by = 10  # pagination
-
-    def get_queryset(self):        
-        if 'search' in self.request.GET:
-            q = self.request.GET['search']
-            objects = TipoPrestacion.objects.filter(
-                nombre__icontains=q)
-        else:
-            objects = TipoPrestacion.objects.all()
-        
-        return objects
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['search_txt'] = self.request.GET.get('search', '')
-        return context
-
