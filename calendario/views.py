@@ -115,7 +115,7 @@ def feed(request):
         'service': t.servicio.pk or 0,
         'status': t.estado,
         'professional': t.profesional.pk or 0,
-        'patient': t.paciente.pk or 0
+        # 'patient': t.paciente.pk or 0
     } for t in turnos]
 
     return JsonResponse(turnos, safe=False)

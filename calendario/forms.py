@@ -39,13 +39,13 @@ class TurnoForm(forms.ModelForm):
 
     class Meta:
         model = Turno
-        fields = '__all__'
+        fields = ['inicio', 'fin', 'servicio', 'profesional', 'bulk', 'duration']
         widgets = {
             'inicio': DateTimePicker(),
             'fin': DateTimePicker(),
             'servicio': autocomplete.ModelSelect2(),
             'profesional': autocomplete.ModelSelect2(),
-            'paciente': autocomplete.ModelSelect2(),
+            # 'paciente': autocomplete.ModelSelect2(),
         }
 
 
