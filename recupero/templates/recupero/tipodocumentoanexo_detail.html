@@ -3,7 +3,10 @@
 {% load static %}
 
 {% block content %}
-
+<a role="button" class="btn btn-warning btn-sm active" href="{% url 'recupero.tipos-doc-anexo' %}">Volver a la lista</a>
+{% if perms.recupero.change_tipoprestacion %}
+<a role="button" class="btn btn-warning btn-sm active" href="{% url 'recupero.tipos-documento-anexo.edit' pk=object.id %}">Editar</a>
+{% endif %}
 <p>Tipo de documento anexto: <b>{{ object.nombre }}</b></p>
 
 {% endblock %}
