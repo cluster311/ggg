@@ -2,11 +2,9 @@
 {% load crispy_forms_tags %}
 {% load static %}
 
-{% block extra_head %}
-{% endblock %}
-
 {% block content %}
     <h2>Nuevo tipo de prestacion</h2>
+    <a role="button" class="btn btn-warning btn-sm active" href="{% url 'recupero.tipos-prestacion' %}">Volver a la lista</a>
     <form method="post" novalidate>
     {% csrf_token %}
         {{ form|crispy}}

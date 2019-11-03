@@ -39,7 +39,8 @@ class TipoPrestacionCreateView(PermissionRequiredMixin,
                                SuccessMessageMixin):
     model = TipoPrestacion
     permission_required = ("view_tipoprestacion",)
-    fields = ['nombre', 'tipo', 'documentos_requeridos', 'documentos_sugeridos']
+    fields = ['nombre', 'codigo', 'descripcion', 'observaciones',
+              'tipo', 'documentos_requeridos', 'documentos_sugeridos']
     success_message = "Creado con éxito."
 
     def get_success_url(self):
@@ -56,7 +57,8 @@ class TipoPrestacionDetailView(PermissionRequiredMixin, DetailView):
 class TipoPrestacionUpdateView(PermissionRequiredMixin, UpdateView):
     model = TipoPrestacion
     permission_required = "change_tipoprestacion"
-    fields = ['nombre', 'tipo', 'documentos_requeridos', 'documentos_sugeridos']
+    fields = ['nombre', 'codigo', 'descripcion', 'observaciones',
+              'tipo', 'documentos_requeridos', 'documentos_sugeridos']
     success_message = "Actualizado con éxito."
 
     def get_success_url(self):

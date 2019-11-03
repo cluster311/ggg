@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils import timezone
-from nhpgd_django.models import NomencladorHPGD
 from cie10_django.models import CIE10
 
 
@@ -102,23 +101,29 @@ class DocumentoAnexo(models.Model):
 
 
 class TipoPrestacion(models.Model):
-    """ Cada uno de los tipos de atencion """
+    """ Cada uno de los tipos de atencion.
+        Basado en la pésima base de datos: Nomenclador para HPGD """
     nombre = models.CharField(max_length=30, help_text='Tipo de atención')
-    # Ejemplos
-    # Enfermería, Imagenes - Rayos X, Imagenes - Ecografía, Imagenes -
-    # Mamografía, Imagenes - Otros
-    # Internacion breve, Internacion prolongada, Atencion de urgencias,
-    # emergencias y traslados
-    # Odontología, Kinesiología
-
+    codigo = models.CharField(max_length=30, 
+                              null=True, blank=True,
+                              help_text='Código del servicio (de nomenclador si corresponde)')
+    
+    arancel = models.DecimalField(max_digits=11, decimal_places=2, default=0.0)
+    descripcion = models.TextField(null=True, blank=True)
+    observaciones = models.TextField(null=True, blank=True)
+    anio_update = models.PositiveIntegerField(default=2019, help_text='Si viene del nomenclador indicar de que versión es')
+    TIPO_DESCONOCIDO = 0
     TIPO_CONSULTA = 100
     TIPO_PRACTICA = 200
     TIPO_INTERNACION = 300
+    TIPO_LABORATORIO = 400
     # el Anexo II al parecer solo permite estos tipos reales de atención.
     # https://github.com/cluster311/Anexo2
-    tipos = ((TIPO_CONSULTA, 'Consulta'),
+    tipos = ((TIPO_DESCONOCIDO, 'Desconocido'),
+             (TIPO_CONSULTA, 'Consulta'),
              (TIPO_PRACTICA, 'Práctica'),
-             (TIPO_INTERNACION, 'Internación')
+             (TIPO_INTERNACION, 'Internación'),
+             (TIPO_LABORATORIO, 'Laboratorio')
              )
     tipo = models.PositiveIntegerField(choices=tipos, default=TIPO_CONSULTA)
 
@@ -136,7 +141,30 @@ class TipoPrestacion(models.Model):
 
     def __str__(self):
         return self.nombre
-
+    
+    @classmethod
+    def importar_desde_nomenclador(cls):
+        """ Traer todos los elementos del nomenclador
+            No usamos NomencladorHPGD porque la base del nomenclador es muy mala
+            Tratamos aqui de crear una base nueva derivada de aquella pero que se pueda
+            completar y mejorar.
+            Como no hay clave única podrían duplicarse, 
+            solo para su uso con bases limpias"""
+        from nhpgd.nomenclador import Nomenclador
+        n = Nomenclador()
+        # actualziar a los últimos datos
+        n.download_csv()
+        for i, nom in n.tree.items():
+            nombre = nom['descripcion'][:29]
+            arancel = 0 if nom['arancel'] == '' else nom['arancel']
+            cls.objects.create(tipo=cls.TIPO_DESCONOCIDO,
+                               nombre=nombre,
+                               codigo=nom['codigo'],
+                               descripcion=nom['descripcion'],
+                               observaciones=nom['observaciones'],
+                               arancel=arancel
+                               )
+            
 
 class Prestacion(models.Model):
     """ Cada una de las atenciones a un paciente/beneficiario
@@ -153,11 +181,4 @@ class Prestacion(models.Model):
     )
     tipo = models.ForeignKey(TipoPrestacion, on_delete=models.PROTECT)
     cantidad = models.IntegerField(default=1)
-    nomenclador = models.ForeignKey(
-        NomencladorHPGD,
-        on_delete=models.CASCADE,
-        related_name='prestaciones',
-        help_text='Servicio realizado o entregado'
-    )
-
     documentos_adjuntados = models.ManyToManyField(DocumentoAnexo, blank=True)
