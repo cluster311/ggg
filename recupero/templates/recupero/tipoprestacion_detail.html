@@ -8,7 +8,7 @@
 <a role="button" class="btn btn-warning btn-sm active" href="{% url 'recupero.tipos-prestacion.edit' pk=object.id %}">Editar</a>
 {% endif %}
 
-<h2>{{ object.codigo }}</h2>
+<h2>Código: {{ object.codigo }}</h2>
 <p>{{ object.nombre }}: <b>$ {{ object.arancel }}</b></p>
 <p>{{ object.descripcion }}</p>
 <p>{{ object.observaciones }}</p>

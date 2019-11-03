@@ -228,9 +228,9 @@ SOURCE_OSS_SSSALUD = 'SSSalud'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Titulo o nombre de este sistema
-SYS_SHORT_TITLE = 'OPS/Cba'
-SYS_TITLE = 'OPS/Córdoba'
-SYS_DESCRIPTION = 'Sistema de información para la salud'
+SYS_SHORT_TITLE = 'HCD/R'
+SYS_TITLE = 'HCD/R[ecupero]'
+SYS_DESCRIPTION = 'Sistema de información de salud para historia clínica y recupero de gasto en Argentina'
 
 # dummy to avoid errors
 EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
