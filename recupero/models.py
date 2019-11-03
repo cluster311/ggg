@@ -111,6 +111,7 @@ class TipoPrestacion(models.Model):
     arancel = models.DecimalField(max_digits=11, decimal_places=2, default=0.0)
     descripcion = models.TextField(null=True, blank=True)
     observaciones = models.TextField(null=True, blank=True)
+    anio_update = models.PositiveIntegerField(default=2019, help_text='Si viene del nomenclador indicar de que versión es')
     TIPO_DESCONOCIDO = 0
     TIPO_CONSULTA = 100
     TIPO_PRACTICA = 200
@@ -151,13 +152,17 @@ class TipoPrestacion(models.Model):
             solo para su uso con bases limpias"""
         from nhpgd.nomenclador import Nomenclador
         n = Nomenclador()
+        # actualziar a los últimos datos
+        n.download_csv()
         for i, nom in n.tree.items():
             nombre = nom['descripcion'][:29]
-            cls.objects.create(tipo=TIPO_DESCONOCIDO,
+            arancel = 0 if nom['arancel'] == '' else nom['arancel']
+            cls.objects.create(tipo=cls.TIPO_DESCONOCIDO,
                                nombre=nombre,
+                               codigo=nom['codigo'],
                                descripcion=nom['descripcion'],
                                observaciones=nom['observaciones'],
-                               arancel=nom['arancel']
+                               arancel=arancel
                                )
             
 

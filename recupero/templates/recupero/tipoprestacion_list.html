@@ -13,16 +13,22 @@
 <table class="table">
     <thead>
     <tr>
+        <th scope="col">Código</th>
         <th scope="col">Nombre</th>
         <th scope="col">Tipo</th>
+        <th scope="col">Arancel</th>
+        <th scope="col">Descripcion</th>
         <th scope="col">Acciones</th>
     </tr>
     </thead>
     <tbody>
     {% for cs in object_list %}
 <tr>
+    <th scope="row">{{ cs.codigo }}</th>
     <th scope="row">{{ cs.nombre }}</th>
     <th scope="row">{{ cs.get_tipo_display }}</th>
+    <th scope="row">{{ cs.arancel }}</th>
+    <th scope="row">{{ cs.descripcion }}</th>
     <th scope="row">
         <a role="button" class="btn btn-warning btn-sm active" href="{% url 'recupero.tipos-prestacion.detail' pk=cs.id %}">Detalles</a>
         {% if perms.recupero.change_tipoprestacion %}
