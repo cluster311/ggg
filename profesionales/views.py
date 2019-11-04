@@ -14,7 +14,7 @@ from django.template import RequestContext
 from django.conf import settings
 from .models import Profesional
 from pacientes.models import Consulta
-from pacientes.forms import ConsultaForm
+from pacientes.forms import ConsultaForm, RecetaFormset, DerivacionFormset, PrestacionFormset
 from crispy_forms.utils import render_crispy_form
 
 
@@ -41,6 +41,9 @@ class ProfesionalListView(PermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['search_txt'] = self.request.GET.get('search', '')
+        context['title'] = 'Lista de profesionales'
+        context['title_url'] = 'profesionales.lista'
+        context['use_search_bar'] = True
         return context
 
 
@@ -175,11 +178,6 @@ class ConsultaDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        context["codigos"] = self.object.codigo.all()
-        context["derivaciones"] = self.object.derivaciones.values_list(
-            "nombre", flat=True
-        )
         context["fecha"] = self.object.created.strftime("%d/%m/%Y")
 
         return context
@@ -193,6 +191,20 @@ class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin,
     template_name = "profesionales/consulta_createview.html"
     form_class = ConsultaForm
     success_message = "Datos guardados con éxito."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        if self.request.POST:
+            context["recetas_frm"] = RecetaFormset(self.request.POST)
+            context["derivaciones_frm"] = DerivacionFormset(self.request.POST)
+            context["prestaciones_frm"] = PrestacionFormset(self.request.POST)
+        else:
+            context["recetas_frm"] = RecetaFormset()
+            context["derivaciones_frm"] = DerivacionFormset()
+            context["prestaciones_frm"] = PrestacionFormset()
+        
+        return context
 
     def get_success_url(self):
         return reverse(

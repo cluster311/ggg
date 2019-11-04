@@ -30,24 +30,31 @@
                                 <label>INDICACIONES:</label>
                                 <p>{{object.indicaciones}}</p>
                             {% endif %}
-                            {% if object.receta %}
-                                <label>RECETA:</label>
-                                <p>{{object.receta}}</p>
-                            {% endif %}
-                            {% if object.practicas %}
-                                <label>PRACTICAS:</label>
-                                <p>{{object.practicas}}</p>
-                            {% endif %}
-                            <!-- derivaciones puede ser null -->
-                            {% if derivaciones.count > 0 %}
-                                <label>DERIVACIONES:</label>
-                                {% for derivacion in derivaciones %}
-                                    <p>{{derivacion}}</p>
+                            {% if object.recetas.count > 0 %}
+                                <label>Recetas:</label>
+                                {% for p in object.recetas %}
+                                <p>{{ p.medicamento}}: {{ p.posologia }}</p>
+                                <p>{{ p.observaciones }}</p>
                                 {% endfor %}
                             {% endif %}
-                            <label>CÓDIGO:</label>
-                            {% for codigo in codigos%}
-                                <p>{{codigo.code}} - {{codigo.description}}</p>
+                            {% if object.prestaciones.count > 0 %}
+                                <label>Prestaciones:</label>
+                                {% for p in object.prestaciones%}
+                                <p>{{ p.tipo.codigo }} {{ p.tipo.nombre }}: {{ p.cantidad }}</p>
+                                <p>{{ p.observaciones }}</p>
+                                {% endfor %}
+                            {% endif %}
+                            <!-- derivaciones puede ser null -->
+                            {% if object.derivaciones.count > 0 %}
+                                <label>Derivaciones:</label>
+                                {% for p in object.derivaciones %}
+                                    <p>{{ p.especialidad.nombre }}</p>
+                                {% endfor %}
+                            {% endif %}
+                            <label>CÓDIGOS:</label>
+                            <p>{{ object.codigo_cie_principal.code }}: {{ object.codigo_cie_principal.description }}</p>
+                            {% for codigo in object.codigos_cie_secundarios %}
+                            <p>{{ codigo.code }}: {{ codigo.description }}</p>
                             {% endfor %}
                           </div>
                         </div>

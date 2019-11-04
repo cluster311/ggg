@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from cie10_django.models import CIE10
+from model_utils.models import TimeStampedModel
 
 
 class Factura(models.Model):
@@ -89,17 +90,6 @@ class TipoDocumentoAnexo(models.Model):
         return self.nombre
 
 
-class DocumentoAnexo(models.Model):
-    """ Cada uno de los documentos que se pueden adjuntar a una prestacion """
-    tipo = models.ForeignKey(TipoDocumentoAnexo, on_delete=models.CASCADE)
-
-    # TODO definir un destino seguro y privado!
-    documento_adjunto = models.FileField(upload_to='documentos_anexos')
-
-    def __str__(self):
-        return f'DOC {self.tipo} {self.id}'
-
-
 class TipoPrestacion(models.Model):
     """ Cada uno de los tipos de atencion.
         Basado en la pésima base de datos: Nomenclador para HPGD """
@@ -164,21 +154,26 @@ class TipoPrestacion(models.Model):
                                observaciones=nom['observaciones'],
                                arancel=arancel
                                )
-            
 
-class Prestacion(models.Model):
-    """ Cada una de las atenciones a un paciente/beneficiario
-        cubiertos por algun programa, obra social o prepaga
-    """
-    fecha = models.DateField(
-        default=timezone.now,
-        help_text='Fecha de la prestación'
-    )
-    factura = models.ForeignKey(
-        Factura,
-        on_delete=models.CASCADE,
-        related_name='prestaciones'
-    )
-    tipo = models.ForeignKey(TipoPrestacion, on_delete=models.PROTECT)
-    cantidad = models.IntegerField(default=1)
-    documentos_adjuntados = models.ManyToManyField(DocumentoAnexo, blank=True)
+
+class Prestacion(TimeStampedModel):
+    """ una prestacion que se le da a un paciente """
+    consulta = models.ForeignKey('pacientes.Consulta', on_delete=models.CASCADE, related_name='prestaciones')
+    tipo = models.ForeignKey(TipoPrestacion, on_delete=models.SET_NULL, null=True)
+    cantidad = models.PositiveIntegerField(default=1)
+    observaciones = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.medicamento
+
+
+class DocumentoAnexo(models.Model):
+    """ Cada uno de los documentos que se pueden adjuntar a una prestacion """
+    prestacion = models.ForeignKey(Prestacion, on_delete=models.CASCADE, related_name='documentos')
+    tipo = models.ForeignKey(TipoDocumentoAnexo, on_delete=models.CASCADE)
+
+    # TODO definir un destino seguro y privado!
+    documento_adjunto = models.FileField(upload_to='documentos_anexos')
+
+    def __str__(self):
+        return f'DOC {self.tipo.nombre} {self.id}'
