@@ -91,8 +91,8 @@
     <li>
         <a href="#menu_recupero" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Recupero</a>
         <ul class="collapse list-unstyled" id="menu_recupero">
-        {% if perms.recupero.change_factura %}
-        <li>
+        {% if perms.recupero.view_factura %}
+        <liview
             <a href="{% url 'recupero.factura.lista-pendientes-envio' %}">Facturación pendiente de envío</a>
         </li>
             
@@ -101,13 +101,13 @@
         </li>
         {% endif %}
         
-        {% if perms.recupero.add_tipodocumentoanexo %}
+        {% if perms.recupero.view_tipodocumentoanexo %}
         <li>
             <a href="{% url 'recupero.tipos-doc-anexo' %}">Tipos de documentos anexos</a>
         </li>
         {% endif %}
 
-        {% if perms.recupero.add_tipoprestacion %}
+        {% if perms.recupero.view_tipoprestacion %}
         <li>
             <a href="{% url 'recupero.tipos-prestacion' %}">Tipos de prestación</a>
         </li>

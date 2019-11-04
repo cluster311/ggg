@@ -1,14 +1,8 @@
 {% extends "base_admin.html" %}
 
 {% block content %}
-<h2>Tipos de documentación a exigir en las prestaciones</h2>
 
-{% include 'admin_search_bar.html' %}
 {% include 'admin_paginate.html' %}
-
-{% if perms.recupero.add_tipoprestacion %}
-{% include 'admin_add_button.html' with add_url='recupero.tipos-documento-anexo.create'%}
-{% endif %}
 
 <table class="table">
     <thead>

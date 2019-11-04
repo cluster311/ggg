@@ -30,7 +30,13 @@ class TipoPrestacionListView(PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['title'] = 'Tipos de prestacion'
+        context['title_url'] = 'recupero.tipos-prestacion'
         context['search_txt'] = self.request.GET.get('search', '')
+        context['use_search_bar'] = True
+        if self.request.user.has_perm('recupero.add_tipoprestacion'):
+            context['use_add_btn'] = True
+            context['add_url'] = 'recupero.tipos-prestacion.create'
         return context
 
 
@@ -43,6 +49,12 @@ class TipoPrestacionCreateView(PermissionRequiredMixin,
               'tipo', 'documentos_requeridos', 'documentos_sugeridos']
     success_message = "Creado con éxito."
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Tipos de prestacion'
+        context['title_url'] = 'recupero.tipos-prestacion'
+        return context
+
     def get_success_url(self):
         return reverse(
             "recupero.tipos-prestacion"
@@ -53,6 +65,12 @@ class TipoPrestacionDetailView(PermissionRequiredMixin, DetailView):
     model = TipoPrestacion
     permission_required = ("view_tipoprestacion",)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Tipos de prestacion'
+        context['title_url'] = 'recupero.tipos-prestacion'
+        return context
+
 
 class TipoPrestacionUpdateView(PermissionRequiredMixin, UpdateView):
     model = TipoPrestacion
@@ -60,6 +78,12 @@ class TipoPrestacionUpdateView(PermissionRequiredMixin, UpdateView):
     fields = ['nombre', 'codigo', 'descripcion', 'observaciones',
               'tipo', 'documentos_requeridos', 'documentos_sugeridos']
     success_message = "Actualizado con éxito."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Tipos de prestacion'
+        context['title_url'] = 'recupero.tipos-prestacion'
+        return context
 
     def get_success_url(self):
         return reverse(

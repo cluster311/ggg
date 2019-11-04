@@ -31,6 +31,12 @@ class TipoDocumentoAnexoListView(PermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['search_txt'] = self.request.GET.get('search', '')
+        context['title'] = 'Tipos de documentos anexos'
+        context['title_url'] = 'recupero.tipos-doc-anexo'
+        context['use_search_bar'] = True
+        if self.request.user.has_perm('recupero.add_tipodocumentoanexo'):
+            context['use_add_btn'] = True
+            context['add_url'] = 'recupero.tipos-documento-anexo.create'
         return context
 
 
@@ -42,6 +48,12 @@ class TipoDocumentoAnexoCreateView(PermissionRequiredMixin,
     fields = ['nombre']
     success_message = "Creado con éxito."
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Tipos de documentos anexos'
+        context['title_url'] = 'recupero.tipos-doc-anexo'
+        return context
+
     def get_success_url(self):
         return reverse(
             "recupero.tipos-doc-anexo"
@@ -52,12 +64,24 @@ class TipoDocumentoAnexoDetailView(PermissionRequiredMixin, DetailView):
     model = TipoDocumentoAnexo
     permission_required = ("view_tipodocumentoanexo",)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Tipos de documentos anexos'
+        context['title_url'] = 'recupero.tipos-doc-anexo'
+        return context
+
 
 class TipoDocumentoAnexoUpdateView(PermissionRequiredMixin, UpdateView):
     model = TipoDocumentoAnexo
     permission_required = "change_tipodocumentoanexo"
     fields = ['nombre']
     success_message = "Actualizado con éxito."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Tipos de documentos anexos'
+        context['title_url'] = 'recupero.tipos-doc-anexo'
+        return context
 
     def get_success_url(self):
         return reverse(
