@@ -3,6 +3,7 @@ from django import forms
 from cie10_django.models import CIE10
 from pacientes.models import Consulta, Paciente
 from profesionales.models import Profesional
+from centros_de_salud.models import CentroDeSalud
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 
@@ -22,6 +23,16 @@ class ConsultaForm(forms.ModelForm):
         queryset=Profesional.objects.all(),
         widget=autocomplete.ModelSelect2(
             url="profesional-autocomplete",
+            attrs={
+                "data-placeholder": "Ingrese número de documento",
+                "data-minimum-input-length": 3,
+            },
+        ),
+    )
+    centro_de_salud = forms.ModelChoiceField(
+        queryset=CentroDeSalud.objects.all(),
+        widget=autocomplete.ModelSelect2(
+            url="centro_de_salud-autocomplete",
             attrs={
                 "data-placeholder": "Ingrese número de documento",
                 "data-minimum-input-length": 3,
