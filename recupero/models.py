@@ -157,6 +157,7 @@ class TipoPrestacion(models.Model):
 
 
 class Prestacion(TimeStampedModel):
+    """ una prestacion que se le da a un paciente """
     consulta = models.ForeignKey('pacientes.Consulta', on_delete=models.CASCADE, related_name='prestaciones')
     tipo = models.ForeignKey(TipoPrestacion, on_delete=models.SET_NULL, null=True)
     cantidad = models.PositiveIntegerField(default=1)
