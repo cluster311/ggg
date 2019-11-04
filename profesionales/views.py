@@ -14,7 +14,7 @@ from django.template import RequestContext
 from django.conf import settings
 from .models import Profesional
 from pacientes.models import Consulta
-from pacientes.forms import ConsultaForm
+from pacientes.forms import ConsultaForm, RecetaFormset, DerivacionFormset, PrestacionFormset
 from crispy_forms.utils import render_crispy_form
 
 
@@ -191,6 +191,20 @@ class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin,
     template_name = "profesionales/consulta_createview.html"
     form_class = ConsultaForm
     success_message = "Datos guardados con éxito."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        if self.request.POST:
+            context["recetas_frm"] = RecetaFormset(self.request.POST)
+            context["derivaciones_frm"] = DerivacionFormset(self.request.POST)
+            context["prestaciones_frm"] = PrestacionFormset(self.request.POST)
+        else:
+            context["recetas_frm"] = RecetaFormset()
+            context["derivaciones_frm"] = DerivacionFormset()
+            context["prestaciones_frm"] = PrestacionFormset()
+        
+        return context
 
     def get_success_url(self):
         return reverse(

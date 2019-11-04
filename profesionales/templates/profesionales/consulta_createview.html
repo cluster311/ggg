@@ -9,7 +9,20 @@
     <h2>Nueva Consulta</h2>
     <form method="post" novalidate>
     {% csrf_token %}
-        {{ form|crispy}}
+    {{ form|crispy}}
+
+    <hr>
+    <h3>Recetas</h3>
+    {{ recetas_frm|crispy }}
+    
+    <hr>
+    <h3>Derivaciones</h3>
+    {{ derivaciones_frm|crispy }}
+    
+    <hr>
+    <h3>Prestaciones</h3>
+    {{ prestaciones_frm|crispy }}
+
         <button type="submit" class="btn btn-success">Guardar Consulta</button>
     </form>
     <div class="line"></div>

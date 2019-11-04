@@ -2,7 +2,8 @@ from django.conf.urls import url
 from core.views import (CIE10Autocomplete,
                         PacienteAutocomplete,
                         ProfesionalAutocomplete,
-                        CentroDeSaludAutocomplete
+                        CentroDeSaludAutocomplete,
+                        TipoPrestacionAutocomplete
                         )
 
 
@@ -27,4 +28,10 @@ urlpatterns = [
         CentroDeSaludAutocomplete.as_view(),
         name="centro_de_salud-autocomplete",
     ),
+    url(
+        r"^tipo-prestacion-autocomplete/$",
+        TipoPrestacionAutocomplete.as_view(),
+        name="tipo_prestacion-autocomplete",
+    ),
+    
 ]

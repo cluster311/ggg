@@ -3,6 +3,7 @@ from cie10_django.models import CIE10
 from pacientes.models import Paciente
 from profesionales.models import Profesional
 from centros_de_salud.models import CentroDeSalud
+from recupero.models import TipoPrestacion
 from django.db.models import Q
 
 
@@ -84,5 +85,25 @@ class CentroDeSaludAutocomplete(autocomplete.Select2QuerySetView):
 
         if self.q:
             qs = qs.filter(nombre__icontains=self.q)
+
+        return qs.order_by("nombre")[:5]
+
+
+class TipoPrestacionAutocomplete(autocomplete.Select2QuerySetView):
+    """
+    Base de autocompletado para tipos de prestaciones.
+    """
+
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return TipoPrestacion.objects.none()
+
+        qs = TipoPrestacion.objects.all()
+
+        if self.q:
+            qs = qs.filter(Q(codigo__icontains=self.q) |
+                           Q(nombre__icontains=self.q) |
+                           Q(descripcion__icontains=self.q)
+                           )
 
         return qs.order_by("nombre")[:5]
