@@ -243,23 +243,15 @@ class Consulta(TimeStampedModel):
         blank=True,
     )
 
-    codigo_cie_principal = models.ForeignKey(CIE10, null=True, blank=True, on_delete=models.SET_NULL)
-    codigos_cie_secundarios = models.ManyToManyField(CIE10, blank=True)
+    codigo_cie_principal = models.ForeignKey(CIE10, null=True, blank=True,
+                                             on_delete=models.SET_NULL,
+                                             related_name='diagnositicos_principales')
+    codigos_cie_secundarios = models.ManyToManyField(CIE10, blank=True, related_name='diagnositicos_secundarios')
     diagnostico = models.TextField()
     indicaciones = models.TextField(null=True, blank=True)
     
     def __str__(self):
         return f"{self.id} - CIE: {self.codigo_cie_principal}"
-
-
-class Prestacion(TimeStampedModel):
-    consulta = models.ForeignKey(Consulta, on_delete=models.CASCADE, related_name='prestaciones')
-    tipo = models.ForeignKey('recupero.TipoPrestacion', on_delete=models.SET_NULL, null=True)
-    cantidad = models.PositiveIntegerField(default=1)
-    observaciones = models.TextField(null=True, blank=True)
-
-    def __str__(self):
-        return self.medicamento
 
 
 class Receta(TimeStampedModel):
@@ -276,7 +268,7 @@ class Receta(TimeStampedModel):
 
 class Derivacion(TimeStampedModel):
     consulta = models.ForeignKey(Consulta, on_delete=models.CASCADE, related_name='derivaciones')
-    especialidad = models.ForeignKey("centros_de_salud.Especialidad", blank=True)
+    especialidad = models.ForeignKey("centros_de_salud.Especialidad",on_delete=models.SET_NULL, null=True)
     observaciones = models.TextField(null=True, blank=True)
 
     def __str__(self):

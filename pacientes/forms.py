@@ -28,7 +28,7 @@ class ConsultaForm(forms.ModelForm):
             },
         ),
     )
-    codigo = forms.ModelMultipleChoiceField(
+    codigo_cie_principal = forms.ModelMultipleChoiceField(
         queryset=CIE10.objects.all(),
         widget=autocomplete.ModelSelect2Multiple(
             url="cie10-autocomplete",
@@ -38,8 +38,8 @@ class ConsultaForm(forms.ModelForm):
 
     class Meta:
         model = Consulta
-        fields = ('paciente', 'profesional', 'codigo', 'diagnostico',
-                  'indicaciones', 'receta', 'practicas', 'derivaciones')
+        fields = ('paciente', 'profesional', 'codigo_cie_principal',
+                  'diagnostico', 'indicaciones')
 
     def __init__(self, *args, **kwargs):
         """
