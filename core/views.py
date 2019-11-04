@@ -26,7 +26,7 @@ class CIE10Autocomplete(autocomplete.Select2QuerySetView):
         if self.q:
             qs = qs.filter(Q(code__icontains=self.q) |
                            Q(description__icontains=self.q)
-                          )
+                           )
 
         return qs.order_by("code")
 
@@ -48,7 +48,7 @@ class PacienteAutocomplete(autocomplete.Select2QuerySetView):
                            Q(apellidos__icontains=self.q)
                            )
 
-        return qs.order_by("apellidos", "nombres")
+        return qs.order_by("apellidos", "nombres")[:5]
 
 
 class ProfesionalAutocomplete(autocomplete.Select2QuerySetView):
@@ -68,7 +68,7 @@ class ProfesionalAutocomplete(autocomplete.Select2QuerySetView):
                            Q(apellidos__icontains=self.q)
                            )
 
-        return qs.order_by("apellidos", "nombres")
+        return qs.order_by("apellidos", "nombres")[:5]
 
 
 class CentroDeSaludAutocomplete(autocomplete.Select2QuerySetView):
@@ -85,4 +85,4 @@ class CentroDeSaludAutocomplete(autocomplete.Select2QuerySetView):
         if self.q:
             qs = qs.filter(nombre__icontains=self.q)
 
-        return qs.order_by("apellidos", "nombres")
+        return qs.order_by("nombre")[:5]
