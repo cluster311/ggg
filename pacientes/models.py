@@ -225,7 +225,8 @@ class Paciente(Persona):
 
 class Consulta(TimeStampedModel):
     """
-    Observaciones que realiza el médico al paciente en una consulta.
+    Reunión planificada de un paciente con un profesional
+    Incluye lo que el médico hace y opina de la consulta
     """
 
     paciente = models.ForeignKey(
@@ -241,20 +242,42 @@ class Consulta(TimeStampedModel):
         null=True,
         blank=True,
     )
+
+    codigo_cie_principal = models.ForeignKey(CIE10, null=True, blank=True, on_delete=models.SET_NULL)
+    codigos_cie_secundarios = models.ManyToManyField(CIE10, blank=True)
     diagnostico = models.TextField()
     indicaciones = models.TextField(null=True, blank=True)
-    # podria ser un manytomany a un modelo de medicamentos
-    receta = models.TextField(null=True, blank=True)
-    practicas = models.TextField(null=True, blank=True)
-    derivaciones = models.ManyToManyField(
-        "centros_de_salud.Especialidad",
-        blank=True
-    )
-    codigo = models.ManyToManyField(CIE10, blank=True)
+    
+    def __str__(self):
+        return f"{self.id} - CIE: {self.codigo_cie_principal}"
+
+
+class Prestacion(TimeStampedModel):
+    consulta = models.ForeignKey(Consulta, on_delete=models.CASCADE, related_name='prestaciones')
+    tipo = models.ForeignKey('recupero.TipoPrestacion', on_delete=models.SET_NULL, null=True)
+    cantidad = models.PositiveIntegerField(default=1)
+    observaciones = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        fecha = self.created.strftime("%d/%m/%Y")
-        paciente = (
-            f"paciente: {self.paciente.nombres}, {self.paciente.apellidos}"
-        )
-        return f"{self.id} - fecha: {fecha} - {paciente}"
+        return self.medicamento
+
+
+class Receta(TimeStampedModel):
+    consulta = models.ForeignKey(Consulta, on_delete=models.CASCADE, related_name='recetas')
+    #TODO conectarse a algún vademecum online o crear una librería
+    # https://servicios.pami.org.ar/vademecum/views/consultaPublica/listado.zul
+    medicamento = models.CharField(max_length=290)
+    posologia = models.TextField(null=True, blank=True)
+    observaciones = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.medicamento
+
+
+class Derivacion(TimeStampedModel):
+    consulta = models.ForeignKey(Consulta, on_delete=models.CASCADE, related_name='derivaciones')
+    especialidad = models.ForeignKey("centros_de_salud.Especialidad", blank=True)
+    observaciones = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.especialidad.nombre

@@ -178,11 +178,6 @@ class ConsultaDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        context["codigos"] = self.object.codigo.all()
-        context["derivaciones"] = self.object.derivaciones.values_list(
-            "nombre", flat=True
-        )
         context["fecha"] = self.object.created.strftime("%d/%m/%Y")
 
         return context
