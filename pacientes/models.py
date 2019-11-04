@@ -242,6 +242,13 @@ class Consulta(TimeStampedModel):
         null=True,
         blank=True,
     )
+    centro_de_salud = models.ForeignKey(
+        "centros_de_salud.CentroDeSalud",
+        related_name="consultas",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
 
     codigo_cie_principal = models.ForeignKey(CIE10, null=True, blank=True,
                                              on_delete=models.SET_NULL,
