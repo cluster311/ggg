@@ -2,8 +2,6 @@
 
 {% block content %}
 
-{% include 'admin_paginate.html' %}
-
 <table class="table">
     <thead>
     <tr>
@@ -35,6 +33,8 @@
         {% endfor %}
     </tbody>
 </table>
+
+{% include 'admin_paginate.html' %}
 
 {% endblock %}
 

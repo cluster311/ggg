@@ -41,6 +41,9 @@ class ProfesionalListView(PermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['search_txt'] = self.request.GET.get('search', '')
+        context['title'] = 'Lista de profesionales'
+        context['title_url'] = 'profesionales.lista'
+        context['use_search_bar'] = True
         return context
 
 

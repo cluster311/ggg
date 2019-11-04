@@ -16,7 +16,7 @@ class TipoPrestacionListView(PermissionRequiredMixin, ListView):
     """
     model = TipoPrestacion
     permission_required = ("view_tipoprestacion",)
-    paginate_by = 15
+    paginate_by = 10
 
     def get_queryset(self):   
         if 'search' in self.request.GET:
