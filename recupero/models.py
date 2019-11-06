@@ -145,12 +145,14 @@ class Factura(TimeStampedModel):
     # quizas statusfield + monitorfield de model-utils
     # https://django-model-utils.readthedocs.io/en/latest/fields.html#monitorfield
     EST_NUEVO = 100
+    EST_INICIADO = 200  # tomamos la decision de tratar de recuperlo
     EST_ENVIADO_A_OSS = 300  # se lo mandamos a la obra social
     EST_RECHAZADO = 400  # la oss nos mando a freir churros
     EST_ACEPTADO = 500  # la oss nos acepto la factura
     EST_PAGADO = 600  # la oss nos pagó
 
     estados = ((EST_NUEVO, 'Nueva factura'),
+               (EST_INICIADO, 'Iniciado'),
                (EST_ENVIADO_A_OSS, 'Enviada'),
                (EST_RECHAZADO, 'Rechazada'),
                (EST_ACEPTADO, 'Aceptada'),
@@ -161,7 +163,9 @@ class Factura(TimeStampedModel):
     obra_social = models.ForeignKey(
         'obras_sociales.ObraSocial',
         on_delete=models.CASCADE,
-        related_name='facturas'
+        related_name='facturas',
+        null=True,
+        blank=True
     )
     
     def __str__(self):

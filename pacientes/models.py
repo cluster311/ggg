@@ -1,5 +1,6 @@
 from django.db import models
 from core.models import Persona
+from recupero.models import Factura
 from profesionales.models import Profesional
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
@@ -259,6 +260,13 @@ class Consulta(TimeStampedModel):
     
     def __str__(self):
         return f"{self.id} - CIE: {self.codigo_cie_principal}"
+    
+    def save(self, *args, **kwargs):
+        """ crear la factura y analizar luego si se va a recuperar """
+        super().save(*args, **kwargs)
+        for prestacion in self.prestaciones.all():
+            if prestacion.factura is None:
+                f = Factura(prestacion=prestacion)
 
 
 class Receta(TimeStampedModel):
