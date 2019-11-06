@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from cie10_django.models import CIE10
 from model_utils.models import TimeStampedModel
+from core.signals import app_log
 
 
 class TipoDocumentoAnexo(models.Model):
@@ -108,7 +109,7 @@ class Prestacion(TimeStampedModel):
         return self.medicamento
 
 
-class DocumentoAnexo(models.Model):
+class DocumentoAnexo(TimeStampedModel):
     """ Cada uno de los documentos que se pueden adjuntar a una prestacion """
     prestacion = models.ForeignKey(Prestacion, on_delete=models.CASCADE, related_name='documentos')
     tipo = models.ForeignKey(TipoDocumentoAnexo, on_delete=models.CASCADE)
@@ -120,8 +121,9 @@ class DocumentoAnexo(models.Model):
         return f'DOC {self.tipo.nombre} {self.id}'
 
 
-class Factura(models.Model):
-    """ Cada una de las unidades a cobrar a una obra social o programa de salud
+class Factura(TimeStampedModel):
+    """ Cada una de las unidades a cobrar a una obra social o programa de salud.
+        Se crea solo en los casos en los que esperamos recuperar
         De aquí salen los formularios Anexo 2 (y otros según tipo de
         prestación)
         Ver imagen:https://github.com/cluster311/Anexo2/blob/master/originales/Anexo-II-RESOLUCION-487-2002.gif  # noqa
@@ -143,12 +145,18 @@ class Factura(models.Model):
     # quizas statusfield + monitorfield de model-utils
     # https://django-model-utils.readthedocs.io/en/latest/fields.html#monitorfield
     EST_NUEVO = 100
-    EST_INICIADO = 200  # aceptamos que queremos cobrarlo (tenemos los docs)
     EST_ENVIADO_A_OSS = 300  # se lo mandamos a la obra social
     EST_RECHAZADO = 400  # la oss nos mando a freir churros
     EST_ACEPTADO = 500  # la oss nos acepto la factura
-    EST_ACEPTADO = 600  # la oss nos pagó
+    EST_PAGADO = 600  # la oss nos pagó
 
+    estados = ((EST_NUEVO, 'Nueva factura'),
+               (EST_ENVIADO_A_OSS, 'Enviada'),
+               (EST_RECHAZADO, 'Rechazada'),
+               (EST_ACEPTADO, 'Aceptada'),
+               (EST_ACEPTADO, 'Pagada')
+               )
+    estado = models.PositiveIntegerField(choices=estados, default=EST_NUEVO)
     prestacion = models.OneToOneField(Prestacion, on_delete=models.CASCADE)
     obra_social = models.ForeignKey(
         'obras_sociales.ObraSocial',
@@ -158,3 +166,19 @@ class Factura(models.Model):
     
     def __str__(self):
         return f'Factura {self.id}'
+    
+    def define_oss(self):
+        # ver si el paciente tiene OSS o le corresponde algun progeama de salud
+        #TODO self.obra_social = X
+        return
+    
+    def change_status(self, new_status):
+        data = {'old_status': self.estado, 'new_status': new_status}
+        app_log.send(sender=self.__class__,
+                     code='CHANGE_STATUS_FACTURA',
+                     severity=3,
+                     description=None,
+                     data=data)
+        self.estado = new_status
+        self.save()
+    

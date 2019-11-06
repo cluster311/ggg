@@ -1,8 +1,13 @@
 from django.contrib import admin
 from django.contrib.gis import admin as gisadmin
-from .models import DatoDeContacto
+from .models import DatoDeContacto, AppLogs
 from .forms import DatoDeContactoModelForm
 from django.contrib.contenttypes.admin import GenericTabularInline
+
+
+@admin.register(AppLogs)
+class AppLogsAdmin(admin.ModelAdmin):
+    list_display = ['severity', 'code', 'description', 'data']
 
 
 class ContactoAdminInline(GenericTabularInline):
