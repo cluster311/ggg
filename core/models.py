@@ -4,6 +4,7 @@ from model_utils import Choices
 from address.models import AddressField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import JSONField
 from django.utils.timezone import now
 import logging
 
@@ -110,3 +111,14 @@ class DatoDeContacto(models.Model):
 
     def __str__(self):
         return f"{self.tipo}: {self.valor}"
+
+
+class AppLogs(models.Model):
+    """ logs varios de cosas relevantes del sistema """
+    severity = models.PositiveSmallIntegerField(default=0)
+    code = models.CharField(max_length=120)
+    description = models.TextField(null=True, blank=True)
+    data = JSONField(null=True, blank=True)
+
+    def __str__(self):
+        return self.code

@@ -2,65 +2,7 @@ from django.db import models
 from django.utils import timezone
 from cie10_django.models import CIE10
 from model_utils.models import TimeStampedModel
-
-
-class Factura(models.Model):
-    """ Cada una de las unidades a cobrar a una obra social o programa de salud
-        De aquí salen los formularios Anexo 2 (y otros según tipo de
-        prestación)
-        Ver imagen:https://github.com/cluster311/Anexo2/blob/master/originales/Anexo-II-RESOLUCION-487-2002.gif  # noqa
-        Ver imagen: https://user-images.githubusercontent.com/3237309/64081477-fc091780-ccd7-11e9-88aa-6e8bfb34f6c2.png  # noqa
-        Referencia de atencion en Anexo II
-        atencion = {
-            'tipo': 'consulta',  # | practica | internacion
-            'especialidad': 'Especialidad médica',
-            # codigos del nomenclador
-            'codigos_N_HPGD': ['AA01', 'AA02', 'AA06', 'AA07'],
-            'fecha': {'dia': 3, 'mes': 9, 'anio': 2019},
-            'diagnostico_ingreso_cie10': {
-            'principal': 'W020',
-            'otros': ['w021', 'A189']
-            }
-        }
-        """
-    fecha = models.DateField(default=timezone.now)
-    obra_social = models.ForeignKey(
-        'obras_sociales.ObraSocial',
-        on_delete=models.CASCADE,
-        related_name='facturas'
-    )
-    centro_de_salud = models.ForeignKey(
-        'centros_de_salud.CentroDeSalud',
-        on_delete=models.CASCADE,
-        related_name='facturas'
-    )
-    profesional = models.ForeignKey(
-        'profesionales.Profesional',
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-        related_name='facturas'
-    )
-    # ver si esta lista podría ser una columna mas en el nomenclador o de
-    # donde vienen los datos válidos
-    # Odontología es un ejemplo válido de especialidad pero no hay mayores
-    # especificaciones
-    especialidad = models.CharField(max_length=50)
-    codigo_cie_principal = models.ForeignKey(
-        CIE10,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='facturas'
-    )
-    cies_extras = models.ManyToManyField(
-        CIE10,
-        blank=True,
-        related_name='extras_facturas'
-    )
-
-    def __str__(self):
-        return f'Factura {self.id}'
+from core.signals import app_log
 
 
 class TipoDocumentoAnexo(models.Model):
@@ -167,7 +109,7 @@ class Prestacion(TimeStampedModel):
         return self.medicamento
 
 
-class DocumentoAnexo(models.Model):
+class DocumentoAnexo(TimeStampedModel):
     """ Cada uno de los documentos que se pueden adjuntar a una prestacion """
     prestacion = models.ForeignKey(Prestacion, on_delete=models.CASCADE, related_name='documentos')
     tipo = models.ForeignKey(TipoDocumentoAnexo, on_delete=models.CASCADE)
@@ -177,3 +119,70 @@ class DocumentoAnexo(models.Model):
 
     def __str__(self):
         return f'DOC {self.tipo.nombre} {self.id}'
+
+
+class Factura(TimeStampedModel):
+    """ Cada una de las unidades a cobrar a una obra social o programa de salud.
+        Se crea solo en los casos en los que esperamos recuperar
+        De aquí salen los formularios Anexo 2 (y otros según tipo de
+        prestación)
+        Ver imagen:https://github.com/cluster311/Anexo2/blob/master/originales/Anexo-II-RESOLUCION-487-2002.gif  # noqa
+        Ver imagen: https://user-images.githubusercontent.com/3237309/64081477-fc091780-ccd7-11e9-88aa-6e8bfb34f6c2.png  # noqa
+        Referencia de atencion en Anexo II
+        atencion = {
+            'tipo': 'consulta',  # | practica | internacion
+            'especialidad': 'Especialidad médica',
+            # codigos del nomenclador
+            'codigos_N_HPGD': ['AA01', 'AA02', 'AA06', 'AA07'],
+            'fecha': {'dia': 3, 'mes': 9, 'anio': 2019},
+            'diagnostico_ingreso_cie10': {
+            'principal': 'W020',
+            'otros': ['w021', 'A189']
+            }
+        }
+        """
+    #TODO ver una forma de seguir las fechas de cada cambio
+    # quizas statusfield + monitorfield de model-utils
+    # https://django-model-utils.readthedocs.io/en/latest/fields.html#monitorfield
+    EST_NUEVO = 100
+    EST_INICIADO = 200  # tomamos la decision de tratar de recuperlo
+    EST_ENVIADO_A_OSS = 300  # se lo mandamos a la obra social
+    EST_RECHAZADO = 400  # la oss nos mando a freir churros
+    EST_ACEPTADO = 500  # la oss nos acepto la factura
+    EST_PAGADO = 600  # la oss nos pagó
+
+    estados = ((EST_NUEVO, 'Nueva factura'),
+               (EST_INICIADO, 'Iniciado'),
+               (EST_ENVIADO_A_OSS, 'Enviada'),
+               (EST_RECHAZADO, 'Rechazada'),
+               (EST_ACEPTADO, 'Aceptada'),
+               (EST_ACEPTADO, 'Pagada')
+               )
+    estado = models.PositiveIntegerField(choices=estados, default=EST_NUEVO)
+    prestacion = models.OneToOneField(Prestacion, on_delete=models.CASCADE)
+    obra_social = models.ForeignKey(
+        'obras_sociales.ObraSocial',
+        on_delete=models.CASCADE,
+        related_name='facturas',
+        null=True,
+        blank=True
+    )
+    
+    def __str__(self):
+        return f'Factura {self.id}'
+    
+    def define_oss(self):
+        # ver si el paciente tiene OSS o le corresponde algun progeama de salud
+        #TODO self.obra_social = X
+        return
+    
+    def change_status(self, new_status):
+        data = {'old_status': self.estado, 'new_status': new_status}
+        app_log.send(sender=self.__class__,
+                     code='CHANGE_STATUS_FACTURA',
+                     severity=3,
+                     description=None,
+                     data=data)
+        self.estado = new_status
+        self.save()
+    
