@@ -266,7 +266,7 @@ class Consulta(TimeStampedModel):
         super().save(*args, **kwargs)
         for prestacion in self.prestaciones.all():
             if prestacion.factura is None:
-                f = Factura(prestacion=prestacion)
+                Factura.objects.create(prestacion=prestacion)
 
 
 class Receta(TimeStampedModel):
