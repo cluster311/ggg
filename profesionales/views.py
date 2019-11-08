@@ -55,13 +55,43 @@ class ProfesionalCreateView(PermissionRequiredMixin,
                                SuccessMessageMixin):
     model = Profesional
     permission_required = ("view_profesional",)
-    fields = ['nombres','apellidos','dni', 'matricula_profesional', 'profesion','direccion']
-    #fields = ['dni', 'matricula_profesional', 'profesion', 'direccion','datos_de_contacto']
+    fields =  '__all__'
     success_message = "Creado con éxito."
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Profesionales'
+        context['subtitle'] = 'Nuevo Profesional'
+        context['title_url'] = 'profesionales.lista'
+        return context
+
+    def get_success_url(self):
+        return reverse(
+            "profesionales.lista"
+        )
+
+
+class ProfesionalDetailView(PermissionRequiredMixin, DetailView):
+    model = Profesional
+    permission_required = ("view_profesional",)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Profesionales'
+        context['title_url'] = 'profesionales.lista'
+        return context
+
+
+class ProfesionalUpdateView(PermissionRequiredMixin, UpdateView):
+    model = Profesional
+    permission_required = "change_profesional"
+    fields =  '__all__'
+    success_message = "Actualizado con éxito."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Profesionales'
+        context['subtitle'] = 'Editar Profesional'
         context['title_url'] = 'profesionales.lista'
         return context
 

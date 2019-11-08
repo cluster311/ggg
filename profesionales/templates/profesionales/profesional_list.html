@@ -8,6 +8,7 @@
         <th scope="col">Profesional</th>
         <th scope="col">Matrícula</th>
         <th scope="col">Profesión</th>
+        <th scope="col">Acciones</th>
     </tr>
     </thead>
     <tbody>
@@ -16,6 +17,12 @@
     <th scope="row">{{ profesional.nombres }} {{ profesional.apellidos }}</th>
     <td>{{ profesional.matricula_profesional }}</td>
     <td>{{ profesional.profesion }}</td>
+    <th scope="row">
+        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'profesionales.detail' pk=profesional.id %}">Detalles</a>
+        {% if perms.profesionales.change_profesional %}
+        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'profesionales.edit' pk=profesional.id %}">Editar</a>
+        {% endif %}
+    </th>
 </tr>
         {% empty %}
         <td>Sin datos</td><td></td><td></td>
