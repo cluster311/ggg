@@ -1,0 +1,21 @@
+{% extends "base_admin.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+<a role="button" class="btn btn-warning btn-sm active" href="{% url 'profesionales.lista' %}">Volver a la lista</a>
+{% if perms.profesionales.change_profesional %}
+<a role="button" class="btn btn-warning btn-sm active" href="{% url 'profesionales.edit' pk=object.id %}">Editar</a>
+{% endif %}
+<h2>{{ object.apellidos.title }}, {{ object.nombres.title }}</h2>
+<p>Sexo: <b> {{ object.sexo.title }}</b></p>
+<p>Fecha de nacimiento: <b> {{ object.fecha_nacimiento }}</b></p>
+<p>{{ object.tipo_documento }}<b> {{ object.numero_documento }}</b></p>
+<p>Nacionalidad: <b> {{ object.nacionalidad }}</b></p>
+<p>Matricula profesional: <b> {{ object.matricula_profesional }}</b></p>
+<p>Profesion: <b> {{ object.profesion }}</b></p>
+{% if object.direccion %}<p>Direccion:<b> {{ object.direccion }}</b></p>{% endif %}
+
+
+
+{% endblock %}
