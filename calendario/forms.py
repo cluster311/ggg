@@ -36,6 +36,23 @@ class TurnoForm(forms.ModelForm):
                 cleaned_data[field].replace(tzinfo=None)
             )
         return cleaned_data
+    
+    def save(self, *args, **kwargs):
+        turno_date = self.cleaned_data['inicio']
+        while turno_date < self.cleaned_data['fin']:
+            data = {
+                k: v for k, v in self.cleaned_data.items()
+                if k not in ('bulk', 'duration', 'inicio', 'fin', 'delete')
+            }
+            data['inicio'] = turno_date
+            data['fin'] = turno_date.replace(
+                hour=self.cleaned_data['fin'].hour, 
+                minute=self.cleaned_data['fin'].minute, 
+                second=self.cleaned_data['fin'].second
+            )
+            turno = Turno.objects.create(**data)
+            turno_date = turno_date + timedelta(days=1)
+        return turno
 
     class Meta:
         model = Turno
