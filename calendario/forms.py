@@ -1,6 +1,6 @@
 import pytz
 from dal import autocomplete
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from django import forms
 from django.conf import settings
 from calendario.models import Turno
@@ -40,17 +40,26 @@ class TurnoForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         turno_date = self.cleaned_data['inicio']
         while turno_date < self.cleaned_data['fin']:
-            data = {
-                k: v for k, v in self.cleaned_data.items()
-                if k not in ('bulk', 'duration', 'inicio', 'fin', 'delete')
-            }
-            data['inicio'] = turno_date
-            data['fin'] = turno_date.replace(
-                hour=self.cleaned_data['fin'].hour, 
-                minute=self.cleaned_data['fin'].minute, 
-                second=self.cleaned_data['fin'].second
-            )
-            turno = Turno.objects.create(**data)
+            turno_time = time(turno_date.hour, turno_date.minute)
+            end_time = time(self.cleaned_data['fin'].hour, self.cleaned_data['fin'].minute)
+            while turno_time < end_time:
+                data = {
+                    k: v for k, v in self.cleaned_data.items()
+                    if k not in ('bulk', 'duration', 'inicio', 'fin', 'delete')
+                }
+                data['inicio'] = turno_date.replace(
+                    hour=turno_time.hour, 
+                    minute=turno_time.minute, 
+                    second=turno_time.second
+                )
+                horas = int((turno_time.minute + self.cleaned_data['duration']) / 60)
+                mins = (turno_time.minute + self.cleaned_data['duration']) % 60
+                data['fin'] = turno_date.replace(
+                    hour=turno_time.hour + horas, 
+                    minute=mins
+                )
+                turno = Turno.objects.create(**data)
+                turno_time = time(turno_time.hour + horas, mins)
             turno_date = turno_date + timedelta(days=1)
         return turno
 
