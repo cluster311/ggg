@@ -34,7 +34,7 @@ class CentroDeSalud(models.Model):
 
     descripcion = HTMLField(null=True, blank=True)
     horario_de_atencion = models.TextField(null=True, blank=True)
-    direccion = AddressField(null=True, on_delete=models.SET_NULL)
+    direccion = AddressField(null=True, blank=True, on_delete=models.SET_NULL)
     telefonos = models.TextField(null=True, blank=True)
 
     ubicacion = models.PointField(null=True, blank=True)
