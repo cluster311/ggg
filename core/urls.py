@@ -25,7 +25,7 @@ urlpatterns = [
         name="profesional-autocomplete",
     ),
     path(
-        r"profesional-autocomplete-por-servicio/<int:servicio_id>$",
+        r"profesional-autocomplete-por-servicio/<int:servicio_id>",
         ProfesionalAutocomplete.as_view(),
         name="profesional-autocomplete-por-servicio",
     ),
