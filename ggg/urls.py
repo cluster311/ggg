@@ -13,7 +13,7 @@ urlpatterns = [
     url(r'^profesionales/', include('profesionales.urls')),
     url(r'^turnos/', include('calendario.urls')),
     url(r'^obras-sociales/', include('obras_sociales.urls')),
-    url(r'^centros-de-salud/', include('centros_de_salud.urls')),
+    url(r'^centros_de_salud/', include('centros_de_salud.urls')),
     url(r'^recupero/', include('recupero.urls')),
     url(
         r'^$',
