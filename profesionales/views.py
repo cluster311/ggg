@@ -250,14 +250,19 @@ class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin,
         context = super().get_context_data(**kwargs)
         
         if self.request.POST:
-            context["recetas_frm"] = RecetaFormset(self.request.POST)
-            context["derivaciones_frm"] = DerivacionFormset(self.request.POST)
-            context["prestaciones_frm"] = PrestacionFormset(self.request.POST)
+            context["recetas_frm"] = RecetaFormset(self.request.POST, prefix='Recetas')
+            context["derivaciones_frm"] = DerivacionFormset(self.request.POST, prefix='Derivaciones')
+            context["prestaciones_frm"] = PrestacionFormset(self.request.POST, prefix='Prestaciones')
         else:
-            context["recetas_frm"] = RecetaFormset()
-            context["derivaciones_frm"] = DerivacionFormset()
-            context["prestaciones_frm"] = PrestacionFormset()
-        
+            context["recetas_frm"] = RecetaFormset(prefix='Recetas')
+            context["derivaciones_frm"] = DerivacionFormset(prefix='Derivaciones')
+            context["prestaciones_frm"] = PrestacionFormset(prefix='Prestaciones')
+
+        context["formsets"] = [
+            context["recetas_frm"],
+            context["derivaciones_frm"],
+            context["prestaciones_frm"]
+        ]        
         return context
 
     def get_success_url(self):
