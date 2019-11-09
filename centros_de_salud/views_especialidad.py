@@ -12,7 +12,7 @@ from .models import Especialidad
 
 class EspecialidadListView(PermissionRequiredMixin, ListView):
     """
-    Lista de tipos de prestaciones habilitadas para recuperar
+    Lista de Especialidades
     """
     model = Especialidad
     permission_required = ("view_especialidad",)
@@ -30,7 +30,7 @@ class EspecialidadListView(PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Tipos de prestacion'
+        context['title'] = 'Especialidades'
         context['title_url'] = 'centros_de_salud.especialidades'
         context['search_txt'] = self.request.GET.get('search', '')
         context['use_search_bar'] = True
@@ -50,7 +50,7 @@ class EspecialidadCreateView(PermissionRequiredMixin,
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Tipos de prestacion'
+        context['title'] = 'Especialidades'
         context['title_url'] = 'centros_de_salud.especialidades'
         return context
 
@@ -66,7 +66,7 @@ class EspecialidadDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Tipos de prestacion'
+        context['title'] = 'Especialidades'
         context['title_url'] = 'centros_de_salud.especialidades'
         return context
 
@@ -79,7 +79,7 @@ class EspecialidadUpdateView(PermissionRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Tipos de prestacion'
+        context['title'] = 'Especialidades'
         context['title_url'] = 'centros_de_salud.especialidades'
         return context
 

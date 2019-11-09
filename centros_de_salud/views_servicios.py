@@ -12,7 +12,7 @@ from .models import Servicio
 
 class ServicioListView(PermissionRequiredMixin, ListView):
     """
-    Lista de tipos de prestaciones habilitadas para recuperar
+    Lista de Servicios
     """
     model = Servicio
     permission_required = ("view_servicio",)
@@ -22,7 +22,9 @@ class ServicioListView(PermissionRequiredMixin, ListView):
         if 'search' in self.request.GET:
             q = self.request.GET['search']
             objects = Servicio.objects.filter(
-                nombre__icontains=q)
+                Q(centro__nombre__icontains=q) |
+                Q(especialidad__nombre__icontains=q)
+            )
         else:
             objects = Servicio.objects.all()
         
@@ -50,7 +52,7 @@ class ServicioCreateView(PermissionRequiredMixin,
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Tipos de prestacion'
+        context['title'] = 'Servicios'
         context['title_url'] = 'centros_de_salud.servicios'
         return context
 
@@ -66,7 +68,7 @@ class ServicioDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Tipos de prestacion'
+        context['title'] = 'Servicios'
         context['title_url'] = 'centros_de_salud.servicios'
         return context
 
@@ -79,7 +81,7 @@ class ServicioUpdateView(PermissionRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Tipos de prestacion'
+        context['title'] = 'Servicios'
         context['title_url'] = 'centros_de_salud.servicios'
         return context
 
