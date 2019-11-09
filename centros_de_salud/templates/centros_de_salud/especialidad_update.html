@@ -1,0 +1,15 @@
+{% extends "base_admin.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+    <h2>Actualizar Especialidad</h2>
+    <a role="button" class="btn btn-warning btn-sm active" href="{% url 'centros_de_salud.especialidades' %}">Volver a la lista</a>
+    {% crispy form %}
+    <div class="line"></div>
+
+{% endblock %}
+{% block js_footer %}
+    <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+    {{ form.media }}
+{% endblock js_footer %}

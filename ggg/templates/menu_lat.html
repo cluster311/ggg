@@ -49,7 +49,7 @@
         <ul class="collapse list-unstyled" id="menu_centros">
             {% if perms.centros_de_salud.view_centrodesalud %}
             <li>
-                <a href="{% url 'centros-de-salud.lista' %}">Lista</a>
+                <a href="{% url 'centros_de_salud.lista' %}">Lista</a>
             </li>
             {% endif %}
             {% if perms.centros_de_salud.can_view_tablero %}
@@ -60,6 +60,19 @@
                 <a href="#">Por especialidad</a>
             </li>
             {% endif %}
+
+            {% if perms.centros_de_salud.view_servicio %}
+            <li>
+                <a href="{% url 'centros_de_salud.servicios' %}">Servicios</a>
+            </li>
+            {% endif %}
+
+            {% if perms.centros_de_salud.view_especialidad %}
+            <li>
+                <a href="{% url 'centros_de_salud.especialidades' %}">Especialidades</a>
+            </li>
+            {% endif %}
+            
             
         </ul>
     </li>
