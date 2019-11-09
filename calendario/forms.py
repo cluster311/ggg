@@ -22,14 +22,8 @@ class TurnoForm(forms.ModelForm):
     delete = forms.BooleanField(required=False, initial=False)
 
     profesional = forms.ModelChoiceField(
+        label='Profesional en el servicio',
         queryset=Profesional.objects.none(),
-        widget=autocomplete.ModelSelect2(
-            url="profesional-autocomplete",
-            attrs={
-                "data-placeholder": "Ingrese número de documento",
-                "data-minimum-input-length": 3,
-            },
-        ),
     )
 
     def __init__(self, *args, **kwargs):

@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.urls import path
 from core.views import (CIE10Autocomplete,
                         PacienteAutocomplete,
                         ProfesionalAutocomplete,
@@ -22,6 +23,11 @@ urlpatterns = [
         r"^profesional-autocomplete/$",
         ProfesionalAutocomplete.as_view(),
         name="profesional-autocomplete",
+    ),
+    path(
+        r"profesional-autocomplete-por-servicio/<int:servicio_id>$",
+        ProfesionalAutocomplete.as_view(),
+        name="profesional-autocomplete-por-servicio",
     ),
     url(
         r"^centro-de-salud-autocomplete/$",

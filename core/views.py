@@ -63,6 +63,10 @@ class ProfesionalAutocomplete(autocomplete.Select2QuerySetView):
 
         qs = Profesional.objects.all()
 
+        if 'servicio_id' in self.kwargs:
+            si = self.kwargs['servicio_id']
+            qs = qs.filter(servicios__servicio=si)
+
         if self.q:
             qs = qs.filter(Q(numero_documento__icontains=self.q) |
                            Q(nombres__icontains=self.q) |
