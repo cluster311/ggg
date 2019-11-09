@@ -89,6 +89,7 @@ class Paciente(Persona):
     carpeta_familiar = models.ForeignKey(
         "CarpetaFamiliar",
         null=True,
+        blank=True,
         related_name="miembros",
         on_delete=models.SET_NULL
     )
