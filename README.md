@@ -1,6 +1,6 @@
 # Sistema abierto de información de la Salud
 
-Propuesto por la Municipalidad de Córdona y con la 
+Propuesto por la Municipalidad de Córdoba y con la 
 financiación de la Organización Mundial de la Salud 
 nace este sistema abierto de información para la salud.
 
