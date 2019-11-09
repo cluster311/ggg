@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CentroDeSalud, Servicio, Especialidad
+from .models import CentroDeSalud, Servicio, Especialidad, ProfesionalesEnServicio
 from core.admin import GeoAdmin
 
 
@@ -12,6 +12,9 @@ class CentroDeSaludAdmin(GeoAdmin):
     #                 'horario_de_atencion', 'telefonos']
     search_fields = ['nombre', 'descripcion']
 
+@admin.register(ProfesionalesEnServicio)
+class ProfesionalesEnServicioAdmin(admin.ModelAdmin):
+    list_display = ['servicio', 'profesional', 'estado']
 
 admin.site.register(Servicio)
 admin.site.register(Especialidad)
