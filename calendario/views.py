@@ -6,6 +6,7 @@ from django.utils.dateparse import parse_datetime
 import json
 from calendario.models import Turno
 from calendario.forms import BulkTurnoForm, FeedForm, TurnoForm
+from centros_de_salud.models import Servicio
 
 
 def index(request):
@@ -105,8 +106,8 @@ def copy_appointments(request):
     )
 
 
-def feed(request):
-    turnos = get_appointments_list(**request.GET)
+def feed(request, servicio=None):
+    turnos = get_appointments_list(servicio, **request.GET)
     turnos = [{
         'id': t.id,
         'title': str(t),
@@ -121,7 +122,7 @@ def feed(request):
     return JsonResponse(turnos, safe=False)
 
 
-def get_appointments_list(**kwargs):
+def get_appointments_list(servicio, **kwargs):
     if 'id' in kwargs:
         pk = kwargs['id'][0] if isinstance(kwargs['id'], list) else \
              kwargs['id']
@@ -135,4 +136,13 @@ def get_appointments_list(**kwargs):
         end = kwargs['end'][0] if isinstance(kwargs['end'], list) else \
               kwargs['end']
         kw['fin__lte'] = parse_datetime(end)
+    if servicio is not None:
+        kw['servicio__pk'] = servicio
     return Turno.objects.filter(**kw)
+
+
+def agendar(request):
+    context = {
+        'servicios': Servicio.objects.all()
+    }
+    return render(request, 'calendario-agregar.html', context)
