@@ -1,21 +1,17 @@
 /**
- * Django dynamic formsets v1.5.0
+ * jQuery Formset 1.3-pre
+ * @author Stanislaus Madueke (stan DOT madueke AT gmail DOT com)
+ * @requires jQuery 1.2.6 or later
  *
- * @requires jQuery v1.2.6 or later
- *
- * @author Allan James Vestal (ajvestal@dallasnews.com)
- *
- * Originally developed by Stanislaus Madueke
- *
- * Copyright (c) 2016 Allan James Vestal, for
- * The Dallas Morning News (A.H. Belo Corporation).
+ * Copyright (c) 2009, Stanislaus Madueke
  * All rights reserved.
  *
- * Released under the BSD License:
- * http://www.opensource.org/licenses/bsd-license.php
+ * Licensed under the New BSD License
+ * See: http://www.opensource.org/licenses/bsd-license.php
  */
 ;(function($) {
-    $.fn.formset = function(opts) {
+    $.fn.formset = function(opts)
+    {
         var options = $.extend({}, $.fn.formset.defaults, opts),
             flatExtraClasses = options.extraClasses.join(' '),
             totalForms = $('#id_' + options.prefix + '-TOTAL_FORMS'),
@@ -23,7 +19,6 @@
             minForms = $('#id_' + options.prefix + '-MIN_NUM_FORMS'),
             childElementSelector = 'input,select,textarea,label,div',
             $$ = $(this),
-            allowInitialRender = (options.allowEmptyFormset) ? true : ($$.children().length),
 
             applyExtraClasses = function(row, ndx) {
                 if (options.extraClasses) {
@@ -59,26 +54,19 @@
 
             insertDeleteLink = function(row) {
                 var delCssSelector = $.trim(options.deleteCssClass).replace(/\s+/g, '.'),
-                    addCssSelector = $.trim(options.addCssClass).replace(/\s+/g, '.'),
-                    deleteTriggerMarkup = '<a ' +
-                                            'class="' + options.deleteCssClass + '" ' +
-                                            'href="javascript:void(0)">' +
-                                                options.uiText.removePrompt +
-                                            '</a>';
-
+                    addCssSelector = $.trim(options.addCssClass).replace(/\s+/g, '.');
                 if (row.is('TR')) {
                     // If the forms are laid out in table rows, insert
                     // the remove button into the last table cell:
-                    row.children(':last').append(deleteTriggerMarkup);
+                    row.children(':last').append('<a class="' + options.deleteCssClass +'" href="javascript:void(0)">' + options.deleteText + '</a>');
                 } else if (row.is('UL') || row.is('OL')) {
                     // If they're laid out as an ordered/unordered list,
                     // insert an <li> after the last list item:
-
-                    row.append('<li>' + deleteTriggerMarkup + '</li>');
+                    row.append('<li><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText +'</a></li>');
                 } else {
                     // Otherwise, just insert the remove button as the
                     // last child element of the form's container:
-                    row.append(deleteTriggerMarkup);
+                    row.append('<a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText +'</a>');
                 }
                 // Check if we're under the minimum number of forms - not to display delete link at rendering
                 if (!showDeleteLinks()){
@@ -121,13 +109,14 @@
                     // Check if we need to show the add button:
                     if (buttonRow.is(':hidden') && showAddButton()) buttonRow.show();
                     // If a post-delete callback was provided, call it with the deleted form:
-                    if (options.callbacks.onRemove) options.callbacks.onRemove(row);
+                    if (options.removed) options.removed(row);
                     return false;
                 });
             };
 
-        function changeDeleteTrigger(row) {
-            var del = row.find('input:checkbox[id $= "-DELETE"]');
+        $$.each(function(i) {
+            var row = $(this),
+                del = row.find('input:checkbox[id $= "-DELETE"]');
             if (del.length) {
                 // If you specify "can_delete = True" when creating an inline formset,
                 // Django adds a checkbox to each form in the formset.
@@ -144,48 +133,24 @@
                 $('label[for="' + del.attr('id') + '"]').hide();
                 del.remove();
             }
-        }
-
-        $$.children().each(function(i) {
-            var row = $(this);
-
-            changeDeleteTrigger(row);
-
             if (hasChildElements(row)) {
                 row.addClass(options.formCssClass);
-                if (row.is(':visible')) {
                     insertDeleteLink(row);
+                if (row.is(':visible')) {
                     applyExtraClasses(row, i);
                 }
             }
         });
 
-        if (allowInitialRender) {
+        if ($$.length) {
             var hideAddButton = !showAddButton(),
                 addButton, template;
-
             if (options.formTemplate) {
                 // If a form template was specified, we'll clone it to generate new form instances:
                 template = (options.formTemplate instanceof $) ? options.formTemplate : $(options.formTemplate);
-
                 template.removeAttr('id').addClass(options.formCssClass + ' formset-custom-template');
-
                 template.find(childElementSelector).each(function() {
-                    var $elem = $(this);
-
-                    updateElementIndex($elem, options.prefix, '__prefix__');
-
-                    if ($elem.not.apply($elem, options.keepFieldValues).length > 0) {
-                        // If this is a checkbox or radiobutton, uncheck it.
-                        // This fixes Issue 1, reported by Wilson.Andrew.J:
-                        if ($elem.is('input:checkbox') || $elem.is('input:radio')) {
-                            $elem.attr('checked', false);
-                        } else if ($elem.is('select')) {
-                            $elem.find('option[selected="selected"]').removeAttr("selected");
-                        } else {
-                            $elem.val('');
-                        }
-                    }
+                    updateElementIndex($(this), options.prefix, '__prefix__');
                 });
                 insertDeleteLink(template);
             } else {
@@ -195,78 +160,55 @@
                 template.find('input:hidden[id $= "-DELETE"]').remove();
                 // Clear all cloned fields, except those the user wants to keep (thanks to brunogola for the suggestion):
                 template.find(childElementSelector).not(options.keepFieldValues).each(function() {
-                    var $elem = $(this);
+                    var elem = $(this);
                     // If this is a checkbox or radiobutton, uncheck it.
                     // This fixes Issue 1, reported by Wilson.Andrew.J:
-                    if ($elem.is('input:checkbox') || $elem.is('input:radio')) {
-                        $elem.attr('checked', false);
-                    } else if ($elem.is('select')) {
-                        $elem.find('option[selected="selected"]').removeAttr("selected");
+                    if (elem.is('input:checkbox') || elem.is('input:radio')) {
+                        elem.attr('checked', false);
                     } else {
-                        $elem.val('');
+                        elem.val('');
                     }
                 });
             }
             // FIXME: Perhaps using $.data would be a better idea?
             options.formTemplate = template;
 
-            var addTriggerMarkup = '<a ' +
-                                        'class="' + options.addCssClass + '" ' +
-                                        'href="javascript:void(0)">' +
-                                            options.uiText.addPrompt +
-                                        '</a>';
-
-            addButton = $(addTriggerMarkup);
-
-            if (options.addButtonHolder) {
-                // If a custom add-form button holder has been set, append the
-                // add-form-button's HTML into that element.
-                var addHolder = (options.addButtonHolder instanceof $) ? options.addButtonHolder : $(options.addButtonHolder);
-                addHolder.append(addButton);
-                if (hideAddButton) addButton.hide();
+            if ($$.is('TR')) {
+                // If forms are laid out as table rows, insert the
+                // "add" button in a new table row:
+                var numCols = $$.eq(0).children().length,   // This is a bit of an assumption :|
+                    buttonRow = $('<tr><td colspan="' + numCols + '"><a class="' + options.addCssClass + '" href="javascript:void(0)">' + options.addText + '</a></tr>')
+                                .addClass(options.formCssClass + '-add');
+                $$.parent().append(buttonRow);
+                if (hideAddButton) buttonRow.hide();
+                addButton = buttonRow.find('a');
             } else {
-                // Otherwise, insert it immediately after the formset:
-                $$.after(addButton);
+                // Otherwise, insert it immediately after the last form:
+                $$.filter(':last').after('<a class="' + options.addCssClass + '" href="javascript:void(0)">' + options.addText + '</a>');
+                addButton = $$.filter(':last').next();
                 if (hideAddButton) addButton.hide();
             }
-
             addButton.click(function() {
                 var formCount = parseInt(totalForms.val()),
                     row = options.formTemplate.clone(true).removeClass('formset-custom-template'),
+                    buttonRow = $($(this).parents('tr.' + options.formCssClass + '-add').get(0) || this),
                     delCssSelector = $.trim(options.deleteCssClass).replace(/\s+/g, '.');
-
                 applyExtraClasses(row, formCount);
-
-                // Append the new form after all existing forms.
-                // NOTE: We re-query elements based on the selector to be sure
-                // we consider forms that have been added or removed in JS.
-                $$.append(row);
-                // $($$.selector).filter(':last').after(row);
-
+                row.insertBefore(buttonRow).show();
                 row.find(childElementSelector).each(function() {
                     updateElementIndex($(this), options.prefix, formCount);
                 });
-
-                changeDeleteTrigger(row);
-
                 totalForms.val(formCount + 1);
                 // Check if we're above the minimum allowed number of forms -> show all delete link(s)
                 if (showDeleteLinks()){
                     $('a.' + delCssSelector).each(function(){$(this).show();});
                 }
                 // Check if we've exceeded the maximum allowed number of forms:
-                if (!showAddButton()) {
-                    addButton.hide();
-                }
-
+                if (!showAddButton()) buttonRow.hide();
                 // If a post-add callback was supplied, call it with the added form:
-                if (options.callbacks.onAdd) options.callbacks.onAdd(row, formCount);
+                if (options.added) options.added(row);
                 return false;
             });
-
-            if (options.callbacks.postInitialize) {
-                options.callbacks.postInitialize($$);
-            }
         }
 
         return $$;
@@ -274,28 +216,16 @@
 
     /* Setup plugin defaults */
     $.fn.formset.defaults = {
-
         prefix: 'form',                  // The form prefix for your django formset
-        allowEmptyFormset: false,        // Whether to initialize the formset JS when no initial forms are present.
-
-        addButtonHolder: null,           // Where should the add button be placed?
         formTemplate: null,              // The jQuery selection cloned to generate new form instances
-
+        addText: 'add another',          // Text for the add link
+        deleteText: 'remove',            // Text for the delete link
         addCssClass: 'add-row',          // CSS class applied to the add link
         deleteCssClass: 'delete-row',    // CSS class applied to the delete link
         formCssClass: 'dynamic-form',    // CSS class applied to each form in a formset
         extraClasses: [],                // Additional CSS classes, which will be applied to each form in turn
-
-
-        callbacks: {
-            onAdd: null,                 // Function called each time a new form is added.
-            onRemove: null,              // Function called each time an existing form is deleted.
-            postInitialize: null,        // Function called when the formset has been initialized.
-        },
         keepFieldValues: '',             // jQuery selector for fields whose values should be kept when the form is cloned
-        uiText: {
-            addPrompt: 'Add another',         // Text used on the 'add a new form' control.
-            removePrompt: 'Remove',        // Text used on the 'delete this existing form' control.
-        },
+        added: null,                     // Function called each time a new form is added
+        removed: null                    // Function called each time a form is deleted
     };
 })(jQuery);

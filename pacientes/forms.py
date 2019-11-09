@@ -49,8 +49,8 @@ class PrestacionForm(forms.ModelForm):
         }
 
 
-RecetaFormset = inlineformset_factory(Consulta, Receta, form=RecetaForm, extra=2)
-PrestacionFormset = inlineformset_factory(Consulta, Prestacion, form=PrestacionForm, extra=2)
+RecetaFormset = inlineformset_factory(Consulta, Receta, form=RecetaForm, extra=1)
+PrestacionFormset = inlineformset_factory(Consulta, Prestacion, form=PrestacionForm, extra=1)
 DerivacionFormset = inlineformset_factory(Consulta, Derivacion, form=DerivacionForm, extra=1)
 
 
