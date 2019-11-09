@@ -16,7 +16,7 @@ sisa>=0.918
 pycodestyle==2.5.0
 pyexcel>=0.5.15
 pyexcel_xls>=0.5.8
-cie>=0.205
+cie>=0.206
 fastkml>=0.11
 django_tinymce>=2.8.0
 oss-ar>=0.131
