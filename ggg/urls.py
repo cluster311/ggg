@@ -16,6 +16,11 @@ urlpatterns = [
     url(r'^centros-de-salud/', include('centros_de_salud.urls')),
     url(r'^recupero/', include('recupero.urls')),
     url(
+        r'^ciudadano/',
+        HomeView.as_view(),
+        name="admin.ciudadano-home",
+    ),
+    url(
         r'^$',
         HomeView.as_view(),
         name="admin.home",
