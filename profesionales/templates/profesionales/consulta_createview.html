@@ -33,7 +33,8 @@
                 <div class="{{ p }}-form">
                     {{ form|crispy }}
                 </div>
-            {% endfor %}                
+            {% endfor %}
+            {{ formset.management_form }}              
       </div>
     </div>
   </div>
