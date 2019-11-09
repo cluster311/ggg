@@ -32,7 +32,7 @@ class ServicioListView(PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Tipos de prestacion'
+        context['title'] = 'Servicios'
         context['title_url'] = 'centros_de_salud.servicios'
         context['search_txt'] = self.request.GET.get('search', '')
         context['use_search_bar'] = True
