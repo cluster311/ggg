@@ -28,6 +28,7 @@ class ConsultaInLine(admin.StackedInline):
 
 
 class PacienteAdmin(admin.ModelAdmin):
+    save_as = True
     inlines = [ContactoAdminInline]
 
 
