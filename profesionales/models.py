@@ -9,14 +9,13 @@ from core.models import DatoDeContacto
 
 
 class Profesional(Persona):
-    dni = models.CharField(max_length=20, null=True, blank=True)
     matricula_profesional = models.CharField(
         max_length=20,
         null=True,
         blank=True
     )
     profesion = models.CharField(max_length=190, null=True, blank=True)
-    direccion = AddressField(null=True, on_delete=models.SET_NULL)
+    direccion = AddressField(null=True, blank=True, on_delete=models.SET_NULL)
     datos_de_contacto = GenericRelation(
         'core.DatoDeContacto',
         related_query_name='profesionales',

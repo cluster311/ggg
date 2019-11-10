@@ -222,3 +222,8 @@ a.article, a.article:hover {
     }
 
 }
+
+/* override select2 */
+.select2-container .select2-selection--single {
+    height: 41px;
+    }

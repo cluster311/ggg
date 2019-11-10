@@ -34,7 +34,7 @@ class DerivacionForm(forms.ModelForm):
 class PrestacionForm(forms.ModelForm):
 
     tipo = forms.ModelChoiceField(
-        queryset=TipoPrestacion.objects.none(),
+        queryset=TipoPrestacion.objects.all(),
         widget=autocomplete.ModelSelect2(
             url="tipo_prestacion-autocomplete",
             attrs={"data-placeholder": "Ingrese código o descripción"}
@@ -49,24 +49,24 @@ class PrestacionForm(forms.ModelForm):
         }
 
 
-RecetaFormset = inlineformset_factory(Consulta, Receta, form=RecetaForm, extra=2)
-PrestacionFormset = inlineformset_factory(Consulta, Prestacion, form=PrestacionForm, extra=2)
+RecetaFormset = inlineformset_factory(Consulta, Receta, form=RecetaForm, extra=1)
+PrestacionFormset = inlineformset_factory(Consulta, Prestacion, form=PrestacionForm, extra=1)
 DerivacionFormset = inlineformset_factory(Consulta, Derivacion, form=DerivacionForm, extra=1)
 
 
 class ConsultaForm(forms.ModelForm):
     paciente = forms.ModelChoiceField(
-        queryset=Paciente.objects.none(),
+        queryset=Paciente.objects.all(),
         widget=autocomplete.ModelSelect2(
             url="paciente-autocomplete",
             attrs={
-                "data-placeholder": "Ingrese número de documento",
+                "data-placeholder": "Ingrese nombre o número de documento",
                 "data-minimum-input-length": 3,
             },
         ),
     )
     profesional = forms.ModelChoiceField(
-        queryset=Profesional.objects.none(),
+        queryset=Profesional.objects.all(),
         widget=autocomplete.ModelSelect2(
             url="profesional-autocomplete",
             attrs={
@@ -76,7 +76,7 @@ class ConsultaForm(forms.ModelForm):
         ),
     )
     centro_de_salud = forms.ModelChoiceField(
-        queryset=CentroDeSalud.objects.none(),
+        queryset=CentroDeSalud.objects.all(),
         widget=autocomplete.ModelSelect2(
             url="centro_de_salud-autocomplete",
             attrs={

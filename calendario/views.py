@@ -6,7 +6,9 @@ from django.utils.dateparse import parse_datetime
 import json
 from calendario.models import Turno
 from calendario.forms import BulkTurnoForm, FeedForm, TurnoForm
-
+import logging
+logger = logging.getLogger(__name__)
+from django.contrib.auth.decorators import permission_required
 
 def index(request):
     context = {
@@ -24,6 +26,7 @@ def index(request):
     return render(request, 'calendario.html', context)
 
 
+@permission_required('calendario.add_turno')
 def add_appointment(request):
     form_data = json.loads(request.body)
     if form_data['bulk']:
@@ -54,6 +57,7 @@ def add_appointment(request):
             } for a in appointments]
         }
     else:
+        logger.error(f'Error al grabar turnos: {form.errors}, data: {form_data}')
         response_data = {'success': False, 'errors': form.errors}
 
     return JsonResponse(response_data)
