@@ -5,8 +5,8 @@ from django.db.models import Count, Q
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
-from crispy_forms.utils import render_crispy_form
 
+from .forms import ProfesionalesEnServicioForm
 from .models import ProfesionalesEnServicio
 
 
@@ -49,7 +49,7 @@ class ProfesionalesEnServicioCreateView(PermissionRequiredMixin,
                                SuccessMessageMixin):
     model = ProfesionalesEnServicio
     permission_required = ("view_profesionalesenservicio",)
-    fields = ['servicio', 'profesional', 'estado']
+    form_class = ProfesionalesEnServicioForm
     success_message = "Creado con éxito."
 
     def get_context_data(self, **kwargs):
@@ -78,7 +78,7 @@ class ProfesionalesEnServicioDetailView(PermissionRequiredMixin, DetailView):
 class ProfesionalesEnServicioUpdateView(PermissionRequiredMixin, UpdateView):
     model = ProfesionalesEnServicio
     permission_required = "change_profesionalesenservicio"
-    fields = ['servicio', 'profesional', 'estado']
+    form_class = ProfesionalesEnServicioForm
     success_message = "Actualizado con éxito."
 
     def get_context_data(self, **kwargs):

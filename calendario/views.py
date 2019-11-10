@@ -39,8 +39,6 @@ def add_appointment(request):
         else:
             form = TurnoForm(form_data, instance=instance)
     else:
-        form_data['profesional'] = int(form_data['profesional'])
-        form_data['servicio'] = int(form_data['servicio'])
         form = TurnoForm(form_data)
 
     if form is None:
