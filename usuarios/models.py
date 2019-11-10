@@ -14,5 +14,12 @@ class UsuarioEnCentroDeSalud(models.Model):
                                         on_delete=models.CASCADE,
                                         related_name='usuarios_permitidos')
     
+    EST_INACTIVO = 100
+    EST_ACTIVO = 200
+    estados = ((EST_INACTIVO, 'Inactivo'),
+               (EST_ACTIVO, 'Activo'))
+
+    estado = models.PositiveIntegerField(choices=estados, default=EST_ACTIVO)
+    
     def __str__(self):
         return f'{self.usuario} en {self.centro_de_salud}'

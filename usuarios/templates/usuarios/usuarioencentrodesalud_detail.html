@@ -3,11 +3,12 @@
 {% load static %}
 
 {% block content %}
-<a role="button" class="btn btn-warning btn-sm active" href="{% url 'centros_de_salud.servicios' %}">Volver a la lista</a>
+<a role="button" class="btn btn-warning btn-sm active" href="{% url 'usuarios.en-centro-de-salud' %}">Volver a la lista</a>
 {% if perms.centros_de_salud.change_servicio %}
-<a role="button" class="btn btn-warning btn-sm active" href="{% url 'centros_de_salud.servicios.edit' pk=object.id %}">Editar</a>
+<a role="button" class="btn btn-warning btn-sm active" href="{% url 'usuarios.en-centro-de-salud.edit' pk=object.id %}">Editar</a>
 {% endif %}
-<p>Especialidad: <b>{{ object.especialidad }}</b></p>
-<p>Centro de salud: <b>{{ object.centro.nombre }}</b></p>
+<p>Usuario: <b>{{ object.usuario }}</b></p>
+<p>Centro de salud: <b>{{ object.centro_de_salud.nombre }}</b></p>
+<p>Estado: <b>{{ object.get_estado_display }}</b></p>
 
 {% endblock %}

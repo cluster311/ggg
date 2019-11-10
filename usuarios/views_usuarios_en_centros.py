@@ -47,7 +47,7 @@ class UsuarioEnCentroDeSaludCreateView(PermissionRequiredMixin,
                                SuccessMessageMixin):
     model = UsuarioEnCentroDeSalud
     permission_required = ("usuarios.add_usuarioencentrodesalud",)
-    fields = ['centro', 'especialidad']
+    fields = ['centro_de_salud', 'usuario', 'estado']
     success_message = "Creado con éxito."
 
     def get_context_data(self, **kwargs):
@@ -76,7 +76,7 @@ class UsuarioEnCentroDeSaludDetailView(PermissionRequiredMixin, DetailView):
 class UsuarioEnCentroDeSaludUpdateView(PermissionRequiredMixin, UpdateView):
     model = UsuarioEnCentroDeSalud
     permission_required = "usuarios.change_usuarioencentrodesalud"
-    fields = ['centro', 'especialidad']
+    fields = ['centro_de_salud', 'usuario', 'estado']
     success_message = "Actualizado con éxito."
 
     def get_context_data(self, **kwargs):
