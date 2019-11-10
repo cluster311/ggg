@@ -5,6 +5,9 @@ from django import forms
 from django.conf import settings
 from calendario.models import Turno
 from calendario.widgets import DateTimePicker
+from profesionales.models import Profesional
+import logging
+logger = logging.getLogger(__name__)
 
 
 LOCAL_TZ = pytz.timezone(settings.TIME_ZONE)
@@ -19,6 +22,11 @@ class TurnoForm(forms.ModelForm):
     bulk = forms.BooleanField(required=False, label='En masa')
     duration = forms.IntegerField(initial=10, label='Duración')
     delete = forms.BooleanField(required=False, initial=False)
+
+    profesional = forms.ModelChoiceField(
+        label='Profesional en el servicio',
+        queryset=Profesional.objects.all(),
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -70,8 +78,6 @@ class TurnoForm(forms.ModelForm):
             'inicio': DateTimePicker(),
             'fin': DateTimePicker(),
             'servicio': autocomplete.ModelSelect2(),
-            'profesional': autocomplete.ModelSelect2(),
-            # 'paciente': autocomplete.ModelSelect2(),
         }
 
 

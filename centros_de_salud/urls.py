@@ -11,6 +11,10 @@ from .views_especialidad import (EspecialidadListView,
                                  EspecialidadDetailView,
                                  EspecialidadUpdateView)
 
+from .views_profesionales_en_servicios import (ProfesionalesEnServicioListView,
+                                               ProfesionalesEnServicioCreateView,
+                                               ProfesionalesEnServicioDetailView,
+                                               ProfesionalesEnServicioUpdateView)
 
 urlpatterns = [
     url(
@@ -61,5 +65,27 @@ urlpatterns = [
         r"editar-especialidad/<int:pk>",
         EspecialidadUpdateView.as_view(),
         name="centros_de_salud.especialidades.edit",
+    ),
+
+
+    url(
+        r"^profesionales-en-servicio.html$",
+        ProfesionalesEnServicioListView.as_view(),
+        name="centros_de_salud.profesionales-en-servicio",
+    ),
+    url(
+        r"^crear-profesional-en-servicio.html",
+        ProfesionalesEnServicioCreateView.as_view(),
+        name="centros_de_salud.profesionales-en-servicio.create",
+    ),
+    path(
+        r"detalle-profesional-en-servicio/<int:pk>",
+        ProfesionalesEnServicioDetailView.as_view(),
+        name="centros_de_salud.profesionales-en-servicio.detail",
+    ),
+    path(
+        r"editar-profesional-en-servicio/<int:pk>",
+        ProfesionalesEnServicioUpdateView.as_view(),
+        name="centros_de_salud.profesionales-en-servicio.edit",
     ),
 ]

@@ -60,7 +60,7 @@ class ConsultaForm(forms.ModelForm):
         widget=autocomplete.ModelSelect2(
             url="paciente-autocomplete",
             attrs={
-                "data-placeholder": "Ingrese número de documento",
+                "data-placeholder": "Ingrese nombre o número de documento",
                 "data-minimum-input-length": 3,
             },
         ),
