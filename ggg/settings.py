@@ -93,6 +93,9 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'ggg.context_processors.cpp_settings',
             ],
+            'libraries':{
+                'extra_tags': 'ggg.templatetags.extra_tags',
+            }
         },
     },
 ]
