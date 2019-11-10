@@ -252,9 +252,12 @@ LOGIN_URL = 'account_login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'landing'
 
-
-
-
+# Ciudadano que usa los servicios de salud
+GRUPO_CIUDADANO = 'grupo_ciudadano'
+# Empleados administrativos del municipio
+GRUPO_ADMIN = 'grupo_administrativo'
+# Profesionales médicos que dan servicios en el municipio
+GRUPO_PROFESIONAL = 'grupo_profesional'
 
 try:
     from .local_settings import *
