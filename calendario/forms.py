@@ -6,6 +6,7 @@ from django.conf import settings
 from calendario.models import Turno
 from calendario.widgets import DateTimePicker
 from profesionales.models import Profesional
+from centros_de_salud.models import ProfesionalesEnServicio
 import logging
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ class TurnoForm(forms.ModelForm):
 
     profesional = forms.ModelChoiceField(
         label='Profesional en el servicio',
+        #TODO este qs tarde varios segundos en cargar cuando es muy grande
         queryset=Profesional.objects.all(),
     )
 
@@ -38,7 +40,27 @@ class TurnoForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({'class': classes_to_ad})
 
     def clean(self, *args, **kwargs):
+
         cleaned_data = super().clean(*args, **kwargs)
+        logger.info(f'Cleaning turno form {cleaned_data}')
+        
+        # ver que el profesional este en el servicio
+        servicio = cleaned_data['servicio']
+        profesional = cleaned_data['profesional']
+        q = ProfesionalesEnServicio.objects.filter(servicio=servicio,
+                                                   profesional=profesional)
+        
+        if q.count() == 0:
+            error = {'profesional': ["El profesional no esta asignado al servicio"]}
+            logger.error(error)
+            raise forms.ValidationError(error)
+            
+        else:
+            if q[0].estado != ProfesionalesEnServicio.EST_ACTIVO:
+                error = {'profesional': ["El profesional no esta activado asignado al servicio"]}
+                logger.error(error)
+                raise forms.ValidationError(error)
+
         for field in ('inicio', 'fin'):
             cleaned_data[field] = LOCAL_TZ.localize(
                 cleaned_data[field].replace(tzinfo=None)
