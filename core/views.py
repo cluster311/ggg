@@ -7,7 +7,6 @@ from recupero.models import TipoPrestacion
 from django.db.models import Q
 
 
-
 class CIE10Autocomplete(autocomplete.Select2QuerySetView):
     """
     Base de autompletado para códigos de diagnósticos.
