@@ -58,6 +58,7 @@ class Especialidad(models.Model):
     obstetricia, dermatología, etc
     """
     nombre = models.CharField(max_length=290)
+    tiempo_predeterminado_turno = models.PositiveIntegerField(default=15)
 
     def __str__(self):
         return self.nombre

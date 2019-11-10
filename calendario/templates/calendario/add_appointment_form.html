@@ -14,7 +14,10 @@
       {{ form.bulk }}
     </div>
 
-    <div class="col-12 col-md-5">
+    <div class="col-12 col-md-5"
+               id='lista_de_servicios'
+               data-minutos="{{ tiempo_predeterminado_turno }}">
+
       <p>{{ form.fields.servicio.label }}</p>
       {{ form.servicio }}
     </div>
