@@ -208,7 +208,11 @@ LOGGING = {
             'handlers': ['console', 'file'],
             'level': 'INFO',
             'propagate': False,
-        }
+        },
+        '': {
+            'handlers': ['console', 'file'],
+            'propagate': False,
+        },
     }
 }
 
@@ -242,6 +246,15 @@ EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 # EMAIL_USE_TLS = True
 # EMAIL_HOST_USER = <my-ses-smtp-username>
 # EMAIL_HOST_PASSWORD = <my-ses-smtp-password>
+
+
+LOGIN_URL = 'account_login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'landing'
+
+
+
+
 
 try:
     from .local_settings import *
