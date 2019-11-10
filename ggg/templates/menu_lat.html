@@ -9,23 +9,48 @@
             </li>
             {% endif %}
 
-            {% if perms.centros_de_salud.view_especialidad %}
+            {% if perms.centros_de_salud.view_profesionalesenservicio %}
             <li>
                 <a href="{% url 'centros_de_salud.profesionales-en-servicio' %}">Profesionales en servicios</a>
             </li>
             {% endif %}
-            
-            {% if perms.profesionales.can_view_tablero %}
-            <li>
-                <a href="{% url 'profesionales.tablero.por_profesion' %}">Por profesion</a>
-            </li>
-            <li>
-                <a href="{% url 'profesionales.tablero.por_departamento' %}">Por departamento</a>
-            </li>
-            {% endif %}
+        
         </ul>
     </li>
     
+    <li>
+        <a href="#menu_tableros" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Tableros de gestion</a>
+        <ul class="collapse list-unstyled" id="menu_tableros">
+            {% if perms.profesionales.can_view_tablero %}
+            <li>
+                <a href="{% url 'profesionales.tablero.por_profesion' %}">Profesionales Por profesion</a>
+            </li>
+            <li>
+                <a href="{% url 'profesionales.tablero.por_departamento' %}">Profesionales Por zona</a>
+            </li>
+            {% endif %}
+
+            {% if perms.obras_sociales.can_view_tablero %}
+            <li>
+                <a href="{% url 'obras-sociales.tablero.por_provincia' %}">OSS por provincia</a>
+            </li>
+            <li>
+                <a href="#TODO">OSS por especialidad</a>
+            </li>
+            {% endif %}
+
+            {% if perms.centros_de_salud.can_view_tablero %}
+            <li>
+                <a href="#TODO">Centros de salud por area programática</a>
+            </li>
+            <li>
+                <a href="#TODO">Centros de salud por especialidad</a>
+            </li>
+            {% endif %}
+
+        </ul>
+    </li>
+
     <!--titulo agrupador sin link <p>Atenciones</p> -->
     <li>
         <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
@@ -34,14 +59,6 @@
             {% if perms.obras_sociales.view_obrasocial %}
             <li>
                 <a href="{% url 'obras-sociales.lista' %}">Lista</a>
-            </li>
-            {% endif %}
-            {% if perms.obras_sociales.can_view_tablero %}
-            <li>
-                <a href="{% url 'obras-sociales.tablero.por_provincia' %}">Por provincia</a>
-            </li>
-            <li>
-                <a href="#">Por especialidad</a>
             </li>
             {% endif %}
             
@@ -56,14 +73,6 @@
             {% if perms.centros_de_salud.view_centrodesalud %}
             <li>
                 <a href="{% url 'centros_de_salud.lista' %}">Lista</a>
-            </li>
-            {% endif %}
-            {% if perms.centros_de_salud.can_view_tablero %}
-            <li>
-                <a href="#">Por area programática</a>
-            </li>
-            <li>
-                <a href="#">Por especialidad</a>
             </li>
             {% endif %}
 
