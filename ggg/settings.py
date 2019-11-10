@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'nhpgd_django',  # nomenclador de hostpitales publicos de gestion descentralizada
     'calendario',
     'recupero',
+    'usuarios',
 ]
 
 MIDDLEWARE = [

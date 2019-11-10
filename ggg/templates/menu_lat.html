@@ -115,6 +115,22 @@
         </ul>
     </li>
 
+
+    <li>
+        <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
+        <a href="#menu_usuarios" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Usuarios</a>
+        <ul class="collapse list-unstyled" id="menu_usuarios">
+        {% if perms.usuarios.view_usuarioencentrodesalud %}
+        <li>
+            <a href="{% url 'usuarios.en-centro-de-salud' %}">Autorizados en Centros de Salud</a>
+        </li>
+
+        {% endif %}
+        
+        </ul>
+    </li>
+    
+
     <li>
         <a href="#menu_recupero" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Recupero</a>
         <ul class="collapse list-unstyled" id="menu_recupero">
