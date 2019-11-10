@@ -13,9 +13,17 @@ $( document ).ready(function() {
 
   $('body').on('DOMSubtreeModified', '#select2-id_servicio-container', function () {
     let servicio_id = $('#id_servicio').val();
-    reload_profesionales(servicio_id)
+    //TODO necesitamos cargar especialidad.tiempo_predeterminado_turno en data-minutos de cada elemento del selector
+    let minutos = $('#id_servicio').data('minutos') | 20;
+    reload_profesionales(servicio_id);
+    update_minutos_consulta(minutos);
   });
-
+    
+    function update_minutos_consulta(minutos) {
+      // cada servicio tiene una especialidad que 
+      // a su vez tiene una cantidad de minutos predeterminada
+      $('#id_duration').val(minutos);
+    }
     function reload_profesionales(servicio_id) {
       var url = $("#lista_de_profesionales_filtrado").data("profesionales-por-servicio-url");
       

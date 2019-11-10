@@ -45,7 +45,7 @@ class EspecialidadCreateView(PermissionRequiredMixin,
                                SuccessMessageMixin):
     model = Especialidad
     permission_required = ("view_especialidad",)
-    fields = ['nombre']
+    fields = ['nombre', 'tiempo_predeterminado_turno']
     success_message = "Creado con éxito."
 
     def get_context_data(self, **kwargs):
@@ -74,7 +74,7 @@ class EspecialidadDetailView(PermissionRequiredMixin, DetailView):
 class EspecialidadUpdateView(PermissionRequiredMixin, UpdateView):
     model = Especialidad
     permission_required = "change_especialidad"
-    fields = ['nombre']
+    fields = ['nombre', 'tiempo_predeterminado_turno']
     success_message = "Actualizado con éxito."
 
     def get_context_data(self, **kwargs):
