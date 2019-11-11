@@ -5,6 +5,10 @@ from django import forms
 from django.conf import settings
 from calendario.models import Turno
 from calendario.widgets import DateTimePicker
+from profesionales.models import Profesional
+from centros_de_salud.models import ProfesionalesEnServicio, Servicio
+import logging
+logger = logging.getLogger(__name__)
 
 
 LOCAL_TZ = pytz.timezone(settings.TIME_ZONE)
@@ -20,7 +24,20 @@ class TurnoForm(forms.ModelForm):
     duration = forms.IntegerField(initial=10, label='Duración')
     delete = forms.BooleanField(required=False, initial=False)
 
+    profesional = forms.ModelChoiceField(
+        label='Profesional en el servicio',
+        #TODO este qs tarde varios segundos en cargar cuando es muy grande
+        queryset=Profesional.objects.all(),
+    )
+
+    servicio = forms.ModelChoiceField(
+        label='Servicios',
+        queryset=Servicio.objects.all(),
+        widget=autocomplete.ModelSelect2(),
+    )
+        
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         # Add custom bootstrap classes to form fields' CSS.
         for field in self.fields.keys():
@@ -28,9 +45,35 @@ class TurnoForm(forms.ModelForm):
             if field == 'estado':
                 classes_to_ad += ' custom-select'
             self.fields[field].widget.attrs.update({'class': classes_to_ad})
+        
+        if user is not None:
+            csp = user.centros_de_salud_permitidos.all()
+            centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
+            qs = Servicio.objects.filter(centro__in=centros_de_salud_permitidos)
+            self.fields['servicio'].queryset = qs
 
     def clean(self, *args, **kwargs):
+
         cleaned_data = super().clean(*args, **kwargs)
+        logger.info(f'Cleaning turno form {cleaned_data}')
+        
+        # ver que el profesional este en el servicio
+        servicio = cleaned_data['servicio']
+        profesional = cleaned_data['profesional']
+        q = ProfesionalesEnServicio.objects.filter(servicio=servicio,
+                                                   profesional=profesional)
+        
+        if q.count() == 0:
+            error = {'profesional': ["El profesional no esta asignado al servicio"]}
+            logger.error(error)
+            raise forms.ValidationError(error)
+            
+        else:
+            if q[0].estado != ProfesionalesEnServicio.EST_ACTIVO:
+                error = {'profesional': ["El profesional no esta activado asignado al servicio"]}
+                logger.error(error)
+                raise forms.ValidationError(error)
+
         for field in ('inicio', 'fin'):
             cleaned_data[field] = LOCAL_TZ.localize(
                 cleaned_data[field].replace(tzinfo=None)
@@ -69,9 +112,6 @@ class TurnoForm(forms.ModelForm):
         widgets = {
             'inicio': DateTimePicker(),
             'fin': DateTimePicker(),
-            'servicio': autocomplete.ModelSelect2(),
-            'profesional': autocomplete.ModelSelect2(),
-            # 'paciente': autocomplete.ModelSelect2(),
         }
 
 

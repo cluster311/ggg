@@ -1,5 +1,4 @@
-{% load static %}
-<!DOCTYPE html>
+{% load static %}{% csrf_token %}<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -21,9 +20,9 @@
   <!-- Our Custom CSS -->
   <link rel="stylesheet" href="{% static 'css/tableros.css' %}">
 
-  <!-- jQuery CDN - Slim version (=without AJAX) -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-  integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+  <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
   crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css">
   <!-- Font Awesome JS -->
@@ -49,8 +48,16 @@
   {% include "menu_lat.html" %}
 {% endif %}          
           <ul class="list-unstyled CTAs">
-            <li><a href="https://github.com/cluster311/ggg" class="download">+ info</a></li>
-            <!--<li><a href="#" class="article">Menu lindo 2</a></li>-->
+              <li>
+                <a target='_blank' 
+                  href="https://docs.google.com/document/d/1ePgRHtQiG81u2eF4qf48ozq4RMyviwgu/export?format=pdf" 
+                  class="download">Manual de usuario</a>
+              </li>
+              <li>
+                <a target='_blank' href="https://github.com/cluster311/ggg/blob/master/README.md" 
+                    class="article">+ info</a>
+              </li>
+            
           </ul>
       </nav>
 
@@ -99,9 +106,25 @@
     </script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/js/tempusdominus-bootstrap-4.min.js">
     </script>
+    <script type="text/javascript" src="{% static 'usuarios/js/elegir-centro.js' %}"></script>
 
     <script type="text/javascript">
+
       $(document).ready(function () {
+
+        var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
         $('#sidebarCollapse').on('click', function () {
           $('#sidebar').toggleClass('active');
           $(this).toggleClass('active');

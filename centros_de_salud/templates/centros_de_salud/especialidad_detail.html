@@ -8,5 +8,6 @@
 <a role="button" class="btn btn-warning btn-sm active" href="{% url 'centros_de_salud.especialidades.edit' pk=object.id %}">Editar</a>
 {% endif %}
 <p>Especialidad: <b>{{ object.nombre }}</b></p>
+<p>Tiempo predeterminado en minutos para cada consulta: <b>{{ object.tiempo_predeterminado_turno }}</b></p>
 
 {% endblock %}

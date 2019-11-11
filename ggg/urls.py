@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url, include
-from .views import HomeView
+from .views import LandingPage, choice_homepage, CiudadanoHome
 
 
 urlpatterns = [
@@ -15,9 +15,8 @@ urlpatterns = [
     url(r'^obras-sociales/', include('obras_sociales.urls')),
     url(r'^centros_de_salud/', include('centros_de_salud.urls')),
     url(r'^recupero/', include('recupero.urls')),
-    url(
-        r'^$',
-        HomeView.as_view(),
-        name="admin.home",
-    ),
+    url(r'^usuarios/', include('usuarios.urls')),
+    url(r'^$', LandingPage.as_view(), name='landing'),
+    url(r'^ciudadano/$', CiudadanoHome.as_view(), name='ciudadano.home'),
+    url(r'^home$', choice_homepage, name='home'),
 ]

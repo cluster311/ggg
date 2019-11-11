@@ -7,7 +7,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
 from crispy_forms.utils import render_crispy_form
 
-from .models import Servicio
+from .models import Servicio, CentroDeSalud
+from .forms import ServicioForm
 
 
 class ServicioListView(PermissionRequiredMixin, ListView):
@@ -18,17 +19,19 @@ class ServicioListView(PermissionRequiredMixin, ListView):
     permission_required = ("view_servicio",)
     paginate_by = 10
 
-    def get_queryset(self):   
+    def get_queryset(self):
+        csp = self.request.user.centros_de_salud_permitidos.all()
+        permitidos = [c.centro_de_salud for c in csp]
+        qs = Servicio.objects.filter(centro__in=permitidos)
+
         if 'search' in self.request.GET:
             q = self.request.GET['search']
-            objects = Servicio.objects.filter(
+            qs = qs.filter(
                 Q(centro__nombre__icontains=q) |
                 Q(especialidad__nombre__icontains=q)
             )
-        else:
-            objects = Servicio.objects.all()
         
-        return objects
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -47,8 +50,13 @@ class ServicioCreateView(PermissionRequiredMixin,
                                SuccessMessageMixin):
     model = Servicio
     permission_required = ("view_servicio",)
-    fields = ['centro', 'especialidad']
     success_message = "Creado con éxito."
+    form_class = ServicioForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -76,8 +84,13 @@ class ServicioDetailView(PermissionRequiredMixin, DetailView):
 class ServicioUpdateView(PermissionRequiredMixin, UpdateView):
     model = Servicio
     permission_required = "change_servicio"
-    fields = ['centro', 'especialidad']
     success_message = "Actualizado con éxito."
+    form_class = ServicioForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

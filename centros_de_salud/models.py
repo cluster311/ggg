@@ -58,6 +58,7 @@ class Especialidad(models.Model):
     obstetricia, dermatología, etc
     """
     nombre = models.CharField(max_length=290)
+    tiempo_predeterminado_turno = models.PositiveIntegerField(default=15)
 
     def __str__(self):
         return self.nombre
@@ -72,3 +73,19 @@ class Servicio(models.Model):
 
     def __str__(self):
         return f'{self.especialidad} - {self.centro}'
+
+
+class ProfesionalesEnServicio(models.Model):
+    """ cada uno de los profesionales activos en un servicio particular """
+    servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name='profesionales')
+    profesional = models.ForeignKey('profesionales.Profesional', on_delete=models.CASCADE, related_name='servicios')
+
+    EST_INACTIVO = 100
+    EST_ACTIVO = 200
+    estados = ((EST_INACTIVO, 'Inactivo'),
+               (EST_ACTIVO, 'Activo'))
+
+    estado = models.PositiveIntegerField(choices=estados, default=EST_ACTIVO)
+
+    def __str__(self):
+        return '{self.profesional} en {self.servicio}'

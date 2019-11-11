@@ -6,6 +6,9 @@ from django.utils.dateparse import parse_datetime
 import json
 from calendario.models import Turno
 from calendario.forms import BulkTurnoForm, FeedForm, TurnoForm
+import logging
+logger = logging.getLogger(__name__)
+from django.contrib.auth.decorators import permission_required
 from centros_de_salud.models import Servicio
 
 
@@ -20,11 +23,12 @@ def index(request):
             'id="addAppointmentButton" '
             'onclick="customAppointmentFormSubmit();">Agregar</button>'
         ),
-        'form': TurnoForm()
+        'form': TurnoForm(user=request.user)
     }
     return render(request, 'calendario.html', context)
 
 
+@permission_required('calendario.add_turno')
 def add_appointment(request):
     form_data = json.loads(request.body)
     if form_data['bulk']:
@@ -55,6 +59,7 @@ def add_appointment(request):
             } for a in appointments]
         }
     else:
+        logger.error(f'Error al grabar turnos: {form.errors}, data: {form_data}')
         response_data = {'success': False, 'errors': form.errors}
 
     return JsonResponse(response_data)
@@ -74,10 +79,12 @@ def copy_appointments(request):
     end = c_end - timedelta(days=7)
 
     current_appointments = get_appointments_list(
+        user=request.user,
         start=c_start.strftime('%Y-%m-%d %H:%M:%S'),
         end=c_end.strftime('%Y-%m-%d %H:%M:%S')
     )
     appointments = get_appointments_list(
+        user=request.user,
         start=start.strftime('%Y-%m-%d %H:%M:%S'),
         end=end.strftime('%Y-%m-%d %H:%M:%S')
     )
@@ -107,7 +114,7 @@ def copy_appointments(request):
 
 
 def feed(request, servicio=None):
-    turnos = get_appointments_list(servicio, **request.GET)
+    turnos = get_appointments_list(servicio, user=request.user, **request.GET)
     turnos = [{
         'id': t.id,
         'title': str(t),
@@ -122,7 +129,7 @@ def feed(request, servicio=None):
     return JsonResponse(turnos, safe=False)
 
 
-def get_appointments_list(servicio, **kwargs):
+def get_appointments_list(servicio, user, **kwargs):
     if 'id' in kwargs:
         pk = kwargs['id'][0] if isinstance(kwargs['id'], list) else \
              kwargs['id']
@@ -138,7 +145,12 @@ def get_appointments_list(servicio, **kwargs):
         kw['fin__lte'] = parse_datetime(end)
     if servicio is not None:
         kw['servicio__pk'] = servicio
-    return Turno.objects.filter(**kw)
+        return Turno.objects.filter(**kw)
+    else:
+        csp = user.centros_de_salud_permitidos.all()
+        centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
+        
+        return Turno.objects.filter(servicio__centro__in=centros_de_salud_permitidos, **kw)
 
 
 def agendar(request):
@@ -146,3 +158,4 @@ def agendar(request):
         'servicios': Servicio.objects.all()
     }
     return render(request, 'calendario-agregar.html', context)
+

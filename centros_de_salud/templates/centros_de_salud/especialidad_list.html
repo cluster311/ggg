@@ -6,6 +6,7 @@
     <thead>
     <tr>
         <th scope="col">Nombre</th>
+        <th scope="col">Minutos predet. en consulta</th>
         <th scope="col">Acciones</th>
     </tr>
     </thead>
@@ -13,6 +14,8 @@
     {% for cs in object_list %}
 <tr>
     <th scope="row">{{ cs.nombre }}</th>
+    <th scope="row">{{ cs.tiempo_predeterminado_turno }}</th>
+    
     <th scope="row">
         <a role="button" class="btn btn-warning btn-sm active" href="{% url 'centros_de_salud.especialidades.detail' pk=cs.id %}">Detalles</a>
         {% if perms.centros_de_salud.change_esopecialidad %}

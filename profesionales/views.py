@@ -246,6 +246,11 @@ class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin,
     form_class = ConsultaForm
     success_message = "Datos guardados con éxito."
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
@@ -282,6 +287,11 @@ class ConsultaUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = "can_view_tablero"
     template_name = "profesionales/consulta_updateview.html"
     success_message = "Datos actualizados con éxito."
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def get_success_url(self):
         return reverse(

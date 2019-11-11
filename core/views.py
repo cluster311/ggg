@@ -2,9 +2,11 @@ from dal import autocomplete
 from cie10_django.models import CIE10
 from pacientes.models import Paciente
 from profesionales.models import Profesional
-from centros_de_salud.models import CentroDeSalud
+from centros_de_salud.models import CentroDeSalud, ProfesionalesEnServicio
 from recupero.models import TipoPrestacion
 from django.db.models import Q
+import logging
+logger = logging.getLogger(__name__)
 
 
 class CIE10Autocomplete(autocomplete.Select2QuerySetView):
@@ -62,6 +64,11 @@ class ProfesionalAutocomplete(autocomplete.Select2QuerySetView):
             return Profesional.objects.none()
 
         qs = Profesional.objects.all()
+
+        if 'servicio_id' in self.kwargs:
+            si = self.kwargs['servicio_id']
+            qs = qs.filter(servicios__servicio=si, servicios__estado=ProfesionalesEnServicio.EST_ACTIVO)
+            logger.info(f'Profesionales por servicio {si}')
 
         if self.q:
             qs = qs.filter(Q(numero_documento__icontains=self.q) |
