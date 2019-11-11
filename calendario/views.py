@@ -78,10 +78,12 @@ def copy_appointments(request):
     end = c_end - timedelta(days=7)
 
     current_appointments = get_appointments_list(
+        user=request.user,
         start=c_start.strftime('%Y-%m-%d %H:%M:%S'),
         end=c_end.strftime('%Y-%m-%d %H:%M:%S')
     )
     appointments = get_appointments_list(
+        user=request.user,
         start=start.strftime('%Y-%m-%d %H:%M:%S'),
         end=end.strftime('%Y-%m-%d %H:%M:%S')
     )
@@ -111,7 +113,7 @@ def copy_appointments(request):
 
 
 def feed(request):
-    turnos = get_appointments_list(**request.GET)
+    turnos = get_appointments_list(user=request.user, **request.GET)
     turnos = [{
         'id': t.id,
         'title': str(t),
@@ -126,7 +128,7 @@ def feed(request):
     return JsonResponse(turnos, safe=False)
 
 
-def get_appointments_list(**kwargs):
+def get_appointments_list(user, **kwargs):
     if 'id' in kwargs:
         pk = kwargs['id'][0] if isinstance(kwargs['id'], list) else \
              kwargs['id']
@@ -140,4 +142,8 @@ def get_appointments_list(**kwargs):
         end = kwargs['end'][0] if isinstance(kwargs['end'], list) else \
               kwargs['end']
         kw['fin__lte'] = parse_datetime(end)
-    return Turno.objects.filter(**kw)
+    
+    csp = user.centros_de_salud_permitidos.all()
+    centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
+    
+    return Turno.objects.filter(servicio__centro__in=centros_de_salud_permitidos, **kw)
