@@ -1,3 +1,14 @@
+
+{% if user__es_administrativo %}
+{# centros de salud autorizados para este usuario #}
+Centro de salud activo
+<select class="custom-select custom-select-sm">
+    {% for centro in user__centros_de_salud_autorizados %}
+    <option value="centro.id">{{ centro.nombre }}</option>
+    {% endfor %}
+</select>
+{% endif %}
+
 <ul class="list-unstyled components">
     <!--titulo agrupador sin link <p>Profesionales</p>-->
     <li class="active">
