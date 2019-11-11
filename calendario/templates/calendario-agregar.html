@@ -42,6 +42,7 @@
     let calendar;
 
     function initCalendar(calendarEl, servicio){
+      if (servicio == null) servicio = 0;
       calendar = new FullCalendar.Calendar(calendarEl, {
         plugins: [ 'dayGrid', 'timeGrid' ],
         eventSources: [{
@@ -92,6 +93,7 @@
         }
       });
       $("#select2Servicios").select2();
+      $("#select2Servicios").change();
     }
     initServicioSelect();
     
