@@ -75,11 +75,36 @@
       initCalendar(calendarEl, 0);
     });
 
-    $("#select2Servicios").select2();
+
+    var servicios = [];
+    {% for servicio  in servicios %}
+      servicios.push({
+        'nombre':'{{servicio.especialidad.nombre}}',
+        'pk':{{servicio.pk}},
+        'centro_pk':{{servicio.centro.pk}}
+      });
+    {% endfor %}
+    
+    function initServicioSelect(){
+      $("#select2Servicios").empty();
+      servicios.forEach(function(servicio, index) {
+        if($("#usuario_elegir_centro").val() == servicio["centro_pk"]){
+          $("#select2Servicios").append(
+            "<option value="+servicio["pk"]+">"+servicio["nombre"]+"</option>");
+        }
+      });
+      $("#select2Servicios").select2();
+    }
+    initServicioSelect();
+    
     $("#select2Servicios").change(function(){
       let servicio_id = $("#select2Servicios").val();
       const calendarEl = document.getElementById('calendar');
       initCalendar(calendarEl, servicio_id);
+    });
+
+    $("#usuario_elegir_centro").change(function(){
+      initServicioSelect();
     });
   </script>
 
@@ -257,9 +282,6 @@
       <div class="col-md-5">
         <p>Servicio</p>
         <select id="select2Servicios" style="width:100%">
-          {% for servicio in servicios %}
-          <option value="{{servicio.pk}}">{{servicio.especialidad.nombre}} - {{servicio.centro.nombre}}</option>
-          {% endfor %}
         </select>
       </div>
     </div>
