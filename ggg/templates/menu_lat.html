@@ -1,3 +1,20 @@
+
+{% if user__es_administrativo %}
+{# centros de salud autorizados para este usuario #}
+Centro de salud activo
+<select class="custom-select custom-select-sm" 
+        id="usuario_elegir_centro"
+        data-elegir-centro-url="{% url 'usuarios.elegir-centro' %}">
+    {% for centro in user__centros_de_salud_autorizados %}
+    <option 
+        value="{{centro.id}}"
+        {% if user__centro_de_salud_elegido.centro_de_salud.id == centro.id %}selected{% endif %}
+        >{{ centro.nombre }}
+    </option>
+    {% endfor %}
+</select>
+{% endif %}
+
 <ul class="list-unstyled components">
     <!--titulo agrupador sin link <p>Profesionales</p>-->
     <li class="active">
@@ -114,6 +131,22 @@
         {% endif %}
         </ul>
     </li>
+
+
+    <li>
+        <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
+        <a href="#menu_usuarios" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Usuarios</a>
+        <ul class="collapse list-unstyled" id="menu_usuarios">
+        {% if perms.usuarios.view_usuarioencentrodesalud %}
+        <li>
+            <a href="{% url 'usuarios.en-centro-de-salud' %}">Autorizados en Centros de Salud</a>
+        </li>
+
+        {% endif %}
+        
+        </ul>
+    </li>
+    
 
     <li>
         <a href="#menu_recupero" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Recupero</a>

@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'nhpgd_django',  # nomenclador de hostpitales publicos de gestion descentralizada
     'calendario',
     'recupero',
+    'usuarios',
 ]
 
 MIDDLEWARE = [
@@ -92,6 +93,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'ggg.context_processors.cpp_settings',
+                'usuarios.context_processors.cpp_usuarios',
             ],
         },
     },
