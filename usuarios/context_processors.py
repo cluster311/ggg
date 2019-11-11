@@ -7,10 +7,10 @@ def cpp_usuarios(request):
     user = request.user
     context = {}
 
-    if user.is_superuser:
-        centros_de_salud_permitidos = CentroDeSalud.objects.all()
-    else:
-        centros_de_salud_permitidos = [centro.centro_de_salud for centro in user.centros_de_salud_permitidos.all()]
+    csp = user.centros_de_salud_permitidos.all()
+    centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
+    # if user.is_superuser:
+    #     centros_de_salud_permitidos = CentroDeSalud.objects.all()
 
     context["user__centros_de_salud_autorizados"] = centros_de_salud_permitidos
     
