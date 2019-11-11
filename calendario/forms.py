@@ -36,7 +36,8 @@ class TurnoForm(forms.ModelForm):
         widget=autocomplete.ModelSelect2(),
     )
         
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         # Add custom bootstrap classes to form fields' CSS.
         for field in self.fields.keys():
@@ -45,10 +46,12 @@ class TurnoForm(forms.ModelForm):
                 classes_to_ad += ' custom-select'
             self.fields[field].widget.attrs.update({'class': classes_to_ad})
         
-        csp = user.centros_de_salud_permitidos.all()
-        centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
-        qs = Servicio.objects.filter(centro__in=centros_de_salud_permitidos)
-        self.fields['servicio'].queryset = qs
+        
+        if user is not None:
+            csp = user.centros_de_salud_permitidos.all()
+            centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
+            qs = Servicio.objects.filter(centro__in=centros_de_salud_permitidos)
+            self.fields['servicio'].queryset = qs
 
     def clean(self, *args, **kwargs):
 

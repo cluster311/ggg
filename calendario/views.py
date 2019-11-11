@@ -12,7 +12,6 @@ from django.contrib.auth.decorators import permission_required
 
 
 def index(request):
-    user = request.user
     context = {
         'modal_title': 'Agregar turno',
         'modal_close': 'Cancelar',
@@ -23,7 +22,7 @@ def index(request):
             'id="addAppointmentButton" '
             'onclick="customAppointmentFormSubmit();">Agregar</button>'
         ),
-        'form': TurnoForm(user=user)
+        'form': TurnoForm(user=request.user)
     }
     return render(request, 'calendario.html', context)
 
