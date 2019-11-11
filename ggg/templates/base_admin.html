@@ -1,5 +1,4 @@
-{% load static %}
-<!DOCTYPE html>
+{% load static %}{% csrf_token %}<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -107,9 +106,25 @@
     </script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/js/tempusdominus-bootstrap-4.min.js">
     </script>
+    <script type="text/javascript" src="{% static 'usuarios/js/elegir-centro.js' %}"></script>
 
     <script type="text/javascript">
+
       $(document).ready(function () {
+
+        var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
         $('#sidebarCollapse').on('click', function () {
           $('#sidebar').toggleClass('active');
           $(this).toggleClass('active');

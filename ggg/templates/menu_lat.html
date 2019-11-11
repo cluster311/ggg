@@ -2,9 +2,15 @@
 {% if user__es_administrativo %}
 {# centros de salud autorizados para este usuario #}
 Centro de salud activo
-<select class="custom-select custom-select-sm">
+<select class="custom-select custom-select-sm" 
+        id="usuario_elegir_centro"
+        data-elegir-centro-url="{% url 'usuarios.elegir-centro' %}">
     {% for centro in user__centros_de_salud_autorizados %}
-    <option value="centro.id">{{ centro.nombre }}</option>
+    <option 
+        value="{{centro.id}}"
+        {% if user__centro_de_salud_elegido.centro_de_salud.id == centro.id %}selected{% endif %}
+        >{{ centro.nombre }}
+    </option>
     {% endfor %}
 </select>
 {% endif %}

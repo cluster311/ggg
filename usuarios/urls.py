@@ -4,7 +4,7 @@ from .views_usuarios_en_centros import (UsuarioEnCentroDeSaludListView,
                                         UsuarioEnCentroDeSaludCreateView,
                                         UsuarioEnCentroDeSaludDetailView,
                                         UsuarioEnCentroDeSaludUpdateView)
-
+from .views import elegir_centro
 
 urlpatterns = [
 
@@ -28,6 +28,8 @@ urlpatterns = [
         UsuarioEnCentroDeSaludUpdateView.as_view(),
         name="usuarios.en-centro-de-salud.edit",
     ),
+
+    url(r'^elegir_centro/$', elegir_centro, name='usuarios.elegir-centro'),
 
 
 ]
