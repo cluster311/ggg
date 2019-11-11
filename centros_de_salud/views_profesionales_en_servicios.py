@@ -52,6 +52,11 @@ class ProfesionalesEnServicioCreateView(PermissionRequiredMixin,
     form_class = ProfesionalesEnServicioForm
     success_message = "Creado con éxito."
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Profesionales en Servicios'
@@ -80,6 +85,11 @@ class ProfesionalesEnServicioUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = "change_profesionalesenservicio"
     form_class = ProfesionalesEnServicioForm
     success_message = "Actualizado con éxito."
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

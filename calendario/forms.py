@@ -46,7 +46,6 @@ class TurnoForm(forms.ModelForm):
                 classes_to_ad += ' custom-select'
             self.fields[field].widget.attrs.update({'class': classes_to_ad})
         
-        
         if user is not None:
             csp = user.centros_de_salud_permitidos.all()
             centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
