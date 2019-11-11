@@ -19,17 +19,19 @@ class ServicioListView(PermissionRequiredMixin, ListView):
     permission_required = ("view_servicio",)
     paginate_by = 10
 
-    def get_queryset(self):   
+    def get_queryset(self):
+        csp = self.request.user.centros_de_salud_permitidos.all()
+        permitidos = [c.centro_de_salud for c in csp]
+        qs = Servicio.objects.filter(centro__in=permitidos)
+
         if 'search' in self.request.GET:
             q = self.request.GET['search']
-            objects = Servicio.objects.filter(
+            qs = qs.filter(
                 Q(centro__nombre__icontains=q) |
                 Q(especialidad__nombre__icontains=q)
             )
-        else:
-            objects = Servicio.objects.all()
         
-        return objects
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

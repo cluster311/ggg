@@ -18,19 +18,22 @@ class ProfesionalesEnServicioListView(PermissionRequiredMixin, ListView):
     permission_required = ("view_profesionalesenservicio",)
     paginate_by = 10
 
-    def get_queryset(self):   
+    def get_queryset(self):
+
+        csp = self.request.user.centros_de_salud_permitidos.all()
+        permitidos = [c.centro_de_salud for c in csp]
+        qs = ProfesionalesEnServicio.objects.filter(servicio__centro__in=permitidos)
+
         if 'search' in self.request.GET:
             q = self.request.GET['search']
-            objects = ProfesionalesEnServicio.objects.filter(
+            qs = qs.filter(
                 Q(servicio__centro__nombre__icontains=q) |
                 Q(servicio__especialidad__nombre__icontains=q) |
                 Q(profesional__apellidos__icontains=q) |
                 Q(profesional__nombres__icontains=q)
             )
-        else:
-            objects = ProfesionalesEnServicio.objects.all()
         
-        return objects
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
