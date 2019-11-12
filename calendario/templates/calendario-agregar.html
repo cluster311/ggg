@@ -46,7 +46,7 @@
       calendar = new FullCalendar.Calendar(calendarEl, {
         plugins: [ 'dayGrid', 'timeGrid' ],
         eventSources: [{
-            url: '{% url "calendario.feed" servicio=0 %}'.replace(0,servicio),
+            url: '{% url "calendario.feed-availables" servicio=0 %}'.replace(0,servicio),
         }],
         eventClick: function(info) {
           $('#modal-body-text').text(
@@ -55,6 +55,7 @@
             " a las " + info.event.start.getHours() + ":" 
             + info.event.start.getMinutes() + " horas?"
           );
+          $("#turn_pk").val(info.event.id);
           $('#agendarModal').modal('show');
         },
         defaultView: 'dayGridWeek',
@@ -76,13 +77,6 @@
 
       calendar.render();
     }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const calendarEl = document.getElementById('calendar');
-
-      initCalendar(calendarEl, 0);
-    });
-
 
     var servicios = [];
     {% for servicio  in servicios %}
@@ -111,6 +105,7 @@
       const calendarEl = document.getElementById('calendar');
       initCalendar(calendarEl, servicio_id);
     });
+    $("#select2Servicios").change();
 
     $("#usuario_elegir_centro").change(function(){
       initServicioSelect();
@@ -121,168 +116,32 @@
 
   <script>
     'use strict';
-    function customAppointmentFormSubmit() {
-      const formData = getFormData();
-
+    function confirmTurn() {
+      let formData = {
+        'paciente':$("#dni").val(),
+      }
+      let pk = $("#turn_pk").val()
       axios({
         method: 'put',
-        url: "{% url 'add_appointments' %}",
+        url: "{% url 'calendario.confirm' pk=0 %}".replace(0,pk),
         headers: {'Content-Type': 'application/json'},
         data: formData
       })
         .then(response => {
           if (!response.data.success) {
-            showFormErrors(response.data.errors);
+            $("#dni-error").css('display','block');
           } else {
+            $("#dni-error").css('display','none');
+            $("#dni").val("");
             calendar.refetchEvents();
-            dismissFormErrors();
-            $('#modalForm').modal('hide');
+            $('#agendarModal').modal('hide');
           }
         })
         .catch(error => {
-          showFormErrors({Error: [error.toString().slice(7)]});
+          console.error(error)
         });
     }
 
-
-    function getFormData() {
-      const appointmentForm = document.getElementById('appointmentForm');
-
-      const formData = {};
-      for (const field of appointmentForm) {
-        if (field.type === 'checkbox') {
-          formData[field.name] = field.checked;
-        } else {
-          formData[field.name] = field.value;
-        }
-      }
-
-      return formData;
-    }
-
-
-    function showFormErrors(fields) {
-      const errorsList = getOrCreateErrorsList();
-      const errorItems = getErrorItems(fields);
-      errorsList.innerHTML = errorItems;
-      document.getElementById('modalForm').scroll(
-        {top: 0, behavior: 'smooth'}
-      );
-    }
-
-    function dismissFormErrors() {
-      const errorsList = document.getElementById('errorsList');
-      if (errorsList) errorsList.remove();
-    }
-
-    function getOrCreateErrorsList() {
-      let errorsList = document.getElementById('errorsList');
-
-      if (!errorsList) {
-        errorsList = document.createElement('ul');
-        errorsList.setAttribute('id', 'errorsList');
-        errorsList.classList.add('errors', 'list-group');
-        const form = document.getElementById('appointmentForm');
-        form.insertBefore(errorsList, form.firstChild);
-      }
-
-      return errorsList;
-    }
-
-    function getErrorItems(errors) {
-      let errorItems = '';
-      for (const field in errors) {
-        errorItems += `
-          <li class="list-group-item list-group-item-action
-            flex-column align-items-start list-group-item-danger"
-          >
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">
-                ${capitalize(field)}
-              </h5>
-              <span class="badge badge-danger badge-pill mb-2">
-                ${errors[field].length}
-              </span>
-            </div>
-            <ul class="list-group mb-1">
-              ${getFieldErrorsListItems(errors[field])}
-            </ul>
-          </li>`;
-      }
-      return errorItems;
-    }
-
-    function getFieldErrorsListItems(fieldErrors) {
-      let errorsUL = '';
-      for (const error of fieldErrors) {
-        errorsUL += `<li>${error}</li>`;
-      }
-      return errorsUL;
-    }
-
-
-    function capitalize(text) {
-      return text.charAt(0).toUpperCase() + text.slice(1);
-    }
-  </script>
-
-
-
-  <script>
-    'use strict';
-    $('#modalForm').on('hidden.bs.modal', () => {
-      document.getElementById('appointmentId').value = null;
-      document.getElementById('deleteAppointment').value = null;
-      document.getElementById('closeModalButton').hidden = false;
-      getOrCreateDeleteButton().hidden = true;
-      document.getElementById('addAppointmentButton').innerHTML = 'Agregar';
-      document.getElementById('id_duration').disabled = false;
-    });
-  </script>
-
-  <script>
-
-    function getOrCreateDeleteButton() {
-      let deleteButton = document.getElementById('deleteAppointmentButton');
-
-      if (!deleteButton) {
-        deleteButton = document.createElement('button');
-        deleteButton.setAttribute('id', 'deleteAppointmentButton');
-        deleteButton.addEventListener('click', () => {
-          if (confirm('¿Realmente quieres eliminar este evento?')) {
-            document.getElementById("deleteAppointment").value = true;
-            customAppointmentFormSubmit();
-          }
-        });
-        deleteButton.setAttribute('hidden', true);
-        deleteButton.classList.add('btn', 'btn-danger');
-        deleteButton.innerHTML = 'Eliminar';
-        const closeButton = document.getElementById('closeModalButton');
-        closeButton.parentNode.insertBefore(deleteButton, closeButton);
-      }
-
-      return deleteButton;
-    }
-
-
-    function formatDatetime(dateTime) {
-      const year = dateTime.getFullYear();
-      // If number has 2 digits, add leading zero but don't use it
-      const month = `0${dateTime.getMonth()+1}`.slice(-2);
-      const day = `0${dateTime.getDate()}`.slice(-2);
-      const hour = `0${dateTime.getHours()}`.slice(-2);
-      const minutes = `0${dateTime.getMinutes()}`.slice(-2);
-      const seconds = `0${dateTime.getSeconds()}`.slice(-2);
-      return `${day}/${month}/${year} ${hour}:${minutes}:${seconds}`;
-    }
-
-    function toggleElementAttribute(el, attribute) {
-      if (el[attribute]) {
-        el[attribute] = false;
-      } else {
-        el[attribute] = true;
-      }
-    }
   </script>
 {% endblock js_footer %}
 
@@ -320,11 +179,13 @@
         <div class="form-group">
           <label for="dni" class="col-form-label">DNI Paciente:</label>
           <input class="form-control" id="dni"></input>
+          <span class="help-block" id="dni-error" style="display: none;">El dni es incorrecto</span>
         </div>
+        <input id="turn_pk" hidden/>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-primary">Agendar</button>
+        <button type="button" class="btn btn-primary" onclick="confirmTurn()">Agendar</button>
       </div>
     </div>
   </div>

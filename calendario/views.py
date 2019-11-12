@@ -145,6 +145,7 @@ def get_appointments_list(servicio, user, **kwargs):
         kw['fin__lte'] = parse_datetime(end)
     if servicio is not None:
         kw['servicio__pk'] = servicio
+        kw['estado'] = 0
         return Turno.objects.filter(**kw)
     else:
         csp = user.centros_de_salud_permitidos.all()
@@ -159,3 +160,19 @@ def agendar(request):
     }
     return render(request, 'calendario-agregar.html', context)
 
+
+def confirm_turn(request, pk):
+    instance = get_object_or_404(Turno, id=pk)
+    form_data = json.loads(request.body)
+    form = TurnoForm(form_data, instance=instance)
+    save, result = form.update(form_data)
+    if save:
+        return JsonResponse({
+            'success': save,
+            'turno': instance.pk}
+        )
+    else:
+        return JsonResponse({
+            'success': save,
+            'errors': result}
+        )
