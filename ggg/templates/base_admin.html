@@ -34,6 +34,21 @@
     integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY"
     crossorigin="anonymous"></script>
 
+  <!-- Colores para ciudadanos, no administradores de muni-->
+  {% if user__es_ciudadno and not user__es_administrativo and not user__es_profesional %}
+  <style>
+    #sidebar {
+      background: #22CC50;
+    }
+    #sidebar .sidebar-header,
+    #sidebar ul li.active > a,
+    a[aria-expanded="true"],
+    #sidebar ul ul a{
+      background: #509932;
+    }
+  </style>
+  {% endif %}
+
   {% block extra_head %}{% endblock %}
 </head>
 
