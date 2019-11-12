@@ -2,32 +2,31 @@
 
 {% block content %}
 
+
 <table class="table">
     <thead>
-    <tr>
-        <th scope="col">Objeto</th>
-        <th scope="col">Ver</th>
-        <th scope="col">Crear</th>
-        <th scope="col">Editar</th>
-        <th scope="col"> - </th>
-        <th scope="col"> - </th>
-        <th scope="col"> - </th>
+            {% for p in permisos %}
+    <tr style='background-color: #0305'>
+        <th scope="col">{{ p.nombre }}</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+        <th scope="col"></th>
     </tr>
     </thead>
     <tbody>
-    {% for m in apps %}
+    {% for v in p.valores %}
 <tr>
-    <th scope="row">{{ m.app_vn }} - {{ m.name }}</th>
-    <th scope="row"><input type='checkbox' />Ver</th>
-    <th scope="row"><input type='checkbox' />Crear</th>
-    <th scope="row"><input type='checkbox' />Editar</th>
-    {% for p in m.permissions %}
-        <th scope="row"><input type='checkbox' /> {{ p.1 }}</th>
+    <th scope="row">{{ v.nombre }}{% if v.ayuda %}<br /><small>{{ v.ayuda}}</small>{% endif %}</th>
+    {% for permiso in v.permisos %}
+    <th scope="row"><input type='checkbox' />{{ permiso }}</th>
     {% endfor %}
 </tr>
         {% endfor %}
     </tbody>
+    {% endfor %}
 </table>
+
 
 {% include 'admin_paginate.html' %}
 
