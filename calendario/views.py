@@ -165,7 +165,7 @@ def agendar(request):
 
 
 @permission_required('calendario.can_schedule_turno')
-@require_http_methods(["POST"])
+@require_http_methods(["PUT"])
 def confirm_turn(request, pk):
     instance = get_object_or_404(Turno, id=pk)
     form_data = json.loads(request.body)
