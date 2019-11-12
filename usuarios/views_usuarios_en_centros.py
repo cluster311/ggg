@@ -15,7 +15,7 @@ class UsuarioEnCentroDeSaludListView(PermissionRequiredMixin, ListView):
     Lista de Usuarios en Centros de Salud
     """
     model = UsuarioEnCentroDeSalud
-    permission_required = ("view_UsuarioEnCentroDeSalud",)
+    permission_required = ("view_usuarioencentrodesalud",)
     paginate_by = 10
 
     def get_queryset(self):   
