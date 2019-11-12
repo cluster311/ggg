@@ -49,7 +49,7 @@ class ObraSocial(models.Model):
         permissions = [
             (
                 "can_view_tablero",
-                "Puede ver los tableros de comandos sobre obras sociales",
+                "Ver tableros de comandos"
             )
         ]
 

@@ -137,11 +137,17 @@ Centro de salud activo
         <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
         <a href="#menu_usuarios" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Usuarios</a>
         <ul class="collapse list-unstyled" id="menu_usuarios">
+
+        {% if perms.auth.change_user %}
+        <li>
+            <a href="{% url 'usuarios.permisos' %}">Permisos de usuarios</a>
+        </li>
+        {% endif %}
+
         {% if perms.usuarios.view_usuarioencentrodesalud %}
         <li>
             <a href="{% url 'usuarios.en-centro-de-salud' %}">Autorizados en Centros de Salud</a>
         </li>
-
         {% endif %}
         
         </ul>

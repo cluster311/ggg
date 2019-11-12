@@ -5,6 +5,8 @@ from .views_usuarios_en_centros import (UsuarioEnCentroDeSaludListView,
                                         UsuarioEnCentroDeSaludDetailView,
                                         UsuarioEnCentroDeSaludUpdateView)
 from .views import elegir_centro
+from .views_permisos import EditUserPermissionView
+
 
 urlpatterns = [
 
@@ -27,6 +29,12 @@ urlpatterns = [
         r"editar-en-centro-de-salud/<int:pk>",
         UsuarioEnCentroDeSaludUpdateView.as_view(),
         name="usuarios.en-centro-de-salud.edit",
+    ),
+
+    path(
+        r"permisos",
+        EditUserPermissionView.as_view(),
+        name="usuarios.permisos",
     ),
 
     url(r'^elegir_centro/$', elegir_centro, name='usuarios.elegir-centro'),

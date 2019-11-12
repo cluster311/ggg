@@ -48,7 +48,7 @@ class CentroDeSalud(models.Model):
         permissions = [
             (
                 "can_view_tablero",
-                "Puede ver los tableros de comandos sobre centros de salud",
+                "Ver tableros de comandos",
             )
         ]
 

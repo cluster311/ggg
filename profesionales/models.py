@@ -78,7 +78,7 @@ class Profesional(Persona):
         permissions = [
             (
                 "can_view_tablero",
-                "Puede ver los tableros de comandos sobre profesionales",
+                "Ver tableros de comandos"
             )
         ]
         verbose_name_plural = "Profesionales"
