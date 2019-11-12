@@ -3,12 +3,14 @@ from django import forms
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.dateparse import parse_datetime
+from django.views.decorators.http import require_http_methods
 import json
 from calendario.models import Turno
 from calendario.forms import BulkTurnoForm, FeedForm, TurnoForm
 import logging
 logger = logging.getLogger(__name__)
 from django.contrib.auth.decorators import permission_required
+from centros_de_salud.models import Servicio
 
 
 def index(request):
@@ -112,8 +114,8 @@ def copy_appointments(request):
     )
 
 
-def feed(request):
-    turnos = get_appointments_list(user=request.user, **request.GET)
+def feed(request, servicio=None):
+    turnos = get_appointments_list(servicio, user=request.user, **request.GET)
     turnos = [{
         'id': t.id,
         'title': str(t),
@@ -128,7 +130,7 @@ def feed(request):
     return JsonResponse(turnos, safe=False)
 
 
-def get_appointments_list(user, **kwargs):
+def get_appointments_list(servicio, user, **kwargs):
     if 'id' in kwargs:
         pk = kwargs['id'][0] if isinstance(kwargs['id'], list) else \
              kwargs['id']
@@ -142,8 +144,40 @@ def get_appointments_list(user, **kwargs):
         end = kwargs['end'][0] if isinstance(kwargs['end'], list) else \
               kwargs['end']
         kw['fin__lte'] = parse_datetime(end)
-    
-    csp = user.centros_de_salud_permitidos.all()
-    centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
-    
-    return Turno.objects.filter(servicio__centro__in=centros_de_salud_permitidos, **kw)
+    if servicio is not None:
+        kw['servicio__pk'] = servicio
+        kw['estado'] = 0
+        return Turno.objects.filter(**kw)
+    else:
+        csp = user.centros_de_salud_permitidos.all()
+        centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
+        
+        return Turno.objects.filter(servicio__centro__in=centros_de_salud_permitidos, **kw)
+
+
+@permission_required('calendario.can_schedule_turno')
+@require_http_methods(["GET"])
+def agendar(request):
+    context = {
+        'servicios': Servicio.objects.all()
+    }
+    return render(request, 'calendario-agregar.html', context)
+
+
+@permission_required('calendario.can_schedule_turno')
+@require_http_methods(["PUT"])
+def confirm_turn(request, pk):
+    instance = get_object_or_404(Turno, id=pk)
+    form_data = json.loads(request.body)
+    form = TurnoForm(form_data, instance=instance)
+    save, result = form.update(form_data)
+    if save:
+        return JsonResponse({
+            'success': save,
+            'turno': instance.as_json()}
+        )
+    else:
+        return JsonResponse({
+            'success': save,
+            'errors': result}
+        )

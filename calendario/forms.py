@@ -6,6 +6,7 @@ from django.conf import settings
 from calendario.models import Turno
 from calendario.widgets import DateTimePicker
 from profesionales.models import Profesional
+from pacientes.models import Paciente
 from centros_de_salud.models import ProfesionalesEnServicio, Servicio
 import logging
 logger = logging.getLogger(__name__)
@@ -105,6 +106,18 @@ class TurnoForm(forms.ModelForm):
                 turno_time = time(turno_time.hour + horas, mins)
             turno_date = turno_date + timedelta(days=1)
         return turno
+
+    
+    def update(self, data, *args, **kwargs):
+        paciente = Paciente.objects.filter(numero_documento=data['paciente']).first()
+        if paciente is None:
+            error = {'paciente':'El dni ingresado no corresponde a un paciente del sistema'}
+            return False, error
+        else:
+            self.instance.paciente = paciente
+            self.instance.estado = 1
+            self.instance.save()
+            return True, self.instance
 
     class Meta:
         model = Turno

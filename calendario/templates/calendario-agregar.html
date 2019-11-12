@@ -1,0 +1,250 @@
+{% extends "base_admin.html" %}
+{% load static %}
+
+{% block extra_head %}
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.css" rel="stylesheet" />
+
+  <link href="https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.css" rel="stylesheet" />
+
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+
+  <!-- DateTime Picker's assets -->
+  {{ form.media }}
+
+  <link href="{% static 'css/modal_extra.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block js_footer %}
+	{{ block.super }}
+
+  <!-- Import axios and configure it to send csrf tokens -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    'use strict';
+    axios.defaults.xsrfCookieName = 'csrftoken'
+    axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+  </script>
+
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/locales/es.js'></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
+
+  <script src='https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.js'></script>
+
+  <script type="text/javascript">
+    'use strict';
+    let calendar;
+
+    function initCalendar(calendarEl, servicio){
+      if (servicio == null) servicio = 0;
+      calendar = new FullCalendar.Calendar(calendarEl, {
+        plugins: [ 'dayGrid', 'timeGrid' ],
+        eventSources: [{
+            url: '{% url "calendario.feed-availables" servicio=0 %}'.replace(0,servicio),
+        }],
+        eventClick: function(info) {
+          $('#modal-body-text').text(
+            "¿Desea agendar un turno para el " + 
+            info.event.start.getDate() + "/" + info.event.start.getMonth() +
+            " a las " + info.event.start.getHours() + ":" 
+            + info.event.start.getMinutes() + " horas?"
+          );
+          $("#turn_pk").val(info.event.id);
+          $('#agendarModal').modal('show');
+        },
+        defaultView: 'dayGridWeek',
+        header: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,dayGridWeek,dayGridDay'
+        },
+        locale: 'es',
+        weekMode: 'liquid',
+        slotMinutes: 15,
+        defaultEventMinutes: 30,
+        minTime: 8,
+        maxTime: 20,
+        editable: true,
+        themeSystem: 'bootstrap',
+        //eventClick: showModalEvent
+      });
+
+      calendar.render();
+    }
+
+    var servicios = [];
+    {% for servicio  in servicios %}
+      servicios.push({
+        'nombre':'{{servicio.especialidad.nombre}}',
+        'pk':{{servicio.pk}},
+        'centro_pk':{{servicio.centro.pk}}
+      });
+    {% endfor %}
+    
+    function initServicioSelect(){
+      $("#select2Servicios").empty();
+      servicios.forEach(function(servicio, index) {
+        if($("#usuario_elegir_centro").val() == servicio["centro_pk"]){
+          $("#select2Servicios").append(
+            "<option value="+servicio["pk"]+">"+servicio["nombre"]+"</option>");
+        }
+      });
+      $("#select2Servicios").select2();
+      $("#select2Servicios").change();
+    }
+    initServicioSelect();
+    
+    $("#select2Servicios").change(function(){
+      let servicio_id = $("#select2Servicios").val();
+      const calendarEl = document.getElementById('calendar');
+      initCalendar(calendarEl, servicio_id);
+    });
+    $("#select2Servicios").change();
+
+    $("#usuario_elegir_centro").change(function(){
+      initServicioSelect();
+    });
+  </script>
+
+
+
+  <script>
+    'use strict';
+    function confirmTurn() {
+      let formData = {
+        'paciente':$("#dni").val(),
+      }
+      let pk = $("#turn_pk").val()
+      axios({
+        method: 'put',
+        url: "{% url 'calendario.confirm' pk=0 %}".replace(0,pk),
+        headers: {'Content-Type': 'application/json'},
+        data: formData
+      })
+        .then(response => {
+          if (!response.data.success) {
+            $("#dni-error").css('display','block');
+          } else {
+            $("#dni-error").css('display','none');
+            $("#dni").val("");
+            calendar.refetchEvents();
+            $('#agendarModal').modal('hide');
+            crearTicket(response.data.turno);
+            $('#imprimirTurno').modal('show');
+          }
+        })
+        .catch(error => {
+          console.error(error)
+        });
+    }
+
+    function imprimirTurno(){
+      {
+        var elem = 'imprimirBody';
+        var mywindow = window.open('', 'PRINT', 'height=400,width=600');
+
+        mywindow.document.write('<html><head><title>TURNO</title>');
+        mywindow.document.write('</head><body >');
+        mywindow.document.write(document.getElementById(elem).innerHTML);
+        mywindow.document.write('</body></html>');
+
+        mywindow.document.close(); // necessary for IE >= 10
+        mywindow.focus(); // necessary for IE >= 10*/
+
+        mywindow.print();
+        mywindow.close();
+
+        return true;
+      }
+    }
+
+    function crearTicket(data){
+      $("#impServicio").text(data.servicio);
+      if (data.profesional != undefined){
+        $("#pImpProfesional").css('display','block');
+        $("#impProfesional").text(data.profesional);
+      }
+      $("#impFecha").text(data.inicio);
+      $("#impPaciente").text(data.paciente);
+    }
+
+  </script>
+{% endblock js_footer %}
+
+{% block content %}
+    <div class="row">
+      <div class="col-md-5">
+        <p>Servicio</p>
+        <select id="select2Servicios" style="width:100%">
+        </select>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div id='calendar'></div>
+    </div>
+
+
+    
+
+{% endblock %}
+
+
+{% block unwrapped_content %}
+<div class="modal fade" id="agendarModal" tabindex="1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Agendar turno</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-body-text"></p>
+        <div class="form-group">
+          <label for="dni" class="col-form-label">DNI Paciente:</label>
+          <input class="form-control" id="dni"></input>
+          <span class="help-block" id="dni-error" style="display: none;">El dni es incorrecto</span>
+        </div>
+        <input id="turn_pk" hidden/>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" onclick="confirmTurn()">Agendar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="imprimirTurno" tabindex="1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Turno</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="imprimirBody">
+        <h1 id="impServicio"></h1>
+        <p id="pImpProfesional" style="display: none;">
+          Profesional: <strong id="impProfesional"></strong></p>
+        <p>Fecha: <strong id="impFecha"></strong></p>
+        <p>Paciente: <strong id="impPaciente"></strong></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" onclick="imprimirTurno()">Imprimir</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

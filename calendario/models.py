@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime
 
 
 class Turno(models.Model):
@@ -36,5 +37,25 @@ class Turno(models.Model):
     )
     estado = models.IntegerField(choices=OPCIONES_ESTADO, default=DISPONIBLE)
 
+    class Meta:
+        permissions = [
+            (
+                "can_schedule_turno",
+                "Puede agendar un turno",
+            )
+        ]
+
     def __str__(self):
         return f'{self.servicio.especialidad}'
+
+    def as_json(self):
+        json = {
+            'inicio': datetime.strftime(self.inicio, '%d/%m/%Y %H:%M'),
+            'servicio': self.servicio.especialidad.nombre,
+            'paciente': '{}, {}'.format(
+                self.paciente.apellidos, self.paciente.nombres)
+        }
+        if self.profesional is not None:
+            json['profesional'] = '{}, {}'.format(
+                self.profesional.apellidos, self.profesional.nombres)
+        return json
