@@ -1,0 +1,33 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+
+
+<table class="table">
+    <thead>
+            {% for p in permisos %}
+    <tr style='background-color: #0305'>
+        <th scope="col">{{ p.nombre }}</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for v in p.valores %}
+<tr>
+    <th scope="row">{{ v.nombre }}{% if v.ayuda %}<br /><small>{{ v.ayuda}}</small>{% endif %}</th>
+    {% for permiso in v.permisos %}
+    <th scope="row"><input type='checkbox' />{{ permiso }}</th>
+    {% endfor %}
+</tr>
+        {% endfor %}
+    </tbody>
+    {% endfor %}
+</table>
+
+
+{% include 'admin_paginate.html' %}
+
+{% endblock %}
