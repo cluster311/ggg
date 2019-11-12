@@ -35,9 +35,7 @@
     crossorigin="anonymous"></script>
 
   <!-- Colores para ciudadanos, no administradores de muni-->
-  {% load extra_tags %}
-  {% es_municipal_admin user as admin_muni %}
-  {% if not admin_muni %}
+  {% if user__es_ciudadno and not user__es_administrativo and not user__es_profesional %}
   <style>
     #sidebar {
       background: #22CC50;

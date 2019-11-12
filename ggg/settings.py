@@ -95,9 +95,6 @@ TEMPLATES = [
                 'ggg.context_processors.cpp_settings',
                 'usuarios.context_processors.cpp_usuarios',
             ],
-            'libraries':{
-                'extra_tags': 'ggg.templatetags.extra_tags',
-            }
         },
     },
 ]
