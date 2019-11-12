@@ -246,18 +246,28 @@ class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin,
     form_class = ConsultaForm
     success_message = "Datos guardados con éxito."
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
         if self.request.POST:
-            context["recetas_frm"] = RecetaFormset(self.request.POST)
-            context["derivaciones_frm"] = DerivacionFormset(self.request.POST)
-            context["prestaciones_frm"] = PrestacionFormset(self.request.POST)
+            context["recetas_frm"] = RecetaFormset(self.request.POST, prefix='Recetas')
+            context["derivaciones_frm"] = DerivacionFormset(self.request.POST, prefix='Derivaciones')
+            context["prestaciones_frm"] = PrestacionFormset(self.request.POST, prefix='Prestaciones')
         else:
-            context["recetas_frm"] = RecetaFormset()
-            context["derivaciones_frm"] = DerivacionFormset()
-            context["prestaciones_frm"] = PrestacionFormset()
-        
+            context["recetas_frm"] = RecetaFormset(prefix='Recetas')
+            context["derivaciones_frm"] = DerivacionFormset(prefix='Derivaciones')
+            context["prestaciones_frm"] = PrestacionFormset(prefix='Prestaciones')
+
+        context["formsets"] = [
+            context["recetas_frm"],
+            context["derivaciones_frm"],
+            context["prestaciones_frm"]
+        ]        
         return context
 
     def get_success_url(self):
@@ -277,6 +287,11 @@ class ConsultaUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = "can_view_tablero"
     template_name = "profesionales/consulta_updateview.html"
     success_message = "Datos actualizados con éxito."
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def get_success_url(self):
         return reverse(

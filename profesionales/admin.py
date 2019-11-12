@@ -18,6 +18,7 @@ class ProfesionalSite(admin.AdminSite):
 
 @admin.register(Profesional)
 class ProfesionalAdmin(admin.ModelAdmin):
+    save_as = True
     list_display = [
         "nombres",
         "apellidos",

@@ -1,0 +1,14 @@
+{% extends "base_admin.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+<a role="button" class="btn btn-warning btn-sm active" href="{% url 'centros_de_salud.profesionales-en-servicio' %}">Volver a la lista</a>
+{% if perms.centros_de_salud.change_profesionalesenservicio %}
+<a role="button" class="btn btn-warning btn-sm active" href="{% url 'centros_de_salud.profesionales-en-servicio.edit' pk=object.id %}">Editar</a>
+{% endif %}
+<p>Servicio: <b>{{ object.servicio }}</b></p>
+<p>Profesional: <b>{{ object.profesional }}</b></p>
+<p>Estado: <b>{{ object.get_estado_display }}</b></p>
+
+{% endblock %}

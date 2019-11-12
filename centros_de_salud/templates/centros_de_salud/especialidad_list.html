@@ -1,0 +1,34 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Nombre</th>
+        <th scope="col">Minutos predet. en consulta</th>
+        <th scope="col">Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for cs in object_list %}
+<tr>
+    <th scope="row">{{ cs.nombre }}</th>
+    <th scope="row">{{ cs.tiempo_predeterminado_turno }}</th>
+    
+    <th scope="row">
+        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'centros_de_salud.especialidades.detail' pk=cs.id %}">Detalles</a>
+        {% if perms.centros_de_salud.change_esopecialidad %}
+        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'centros_de_salud.especialidades.edit' pk=cs.id %}">Editar</a>
+        {% endif %}
+    </th>
+</tr>
+        {% empty %}
+        <td>Sin datos</td><td></td><td></td>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% include 'admin_paginate.html' %}
+
+{% endblock %}

@@ -13,22 +13,24 @@ class CentroDeSaludListView(PermissionRequiredMixin, ListView):
     permission_required = ("view_centrodesalud",)
     paginate_by = 10  # pagination
 
-    def get_queryset(self):        
+    def get_queryset(self):
+        csp = self.request.user.centros_de_salud_permitidos.all()
+        permitidos = [c.centro_de_salud.id for c in csp]
+        qs = CentroDeSalud.objects.filter(pk__in=permitidos)
+            
         if 'search' in self.request.GET:
             q = self.request.GET['search']
-            objects = CentroDeSalud.objects.filter(
+            qs = qs.filter(
                 Q(nombre__icontains=q) |
                 Q(codigo_hpgd__icontains=q)
                 )
-        else:
-            objects = CentroDeSalud.objects.all()
-        
-        return objects
+
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['search_txt'] = self.request.GET.get('search', '')
         context['title'] = 'Lista de Centros de salud'
-        context['title_url'] = 'centros-de-salud.lista'
+        context['title_url'] = 'centros_de_salud.lista'
         context['use_search_bar'] = True
         return context

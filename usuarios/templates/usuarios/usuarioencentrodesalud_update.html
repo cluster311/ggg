@@ -1,0 +1,15 @@
+{% extends "base_admin.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+    <h2>Actualizar Permiso de usuario en Centro de Salud</h2>
+    <a role="button" class="btn btn-warning btn-sm active" href="{% url 'usuarios.en-centro-de-salud' %}">Volver a la lista</a>
+    {% crispy form %}
+    <div class="line"></div>
+
+{% endblock %}
+{% block js_footer %}
+    <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+    {{ form.media }}
+{% endblock js_footer %}

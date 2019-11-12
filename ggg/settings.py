@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'nhpgd_django',  # nomenclador de hostpitales publicos de gestion descentralizada
     'calendario',
     'recupero',
+    'usuarios',
 ]
 
 MIDDLEWARE = [
@@ -92,6 +93,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'ggg.context_processors.cpp_settings',
+                'usuarios.context_processors.cpp_usuarios',
             ],
             'libraries':{
                 'extra_tags': 'ggg.templatetags.extra_tags',
@@ -211,7 +213,11 @@ LOGGING = {
             'handlers': ['console', 'file'],
             'level': 'INFO',
             'propagate': False,
-        }
+        },
+        '': {
+            'handlers': ['console', 'file'],
+            'propagate': False,
+        },
     }
 }
 
@@ -245,6 +251,18 @@ EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 # EMAIL_USE_TLS = True
 # EMAIL_HOST_USER = <my-ses-smtp-username>
 # EMAIL_HOST_PASSWORD = <my-ses-smtp-password>
+
+
+LOGIN_URL = 'account_login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'landing'
+
+# Ciudadano que usa los servicios de salud
+GRUPO_CIUDADANO = 'grupo_ciudadano'
+# Empleados administrativos del municipio
+GRUPO_ADMIN = 'grupo_administrativo'
+# Profesionales médicos que dan servicios en el municipio
+GRUPO_PROFESIONAL = 'grupo_profesional'
 
 try:
     from .local_settings import *

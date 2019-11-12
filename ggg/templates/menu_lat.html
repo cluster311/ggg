@@ -1,3 +1,20 @@
+
+{% if user__es_administrativo %}
+{# centros de salud autorizados para este usuario #}
+Centro de salud activo
+<select class="custom-select custom-select-sm" 
+        id="usuario_elegir_centro"
+        data-elegir-centro-url="{% url 'usuarios.elegir-centro' %}">
+    {% for centro in user__centros_de_salud_autorizados %}
+    <option 
+        value="{{centro.id}}"
+        {% if user__centro_de_salud_elegido.centro_de_salud.id == centro.id %}selected{% endif %}
+        >{{ centro.nombre }}
+    </option>
+    {% endfor %}
+</select>
+{% endif %}
+
 <ul class="list-unstyled components">
     <!--titulo agrupador sin link <p>Profesionales</p>-->
     <li class="active">
@@ -8,18 +25,49 @@
                 <a href="{% url 'profesionales.lista' %}">Lista</a>
             </li>
             {% endif %}
-            
-            {% if perms.profesionales.can_view_tablero %}
+
+            {% if perms.centros_de_salud.view_profesionalesenservicio %}
             <li>
-                <a href="{% url 'profesionales.tablero.por_profesion' %}">Por profesion</a>
-            </li>
-            <li>
-                <a href="{% url 'profesionales.tablero.por_departamento' %}">Por departamento</a>
+                <a href="{% url 'centros_de_salud.profesionales-en-servicio' %}">Profesionales en servicios</a>
             </li>
             {% endif %}
+        
         </ul>
     </li>
     
+    <li>
+        <a href="#menu_tableros" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Tableros de gestion</a>
+        <ul class="collapse list-unstyled" id="menu_tableros">
+            {% if perms.profesionales.can_view_tablero %}
+            <li>
+                <a href="{% url 'profesionales.tablero.por_profesion' %}">Profesionales Por profesion</a>
+            </li>
+            <li>
+                <a href="{% url 'profesionales.tablero.por_departamento' %}">Profesionales Por zona</a>
+            </li>
+            {% endif %}
+
+            {% if perms.obras_sociales.can_view_tablero %}
+            <li>
+                <a href="{% url 'obras-sociales.tablero.por_provincia' %}">OSS por provincia</a>
+            </li>
+            <li>
+                <a href="#TODO">OSS por especialidad</a>
+            </li>
+            {% endif %}
+
+            {% if perms.centros_de_salud.can_view_tablero %}
+            <li>
+                <a href="#TODO">Centros de salud por area programática</a>
+            </li>
+            <li>
+                <a href="#TODO">Centros de salud por especialidad</a>
+            </li>
+            {% endif %}
+
+        </ul>
+    </li>
+
     <!--titulo agrupador sin link <p>Atenciones</p> -->
     <li>
         <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
@@ -28,14 +76,6 @@
             {% if perms.obras_sociales.view_obrasocial %}
             <li>
                 <a href="{% url 'obras-sociales.lista' %}">Lista</a>
-            </li>
-            {% endif %}
-            {% if perms.obras_sociales.can_view_tablero %}
-            <li>
-                <a href="{% url 'obras-sociales.tablero.por_provincia' %}">Por provincia</a>
-            </li>
-            <li>
-                <a href="#">Por especialidad</a>
             </li>
             {% endif %}
             
@@ -49,15 +89,19 @@
         <ul class="collapse list-unstyled" id="menu_centros">
             {% if perms.centros_de_salud.view_centrodesalud %}
             <li>
-                <a href="{% url 'centros-de-salud.lista' %}">Lista</a>
+                <a href="{% url 'centros_de_salud.lista' %}">Lista</a>
             </li>
             {% endif %}
-            {% if perms.centros_de_salud.can_view_tablero %}
+
+            {% if perms.centros_de_salud.view_servicio %}
             <li>
-                <a href="#">Por area programática</a>
+                <a href="{% url 'centros_de_salud.servicios' %}">Servicios</a>
             </li>
+            {% endif %}
+
+            {% if perms.centros_de_salud.view_especialidad %}
             <li>
-                <a href="#">Por especialidad</a>
+                <a href="{% url 'centros_de_salud.especialidades' %}">Especialidades</a>
             </li>
             {% endif %}
             
@@ -87,6 +131,22 @@
         {% endif %}
         </ul>
     </li>
+
+
+    <li>
+        <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
+        <a href="#menu_usuarios" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Usuarios</a>
+        <ul class="collapse list-unstyled" id="menu_usuarios">
+        {% if perms.usuarios.view_usuarioencentrodesalud %}
+        <li>
+            <a href="{% url 'usuarios.en-centro-de-salud' %}">Autorizados en Centros de Salud</a>
+        </li>
+
+        {% endif %}
+        
+        </ul>
+    </li>
+    
 
     <li>
         <a href="#menu_recupero" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Recupero</a>

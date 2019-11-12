@@ -5,7 +5,7 @@ from cie10_django.models import CIE10
 from pacientes.models import Consulta, Paciente, Receta, Derivacion
 from profesionales.models import Profesional
 from recupero.models import Prestacion, TipoPrestacion
-from centros_de_salud.models import CentroDeSalud
+from centros_de_salud.models import CentroDeSalud, Servicio
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 
@@ -34,7 +34,7 @@ class DerivacionForm(forms.ModelForm):
 class PrestacionForm(forms.ModelForm):
 
     tipo = forms.ModelChoiceField(
-        queryset=TipoPrestacion.objects.none(),
+        queryset=TipoPrestacion.objects.all(),
         widget=autocomplete.ModelSelect2(
             url="tipo_prestacion-autocomplete",
             attrs={"data-placeholder": "Ingrese código o descripción"}
@@ -49,24 +49,24 @@ class PrestacionForm(forms.ModelForm):
         }
 
 
-RecetaFormset = inlineformset_factory(Consulta, Receta, form=RecetaForm, extra=2)
-PrestacionFormset = inlineformset_factory(Consulta, Prestacion, form=PrestacionForm, extra=2)
+RecetaFormset = inlineformset_factory(Consulta, Receta, form=RecetaForm, extra=1)
+PrestacionFormset = inlineformset_factory(Consulta, Prestacion, form=PrestacionForm, extra=1)
 DerivacionFormset = inlineformset_factory(Consulta, Derivacion, form=DerivacionForm, extra=1)
 
 
 class ConsultaForm(forms.ModelForm):
     paciente = forms.ModelChoiceField(
-        queryset=Paciente.objects.none(),
+        queryset=Paciente.objects.all(),
         widget=autocomplete.ModelSelect2(
             url="paciente-autocomplete",
             attrs={
-                "data-placeholder": "Ingrese número de documento",
+                "data-placeholder": "Ingrese nombre o número de documento",
                 "data-minimum-input-length": 3,
             },
         ),
     )
     profesional = forms.ModelChoiceField(
-        queryset=Profesional.objects.none(),
+        queryset=Profesional.objects.all(),
         widget=autocomplete.ModelSelect2(
             url="profesional-autocomplete",
             attrs={
@@ -76,15 +76,8 @@ class ConsultaForm(forms.ModelForm):
         ),
     )
     centro_de_salud = forms.ModelChoiceField(
-        queryset=CentroDeSalud.objects.none(),
-        widget=autocomplete.ModelSelect2(
-            url="centro_de_salud-autocomplete",
-            attrs={
-                "data-placeholder": "Ingrese número de documento",
-                "data-minimum-input-length": 3,
-            },
-        ),
-    )
+        queryset=CentroDeSalud.objects.all(),
+        )
     codigo_cie_principal = forms.ModelChoiceField(
         queryset=CIE10.objects.all(),
         widget=autocomplete.ModelSelect2(
@@ -139,10 +132,17 @@ class ConsultaForm(forms.ModelForm):
         """
         Form update basado en lib crispy
         """
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = "post"
         self.helper.add_input(Submit("submit", "Actualizar"))
+
+        if user is not None:
+            csp = user.centros_de_salud_permitidos.all()
+            centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
+            qs = Servicio.objects.filter(centro__in=centros_de_salud_permitidos)
+            self.fields['centro_de_salud'].queryset = qs
 
 
 class PacienteForm(forms.ModelForm):
