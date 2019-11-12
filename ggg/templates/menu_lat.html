@@ -116,7 +116,9 @@ Centro de salud activo
         <li>
             <a href="{% url 'calendario.index' %}">Definir turnos</a>
         </li>
+        {% endif %}
 
+        {% if perms.calendario.can_schedule_turno %}
         <li>
             <a href="{% url 'calendario.agendar' %}">Agendar un turno</a>
         </li>

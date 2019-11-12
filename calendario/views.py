@@ -3,6 +3,7 @@ from django import forms
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.dateparse import parse_datetime
+from django.views.decorators.http import require_http_methods
 import json
 from calendario.models import Turno
 from calendario.forms import BulkTurnoForm, FeedForm, TurnoForm
@@ -154,6 +155,8 @@ def get_appointments_list(servicio, user, **kwargs):
         return Turno.objects.filter(servicio__centro__in=centros_de_salud_permitidos, **kw)
 
 
+@permission_required('calendario.can_schedule_turno')
+@require_http_methods(["GET"])
 def agendar(request):
     context = {
         'servicios': Servicio.objects.all()
@@ -161,6 +164,8 @@ def agendar(request):
     return render(request, 'calendario-agregar.html', context)
 
 
+@permission_required('calendario.can_schedule_turno')
+@require_http_methods(["POST"])
 def confirm_turn(request, pk):
     instance = get_object_or_404(Turno, id=pk)
     form_data = json.loads(request.body)

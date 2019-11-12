@@ -37,6 +37,14 @@ class Turno(models.Model):
     )
     estado = models.IntegerField(choices=OPCIONES_ESTADO, default=DISPONIBLE)
 
+    class Meta:
+        permissions = [
+            (
+                "can_schedule_turno",
+                "Puede agendar un turno",
+            )
+        ]
+
     def __str__(self):
         return f'{self.servicio.especialidad}'
 
