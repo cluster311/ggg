@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime
 
 
 class Turno(models.Model):
@@ -38,3 +39,13 @@ class Turno(models.Model):
 
     def __str__(self):
         return f'{self.servicio.especialidad}'
+
+    def as_json(self):
+        return {
+            'inicio': datetime.strftime(self.inicio, '%d/%m/%Y %H:%M'),
+            'servicio': self.servicio.especialidad.nombre,
+            'profesional': '{}, {}'.format(
+                self.profesional.apellidos, self.profesional.nombres),
+            'paciente': '{}, {}'.format(
+                self.paciente.apellidos, self.paciente.nombres)
+        }

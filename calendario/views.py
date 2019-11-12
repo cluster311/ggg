@@ -169,7 +169,7 @@ def confirm_turn(request, pk):
     if save:
         return JsonResponse({
             'success': save,
-            'turno': instance.pk}
+            'turno': instance.as_json()}
         )
     else:
         return JsonResponse({

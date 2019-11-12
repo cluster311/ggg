@@ -135,11 +135,40 @@
             $("#dni").val("");
             calendar.refetchEvents();
             $('#agendarModal').modal('hide');
+            $('#imprimirTurno').modal('show');
+            crearTicket(response.data.turno);
           }
         })
         .catch(error => {
           console.error(error)
         });
+    }
+
+    function imprimirTurno(){
+      {
+        var elem = 'imprimirBody';
+        var mywindow = window.open('', 'PRINT', 'height=400,width=600');
+
+        mywindow.document.write('<html><head><title>TURNO</title>');
+        mywindow.document.write('</head><body >');
+        mywindow.document.write(document.getElementById(elem).innerHTML);
+        mywindow.document.write('</body></html>');
+
+        mywindow.document.close(); // necessary for IE >= 10
+        mywindow.focus(); // necessary for IE >= 10*/
+
+        mywindow.print();
+        mywindow.close();
+
+        return true;
+      }
+    }
+
+    function crearTicket(data){
+      $("#impServicio").text(data.servicio);
+      $("#impProfesional").text(data.profesional);
+      $("#impFecha").text(data.inicio);
+      $("#impPaciente").text(data.paciente);
     }
 
   </script>
@@ -186,6 +215,30 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
         <button type="button" class="btn btn-primary" onclick="confirmTurn()">Agendar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="imprimirTurno" tabindex="1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Turno</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="imprimirBody">
+        <h1 id="impServicio"></h1>
+        <p>Profesional: <strong id="impProfesional"></strong></p>
+        <p>Fecha: <strong id="impFecha"></strong></p>
+        <p>Paciente: <strong id="impPaciente"></strong></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" onclick="imprimirTurno()">Imprimir</button>
       </div>
     </div>
   </div>
