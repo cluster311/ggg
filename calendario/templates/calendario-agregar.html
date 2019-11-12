@@ -135,8 +135,8 @@
             $("#dni").val("");
             calendar.refetchEvents();
             $('#agendarModal').modal('hide');
-            $('#imprimirTurno').modal('show');
             crearTicket(response.data.turno);
+            $('#imprimirTurno').modal('show');
           }
         })
         .catch(error => {
@@ -166,7 +166,10 @@
 
     function crearTicket(data){
       $("#impServicio").text(data.servicio);
-      $("#impProfesional").text(data.profesional);
+      if (data.profesional != undefined){
+        $("#pImpProfesional").css('display','block');
+        $("#impProfesional").text(data.profesional);
+      }
       $("#impFecha").text(data.inicio);
       $("#impPaciente").text(data.paciente);
     }
@@ -232,7 +235,8 @@
       </div>
       <div class="modal-body" id="imprimirBody">
         <h1 id="impServicio"></h1>
-        <p>Profesional: <strong id="impProfesional"></strong></p>
+        <p id="pImpProfesional" style="display: none;">
+          Profesional: <strong id="impProfesional"></strong></p>
         <p>Fecha: <strong id="impFecha"></strong></p>
         <p>Paciente: <strong id="impPaciente"></strong></p>
       </div>

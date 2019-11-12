@@ -41,11 +41,13 @@ class Turno(models.Model):
         return f'{self.servicio.especialidad}'
 
     def as_json(self):
-        return {
+        json = {
             'inicio': datetime.strftime(self.inicio, '%d/%m/%Y %H:%M'),
             'servicio': self.servicio.especialidad.nombre,
-            'profesional': '{}, {}'.format(
-                self.profesional.apellidos, self.profesional.nombres),
             'paciente': '{}, {}'.format(
                 self.paciente.apellidos, self.paciente.nombres)
         }
+        if self.profesional is not None:
+            json['profesional'] = '{}, {}'.format(
+                self.profesional.apellidos, self.profesional.nombres)
+        return json
