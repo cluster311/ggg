@@ -38,7 +38,7 @@ def sig_app_log(sender, code, severity=1, description=None, data=None, **kwargs)
 
 @receiver(post_save, sender=User, dispatch_uid="assign_user_first_group")
 def assign_user_first_group(sender, instance, **kwargs):
-
+    # todo usuario nuevo es por defecto ciudadano
     from django.contrib.auth.models import Group
     group, created = Group.objects.get_or_create(name=settings.GRUPO_CIUDADANO)
     user = instance
