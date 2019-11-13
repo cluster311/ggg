@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import User
 from model_utils.models import TimeStampedModel
 
@@ -34,3 +35,4 @@ class UsuarioEnCentroDeSalud(TimeStampedModel):
     
     def __str__(self):
         return f'{self.usuario} en {self.centro_de_salud}'
+

@@ -38,13 +38,13 @@
   {% if user__es_ciudadno and not user__es_administrativo and not user__es_profesional %}
   <style>
     #sidebar {
-      background: #22CC50;
+      background: #81b28e;
     }
     #sidebar .sidebar-header,
     #sidebar ul li.active > a,
     a[aria-expanded="true"],
     #sidebar ul ul a{
-      background: #509932;
+      background: #73a55e;
     }
   </style>
   {% endif %}
@@ -59,8 +59,8 @@
             <div class="sidebar-header">
                 <h3>{{ site_short_title }}</h3>
             </div>
-{% if user.is_authenticated %}
-  {% include "menu_lat.html" %}
+{% if user__es_administrativo %}
+  {% include "menu_lat_admin.html" %}
 {% endif %}          
           <ul class="list-unstyled CTAs">
               <li>
@@ -71,6 +71,11 @@
               <li>
                 <a target='_blank' href="https://github.com/cluster311/ggg/blob/master/README.md" 
                     class="article">+ info</a>
+              </li>
+
+              <li>
+                <a target='_blank' href="{% url 'account_logout' %}" 
+                    class="article">Salir</a>
               </li>
             
           </ul>

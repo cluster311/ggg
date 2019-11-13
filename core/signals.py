@@ -1,5 +1,7 @@
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 from django.dispatch import receiver, Signal
+from django.db.models.signals import post_save
+from django.contrib.auth.models import User
 from django.conf import settings
 from core.models import AppLogs
 
@@ -32,3 +34,12 @@ def sig_app_log(sender, code, severity=1, description=None, data=None, **kwargs)
                            code=code,
                            description=description,
                            data=data)
+
+
+@receiver(post_save, sender=User, dispatch_uid="assign_user_first_group")
+def assign_user_first_group(sender, instance, **kwargs):
+
+    from django.contrib.auth.models import Group
+    group, created = Group.objects.get_or_create(name=settings.GRUPO_CIUDADANO)
+    user = instance
+    group.user_set.add(user)
