@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url, include
-from .views import LandingPage, choice_homepage, CiudadanoHome
+from .views import LandingPage, choice_homepage, CiudadanoHome, ProfesionalHome
 
 
 urlpatterns = [
@@ -18,5 +18,6 @@ urlpatterns = [
     url(r'^usuarios/', include('usuarios.urls')),
     url(r'^$', LandingPage.as_view(), name='landing'),
     url(r'^ciudadano/$', CiudadanoHome.as_view(), name='ciudadano.home'),
+    url(r'^profesionales/$', ProfesionalHome.as_view(), name='profesionales.home'),
     url(r'^home$', choice_homepage, name='home'),
 ]
