@@ -22,7 +22,7 @@ def sig_user_logged_out(sender, user, request, **kwargs):
 
 
 @receiver(user_login_failed)
-def sig_user_logged_out(sender, credentials, request, **kwargs):
+def sig_user_login_failed(sender, credentials, request, **kwargs):
     ip = request.META.get('HTTP_X_REAL_IP', request.META.get('REMOTE_ADDR', None))
     data = {'credentials': credentials, 'ip': ip}
     AppLogs.objects.create(severity=3, code='LOGIN', data=data)
