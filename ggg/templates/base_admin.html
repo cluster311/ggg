@@ -57,7 +57,9 @@
         <!-- Sidebar Holder -->
         <nav id="sidebar">
             <div class="sidebar-header">
+              <a href='{% url "home" %}'>
                 <h3>{{ site_short_title }}</h3>
+              </a>
             </div>
 {% if user__es_administrativo %}
   {% include "menu_lat_admin.html" %}
