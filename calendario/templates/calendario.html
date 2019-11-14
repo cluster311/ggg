@@ -46,28 +46,43 @@
       $("#manageTurnoModal").modal('show');
     }
 
-    function calendarEventShow(event, element, view){
-      var state = event.event.extendedProps.status;
-      //TODO: Setear colores dependiendo del estado
-      switch (state) { 
+    //function calendarEventShow(event, element, view){
+    function calendarEventShow(){
+
+      $.each(calendar.getEvents(), function( index, value ) {
+        var state = value.extendedProps.status;
+        if ($("#documentoFilter").val() != ""){
+          let opacity = "1"
+          if ($("#documentoFilter").val() == event.event.extendedProps.patient_doc){
+            opacity = "0.5";
+          }
+        }
+        switch (state) { 
         case 1: 
           //ASIGNADO
+          value.setProp('backgroundColor','green');
           break;
         case 2:
           //CONFIRMADO
+          value.setProp('backgroundColor','blue');
         case 3: 
           //ATENDIDO
+          value.setProp('backgroundColor','yellow');
           break;		
         case 4:
           //CANCELADO_PACIENTE
+          value.setProp('backgroundColor','red');
           break;
         case 5: 
           //CANCELADO_ESTABLECIMIENTO
+          value.setProp('backgroundColor','pink');
           break;
         default:
           //DISPONIBLE
+          value.setProp('backgroundColor','white');
           break;
-      }
+        }
+      });
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -93,11 +108,10 @@
         maxTime: 20,
         editable: true,
         themeSystem: 'bootstrap',
-        eventRender: calendarEventShow,
+        //eventAfterAllRender: calendarEventShow,
       });
-      
       calendar.render();
-    });
+    });  
   </script>
 
   <script>
@@ -365,6 +379,7 @@
 {% block content %}
   <div class="row action-buttons-container">
     {% include 'base_button.html' with button_text="Cargar semana anterior" attrs='class="btn btn-info" onclick="copyPreviousWeek();"'%}
+    <input placeholder="Buscar por documento... " id="documentoFilter">
     {% include 'base_modal_button.html' with button_text=modal_title %}
   </div>
   <div id='calendar'></div>
