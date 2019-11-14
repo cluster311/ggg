@@ -1,9 +1,39 @@
 {% extends "base_admin.html" %}
 
 {% block content %}
-<h2>Home Profesional</h2>
-<p>Este es el sistema de salud para el profesional</p>
 {% if not request.user.is_authenticated %}
 <a class="btn btn-link btn-primary" href="{% url 'account_login' %}"> Acceso </a>
 {% endif %}
+
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Paciente</th>
+            <th scope="col">Inicio</th>
+            <th scope="col">Fin</th>
+            <th scope="col">Servicio</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for turno in object_list %}
+                <tr>
+                    <th scope="row">{{ turno.paciente.nombres }} {{ turno.paciente.apellidos }}</th>
+                    <td>{{ turno.inicio }}</td>
+                    <td>{{ turno.fin }}</td>
+                    <th scope="row">
+                        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'profesionales.detail' pk=profesional.id %}">Detalles</a>
+                        {% if perms.profesionales.change_profesional %}
+                        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'profesionales.edit' pk=profesional.id %}">Editar</a>
+                        {% endif %}
+                    </th>
+                </tr>
+                {% empty %}
+                <td>Sin datos</td><td></td><td></td>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% include 'admin_paginate.html' %}
+
 {% endblock %}

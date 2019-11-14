@@ -1,3 +1,4 @@
+from braces.views import GroupRequiredMixin
 from django.views.generic import TemplateView, ListView, UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
@@ -19,9 +20,9 @@ from crispy_forms.utils import render_crispy_form
 
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
-class ProfesionalListView(PermissionRequiredMixin, ListView):
+class ProfesionalListView(GroupRequiredMixin, ListView):
     model = Profesional
-    permission_required = ("view_profesional",)
+    group_required = (settings.GRUPO_PROFESIONAL, settings.GRUPO_ADMIN)
     paginate_by = 10  # pagination
 
     def get_queryset(self):        
@@ -35,7 +36,7 @@ class ProfesionalListView(PermissionRequiredMixin, ListView):
                 )
         else:
             objects = Profesional.objects.all()
-        
+
         return objects
 
     def get_context_data(self, **kwargs):

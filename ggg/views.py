@@ -1,9 +1,10 @@
+from braces.views import GroupRequiredMixin
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import TemplateView
 from django.conf import settings
-
+from calendario.models import Turno
 
 class LandingPage(TemplateView):
     """Landing page del sistema """
@@ -15,14 +16,30 @@ class CiudadanoHome(TemplateView):
     template_name = "home-ciudadano.html"
 
 
-class ProfesionalHome(TemplateView, PermissionRequiredMixin):
+class ProfesionalHome(TemplateView, GroupRequiredMixin):
     """
     Home del profesional al loguearse
     """
 
-    # FIXME: Se debería crear otro permiso
-    permission_required = ("can_view_tablero",)
+    group_required = (settings.GRUPO_PROFESIONAL,)
     template_name = "home_profesional.html"
+
+    def get_queryset(self):
+
+        turnos = Turno.objects.all()
+
+        return turnos
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['search_txt'] = self.request.GET.get('search', '')
+    #     context['title'] = 'Lista de profesionales'
+    #     context['title_url'] = 'profesionales.lista'
+    #     context['use_search_bar'] = True
+    #     if self.request.user.has_perm('profesionales.add_profesional'):
+    #         context['use_add_btn'] = True
+    #         context['add_url'] = 'profesionales.create'
+    #     return context
 
 
 @login_required
