@@ -123,7 +123,7 @@ class TurnoForm(forms.ModelForm):
     def change_state(self, data, *args, **kwargs):
         try:
             new_state = int(data['state'])
-            if new_state >= 0 and new_state < 5:
+            if new_state >= 0 and new_state < len(Turno.OPCIONES_ESTADO):
                 self.instance.estado = int(data['state'])
                 self.instance.save()
                 return True, self.instance

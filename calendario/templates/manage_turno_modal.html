@@ -2,10 +2,11 @@
 var states = ['DISPONILE','ASIGNADO','CONFIRMADO','ATENDIDO','CANCELADO_PACIENTE','CANCELADO_ESTABLECIMIENTO']
 
 function cargarData(data){
+  const ASIGNADO = "{{turno_states.ASIGNADO}}";
   $("#title").html(data.title);
   $("#start").html(formatDatetime(data.start));
   $("#state").html(states[data.extendedProps.status]);
-  if (data.extendedProps.status == 1){
+  if (data.extendedProps.status == ASIGNADO){
     /*Solo se podra confirmar el turno cuando este ASIGNADO
       y el paciente llegue */
     $("#btnConfirmar").prop('disabled','');
@@ -41,13 +42,13 @@ function editarEstadoTurno(estado){
 }
 
 function confirmarTurno(){
-  //CONFIRMADO = 2
-  editarEstadoTurno(2);
+  const CONFIRMADO = "{{turno_states.CONFIRMADO}}";
+  editarEstadoTurno(CONFIRMADO);
 }
 
 function cancelarTurno(){
-  //CANCELADO_ESTABLECIMIENTO = 5
-  editarEstadoTurno(5);
+  const CANCELADO_ESTABLECIMIENTO = "{{turno_states.CANCELADO_ESTABLECIMIENTO}}";
+  editarEstadoTurno(CANCELADO_ESTABLECIMIENTO);
 }
 </script>
 

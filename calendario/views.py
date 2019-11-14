@@ -24,7 +24,15 @@ def index(request):
             'id="addAppointmentButton" '
             'onclick="customAppointmentFormSubmit();">Agregar</button>'
         ),
-        'form': TurnoForm(user=request.user)
+        'form': TurnoForm(user=request.user),
+        'turno_states': {
+            'DISPONIBLE' : Turno.DISPONIBLE,
+            'ASIGNADO' : Turno.ASIGNADO,
+            'CONFIRMADO' : Turno.CONFIRMADO,
+            'ATENDIDO' : Turno.ATENDIDO,
+            'CANCELADO_PACIENTE' : Turno.CANCELADO_PACIENTE,
+            'CANCELADO_ESTABLECIMIENTO' : Turno.CANCELADO_ESTABLECIMIENTO
+        }
     }
     return render(request, 'calendario.html', context)
 
