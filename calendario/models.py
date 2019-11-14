@@ -13,7 +13,7 @@ class Turno(models.Model):
     OPCIONES_ESTADO = (
         (DISPONIBLE, 'Disponible'),
         (ASIGNADO, 'Asignado'),
-        (CONFIRMADO, 'Confirmado')
+        (CONFIRMADO, 'Confirmado'),
         (ATENDIDO, 'Atendido'),
         (CANCELADO_PACIENTE, 'Cancelado por el paciente'),
         (CANCELADO_ESTABLECIMIENTO, 'Cancelado por el establecimiento')
