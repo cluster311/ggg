@@ -1,5 +1,5 @@
 <script>
-var states = ['DISPONILE','ASIGNADO','ATENDIDO','CANCELADO_PACIENTE','CANCELADO_ESTABLECIMIENTO']
+var states = ['DISPONILE','ASIGNADO','CONFIRMADO','ATENDIDO','CANCELADO_PACIENTE','CANCELADO_ESTABLECIMIENTO']
 
 function cargarData(data){
   $("#title").html(data.title);
@@ -41,13 +41,13 @@ function editarEstadoTurno(estado){
 }
 
 function confirmarTurno(){
-  //ATENDIDO = 2
+  //CONFIRMADO = 2
   editarEstadoTurno(2);
 }
 
 function cancelarTurno(){
-  //CANCELADO_ESTABLECIMIENTO = 4
-  editarEstadoTurno(4);
+  //CANCELADO_ESTABLECIMIENTO = 5
+  editarEstadoTurno(5);
 }
 </script>
 

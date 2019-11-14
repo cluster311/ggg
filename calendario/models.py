@@ -5,13 +5,15 @@ from datetime import datetime
 class Turno(models.Model):
     DISPONIBLE = 0
     ASIGNADO = 1
-    ATENDIDO = 2
-    CANCELADO_PACIENTE = 3
-    CANCELADO_ESTABLECIMIENTO = 4
+    CONFIRMADO = 2
+    ATENDIDO = 3
+    CANCELADO_PACIENTE = 4
+    CANCELADO_ESTABLECIMIENTO = 5
 
     OPCIONES_ESTADO = (
         (DISPONIBLE, 'Disponible'),
         (ASIGNADO, 'Asignado'),
+        (CONFIRMADO, 'Confirmado')
         (ATENDIDO, 'Atendido'),
         (CANCELADO_PACIENTE, 'Cancelado por el paciente'),
         (CANCELADO_ESTABLECIMIENTO, 'Cancelado por el establecimiento')
