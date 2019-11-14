@@ -118,6 +118,23 @@ class TurnoForm(forms.ModelForm):
             self.instance.estado = 1
             self.instance.save()
             return True, self.instance
+    
+
+    def change_state(self, data, *args, **kwargs):
+        try:
+            new_state = int(data['state'])
+            if new_state >= 0 and new_state < 5:
+                self.instance.estado = int(data['state'])
+                self.instance.save()
+                return True, self.instance
+            else:
+                error = {'state':'No es un estado valido'}
+                return False, error
+        except expression as identifier:
+            error = {'state':'Error al cambiar el estado'}
+            return False, error
+        
+        
 
     class Meta:
         model = Turno

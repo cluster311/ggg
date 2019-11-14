@@ -181,3 +181,22 @@ def confirm_turn(request, pk):
             'success': save,
             'errors': result}
         )
+
+
+@permission_required('calendario.can_change_turno')
+@require_http_methods(["PUT"])
+def edit_turn(request, pk):
+    instance = get_object_or_404(Turno, id=pk)
+    form_data = json.loads(request.body)
+    form = TurnoForm(form_data, instance=instance)
+    save, result = form.change_state(form_data)
+    if save:
+        return JsonResponse({
+            'success': save,
+            'turno': instance.as_json()}
+        )
+    else:
+        return JsonResponse({
+            'success': save,
+            'errors': result}
+        )

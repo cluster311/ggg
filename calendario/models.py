@@ -52,9 +52,10 @@ class Turno(models.Model):
         json = {
             'inicio': datetime.strftime(self.inicio, '%d/%m/%Y %H:%M'),
             'servicio': self.servicio.especialidad.nombre,
-            'paciente': '{}, {}'.format(
-                self.paciente.apellidos, self.paciente.nombres)
         }
+        if self.paciente is not None:
+            json['paciente'] = '{}, {}'.format(
+                self.paciente.apellidos, self.paciente.nombres)
         if self.profesional is not None:
             json['profesional'] = '{}, {}'.format(
                 self.profesional.apellidos, self.profesional.nombres)

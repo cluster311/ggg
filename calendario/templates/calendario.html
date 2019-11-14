@@ -41,6 +41,33 @@
     'use strict';
     let calendar;
 
+    function calendarEventClick(info){
+      cargarData(info.event);
+      $("#manageTurnoModal").modal('show');
+    }
+
+    function calendarEventShow(event, element, view){
+      var state = event.event.extendedProps.status;
+      //TODO: Setear colores dependiendo del estado
+      switch (state) { 
+        case 1: 
+          //ASIGNADO
+          break;
+        case 2: 
+          //ATENDIDO
+          break;		
+        case 3:
+          //CANCELADO_PACIENTE
+          break;
+        case 4: 
+          //CANCELADO_ESTABLECIMIENTO
+          break;
+        default:
+          //DISPONIBLE
+          break;
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       const calendarEl = document.getElementById('calendar');
 
@@ -49,6 +76,7 @@
         eventSources: [{
             url: '{% url "calendario.feed" %}',
         }],
+        eventClick: calendarEventClick,
         defaultView: 'dayGridWeek',
         header: {
           left: 'prev,next today',
@@ -63,9 +91,9 @@
         maxTime: 20,
         editable: true,
         themeSystem: 'bootstrap',
-        eventClick: showModalEvent
+        eventRender: calendarEventShow,
       });
-
+      
       calendar.render();
     });
   </script>
@@ -342,4 +370,5 @@
 
 {% block unwrapped_content %}
   {% include 'base_modal.html' %}
+  {% include 'manage_turno_modal.html' %}
 {% endblock %}
