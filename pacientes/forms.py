@@ -103,7 +103,7 @@ class ConsultaForm(forms.ModelForm):
     class Meta:
         model = Consulta
         fields = ('paciente', 'profesional', 'centro_de_salud',
-                  'codigo_cie_principal',
+                  'especialidad', 'codigo_cie_principal',
                   'codigos_cie_secundarios',
                   'diagnostico', 'indicaciones')
         widgets = {

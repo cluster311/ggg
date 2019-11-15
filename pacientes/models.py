@@ -250,7 +250,11 @@ class Consulta(TimeStampedModel):
         null=True,
         blank=True,
     )
-
+    especialidad = models.ForeignKey('centros_de_salud.Especialidad',
+                                     on_delete=models.CASCADE,
+                                     null=True,
+                                     blank=True,
+                                     related_name='consultas')
     codigo_cie_principal = models.ForeignKey(CIE10, null=True, blank=True,
                                              on_delete=models.SET_NULL,
                                              related_name='diagnositicos_principales')

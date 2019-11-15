@@ -22,12 +22,12 @@
     {% for cs in object_list %}
 <tr>
     <th scope="row">{{ cs.id }}</th>
-    <th scope="row">{{ cs.fecha }}</th>
-    <td scope="row">{{ cs.obra_social }}</td>
-    <td scope="row">{{ cs.centro_de_salud }}</td>
-    <td scope="row">{{ cs.profesional }}</td>
-    <td scope="row">{{ cs.especialidad }}</td>
-    <td scope="row">{{ cs.codigo_cie_principal }}</td>
+    <th scope="row">{{ cs.created|date:"Y/m/d H:i" }}</th>
+    <td scope="row">{{ cs.obra_social|default_if_none:"Sin definir" }}</td>
+    <td scope="row">{{ cs.consulta.centro_de_salud }}</td>
+    <td scope="row">{{ cs.consulta.profesional }}</td>
+    <td scope="row">{{ cs.consulta.especialidad }}</td>
+    <td scope="row">{{ cs.consulta.codigo_cie_principal }}</td>
 </tr>
         {% empty %}
         <td>Sin datos</td><td></td><td></td>
