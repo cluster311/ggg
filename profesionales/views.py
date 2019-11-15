@@ -292,6 +292,25 @@ class ConsultaUpdateView(PermissionRequiredMixin, UpdateView):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        if self.request.POST:
+            context["recetas_frm"] = RecetaFormset(self.request.POST, prefix='Recetas')
+            context["derivaciones_frm"] = DerivacionFormset(self.request.POST, prefix='Derivaciones')
+            context["prestaciones_frm"] = PrestacionFormset(self.request.POST, prefix='Prestaciones')
+        else:
+            context["recetas_frm"] = RecetaFormset(prefix='Recetas')
+            context["derivaciones_frm"] = DerivacionFormset(prefix='Derivaciones')
+            context["prestaciones_frm"] = PrestacionFormset(prefix='Prestaciones')
+
+        context["formsets"] = [
+            context["recetas_frm"],
+            context["derivaciones_frm"],
+            context["prestaciones_frm"]
+        ]        
+        return context
 
     def get_success_url(self):
         return reverse(

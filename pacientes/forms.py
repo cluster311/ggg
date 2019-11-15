@@ -66,6 +66,7 @@ class ConsultaForm(forms.ModelForm):
         ),
     )
     profesional = forms.ModelChoiceField(
+        required=False,
         queryset=Profesional.objects.all(),
         widget=autocomplete.ModelSelect2(
             url="profesional-autocomplete",
@@ -76,9 +77,11 @@ class ConsultaForm(forms.ModelForm):
         ),
     )
     centro_de_salud = forms.ModelChoiceField(
+        required=False,
         queryset=CentroDeSalud.objects.all(),
         )
     codigo_cie_principal = forms.ModelChoiceField(
+        required=False,
         queryset=CIE10.objects.all(),
         widget=autocomplete.ModelSelect2(
             url="cie10-autocomplete",
@@ -87,6 +90,7 @@ class ConsultaForm(forms.ModelForm):
     )
 
     codigos_cie_secundarios = forms.ModelMultipleChoiceField(
+        required=False,
         queryset=CIE10.objects.all(),
         widget=autocomplete.ModelSelect2Multiple(
             url="cie10-autocomplete",
@@ -140,8 +144,8 @@ class ConsultaForm(forms.ModelForm):
 
         if user is not None:
             csp = user.centros_de_salud_permitidos.all()
-            centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
-            qs = Servicio.objects.filter(centro__in=centros_de_salud_permitidos)
+            permitidos = [c.centro_de_salud.id for c in csp]
+            qs = CentroDeSalud.objects.filter(pk__in=permitidos)
             self.fields['centro_de_salud'].queryset = qs
 
 
