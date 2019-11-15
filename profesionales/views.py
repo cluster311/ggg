@@ -16,6 +16,8 @@ from .models import Profesional
 from pacientes.models import Consulta
 from pacientes.forms import ConsultaForm, RecetaFormset, DerivacionFormset, PrestacionFormset
 from crispy_forms.utils import render_crispy_form
+import logging
+logger = logging.getLogger(__name__)
 
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
@@ -251,6 +253,37 @@ class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin,
         kwargs['user'] = self.request.user
         return kwargs
 
+    def form_valid(self, form):
+        
+        context = self.get_context_data()
+        
+        rs = context["recetas_frm"]
+        ds = context["derivaciones_frm"]
+        ps = context["prestaciones_frm"]
+
+        logger.info(f'Validando consulta {form} | {rs} | {ds} | {ps}')
+        self.object = form.save()
+        
+        if rs.is_valid():
+            rs.instance = self.object
+            rs.save()
+        else:
+            raise Exception('Recetas inválidas')
+        
+        if ds.is_valid():
+            ds.instance = self.object
+            ds.save()
+        else:
+            raise Exception('Derivaciones inválidas')
+        
+        if ps.is_valid():
+            ps.instance = self.object
+            ps.save()
+        else:
+            raise Exception('Prestaciones inválidas')
+        
+        return super().form_valid(form)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
@@ -292,6 +325,37 @@ class ConsultaUpdateView(PermissionRequiredMixin, UpdateView):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
+    
+    def form_valid(self, form):
+        
+        context = self.get_context_data()
+        
+        rs = context["recetas_frm"]
+        ds = context["derivaciones_frm"]
+        ps = context["prestaciones_frm"]
+
+        logger.info(f'Validando consulta {form} | {rs} | {ds} | {ps}')
+        self.object = form.save()
+        
+        if rs.is_valid():
+            rs.instance = self.object
+            rs.save()
+        else:
+            raise Exception('Recetas inválidas')
+        
+        if ds.is_valid():
+            ds.instance = self.object
+            ds.save()
+        else:
+            raise Exception('Derivaciones inválidas')
+        
+        if ps.is_valid():
+            ps.instance = self.object
+            ps.save()
+        else:
+            raise Exception('Prestaciones inválidas')
+        
+        return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

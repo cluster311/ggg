@@ -11,7 +11,6 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 import logging
-
 logger = logging.getLogger(__name__)
 
 

@@ -8,6 +8,8 @@ from recupero.models import Prestacion, TipoPrestacion
 from centros_de_salud.models import CentroDeSalud, Servicio
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
+import logging
+logger = logging.getLogger(__name__)
 
 
 class RecetaForm(forms.ModelForm):
@@ -108,29 +110,6 @@ class ConsultaForm(forms.ModelForm):
           'diagnostico': forms.Textarea(attrs={'rows':3}),
           'indicaciones': forms.Textarea(attrs={'rows':3}),
         }
-
-    def form_valid(self, form):
-        context = self.get_context_data()
-        
-        rs = context["recetas_frm"]
-        ds = context["derivaciones_frm"]
-        ps = context["prestaciones_frm"]
-
-        self.object = form.save()
-        
-        if rs.is_valid():
-            rs.instance = self.object
-            rs.save()
-        
-        if ds.is_valid():
-            ds.instance = self.object
-            ds.save()
-        
-        if ps.is_valid():
-            ps.instance = self.object
-            ps.save()
-        
-        return super().form_valid(form)
 
     def __init__(self, *args, **kwargs):
         """

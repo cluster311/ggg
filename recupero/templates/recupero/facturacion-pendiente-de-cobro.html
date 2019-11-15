@@ -9,6 +9,7 @@
 <table class="table">
     <thead>
     <tr>
+        <th scope="col">Factura</th>
         <th scope="col">Fecha</th>
         <th scope="col">Obra social</th>
         <th scope="col">Centro de salud</th>
@@ -20,6 +21,7 @@
     <tbody>
     {% for cs in object_list %}
 <tr>
+    <th scope="row">{{ cs.id }}</th>
     <th scope="row">{{ cs.fecha }}</th>
     <td scope="row">{{ cs.obra_social }}</td>
     <td scope="row">{{ cs.centro_de_salud }}</td>
