@@ -121,6 +121,12 @@ class TurnoForm(forms.ModelForm):
     
 
     def change_state(self, data, *args, **kwargs):
+        if self.instance.profesional is None:
+            error = {'profesional':'El turno deberia tener un profesional asignado'}
+            return False, error
+        elif self.instance.paciente is None:
+            error = {'paciente':'El turno deberia tener un paciente asignado'}
+            return False, error
         try:
             new_state = int(data['state'])
             if new_state >= 0 and new_state < len(Turno.OPCIONES_ESTADO):
