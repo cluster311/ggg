@@ -56,7 +56,7 @@ urlpatterns = [
         name="profesionales.consulta.detalle",
     ),
     path(
-        r"paciente/nueva-consulta",
+        r"paciente/nueva-consulta/<int:dni>/<int:prof>",
         ConsultaCreateView.as_view(),
         name="profesionales.crear.consulta",
     ),

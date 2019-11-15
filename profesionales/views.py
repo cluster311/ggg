@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
 from django.conf import settings
 from .models import Profesional
-from pacientes.models import Consulta
+from pacientes.models import Consulta, Paciente
 from pacientes.forms import ConsultaForm, RecetaFormset, DerivacionFormset, PrestacionFormset
 from crispy_forms.utils import render_crispy_form
 
@@ -203,13 +203,13 @@ class TableroProfesionalesPorLocalidadView(
         return context
 
 
-class ConsultaListView(PermissionRequiredMixin, ListView):
+class ConsultaListView(GroupRequiredMixin, ListView):
     """
     Lista de consultas de un paciente para la interfaz del profesional.
     """
 
     model = Consulta
-    permission_required = ("can_view_tablero",)
+    group_required = (settings.GRUPO_PROFESIONAL, )
     template_name = "profesionales/consulta_listview.html"
 
     def get_context_data(self, **kwargs):
@@ -222,13 +222,13 @@ class ConsultaListView(PermissionRequiredMixin, ListView):
         return context
 
 
-class ConsultaDetailView(PermissionRequiredMixin, DetailView):
+class ConsultaDetailView(GroupRequiredMixin, DetailView):
     """
     Detalle de un objeto Consulta
     """
 
     model = Consulta
-    permission_required = ("can_view_tablero",)
+    group_required = (settings.GRUPO_PROFESIONAL, )
     template_name = "profesionales/consulta_detailview.html"
 
     def get_context_data(self, **kwargs):
@@ -238,11 +238,11 @@ class ConsultaDetailView(PermissionRequiredMixin, DetailView):
         return context
 
 
-class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin,
+class ConsultaCreateView(SuccessMessageMixin, GroupRequiredMixin,
                          CreateView):
     """Crea un objeto Consulta."""
 
-    permission_required = ("can_view_tablero",)
+    group_required = (settings.GRUPO_PROFESIONAL, )
     template_name = "profesionales/consulta_createview.html"
     form_class = ConsultaForm
     success_message = "Datos guardados con éxito."
@@ -254,7 +254,7 @@ class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin,
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
+
         if self.request.POST:
             context["recetas_frm"] = RecetaFormset(self.request.POST, prefix='Recetas')
             context["derivaciones_frm"] = DerivacionFormset(self.request.POST, prefix='Derivaciones')
@@ -268,7 +268,7 @@ class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin,
             context["recetas_frm"],
             context["derivaciones_frm"],
             context["prestaciones_frm"]
-        ]        
+        ]
         return context
 
     def get_success_url(self):
@@ -278,14 +278,28 @@ class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin,
         )
 
 
-class ConsultaUpdateView(PermissionRequiredMixin, UpdateView):
+    def get_initial(self):
+        """
+        Los datos iniciales son el médico que atiende la consulta y el paciente
+        """
+        initial_data = super(ConsultaCreateView, self).get_initial()
+        dni = self.kwargs["dni"]
+        prof = self.kwargs["prof"]
+        profesional = get_object_or_404(Profesional, id=prof)
+        paciente = get_object_or_404(Paciente, numero_documento=dni)
+        initial_data["profesional"] = profesional
+        initial_data["paciente"] = paciente
+        return initial_data
+
+
+class ConsultaUpdateView(GroupRequiredMixin, UpdateView):
     """
     Actualiza un objeto Consulta
     """
 
     model = Consulta
     form_class = ConsultaForm
-    permission_required = "can_view_tablero"
+    group_required = (settings.GRUPO_PROFESIONAL, )
     template_name = "profesionales/consulta_updateview.html"
     success_message = "Datos actualizados con éxito."
 

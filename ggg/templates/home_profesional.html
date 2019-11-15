@@ -5,7 +5,6 @@
 <a class="btn btn-link btn-primary" href="{% url 'account_login' %}"> Acceso </a>
 {% endif %}
 
-
     <table class="table">
         <thead>
         <tr>
@@ -13,19 +12,18 @@
             <th scope="col">Inicio</th>
             <th scope="col">Fin</th>
             <th scope="col">Servicio</th>
+            <th scope="col">Acciones</th>
         </tr>
         </thead>
         <tbody>
-            {% for turno in object_list %}
+            {% for turno in turnos %}
                 <tr>
                     <th scope="row">{{ turno.paciente.nombres }} {{ turno.paciente.apellidos }}</th>
                     <td>{{ turno.inicio }}</td>
                     <td>{{ turno.fin }}</td>
+                    <td>{{ turno.servicio.especialidad.nombre }}</td>
                     <th scope="row">
-                        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'profesionales.detail' pk=profesional.id %}">Detalles</a>
-                        {% if perms.profesionales.change_profesional %}
-                        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'profesionales.edit' pk=profesional.id %}">Editar</a>
-                        {% endif %}
+                        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'profesionales.crear.consulta' dni=turno.paciente.numero_documento prof=turno.profesional.id %}">ingresar</a>
                     </th>
                 </tr>
                 {% empty %}

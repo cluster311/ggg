@@ -24,11 +24,13 @@ class ProfesionalHome(TemplateView, GroupRequiredMixin):
     group_required = (settings.GRUPO_PROFESIONAL,)
     template_name = "home_profesional.html"
 
-    def get_queryset(self):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-        turnos = Turno.objects.all()
+        # asegurarse de que el turno tenga medico y paciente asignado!
+        context['turnos'] = Turno.objects.all()
 
-        return turnos
+        return context
 
     # def get_context_data(self, **kwargs):
     #     context = super().get_context_data(**kwargs)
