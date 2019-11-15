@@ -14,9 +14,42 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
 from django.conf import settings
 from .models import Profesional
+from calendario.models import Turno
+from datetime import datetime
 from pacientes.models import Consulta, Paciente
 from pacientes.forms import ConsultaForm, RecetaFormset, DerivacionFormset, PrestacionFormset
 from crispy_forms.utils import render_crispy_form
+
+
+class ProfesionalHome(TemplateView, GroupRequiredMixin):
+    """
+    Home del profesional al loguearse
+    """
+
+    group_required = (settings.GRUPO_PROFESIONAL,)
+    template_name = "home_profesional.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        hoy = datetime.now()
+        context['hoy'] = hoy
+        context['estados'] = Turno.OPCIONES_ESTADO
+
+        # asegurarse de que el turno tenga medico y paciente asignado!
+        context['turnos'] = Turno.objects.all()
+
+        return context
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['search_txt'] = self.request.GET.get('search', '')
+    #     context['title'] = 'Lista de profesionales'
+    #     context['title_url'] = 'profesionales.lista'
+    #     context['use_search_bar'] = True
+    #     if self.request.user.has_perm('profesionales.add_profesional'):
+    #         context['use_add_btn'] = True
+    #         context['add_url'] = 'profesionales.create'
+    #     return context
 
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
