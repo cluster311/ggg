@@ -14,6 +14,29 @@
   {{ form.media }}
 
   <link href="{% static 'css/modal_extra.css' %}" rel="stylesheet">
+  <style>
+    .turnoDisponible{
+      background-color: white;
+    }
+    .turnoAsignado{
+      background-color: rgb(71, 115, 212);
+    }
+    .turnoConfirmado{
+      background-color: rgb(21, 102, 21);
+    }
+    .turnoAtendido{
+      background-color: rgb(212, 212, 54);
+    }
+    .turnoCanceladoPaciente{
+      background-color: rgb(150, 40, 40); 
+    }
+    .turnoCanceladoEstablecimiento{
+      background-color: rgb(247, 68, 68);
+    }
+    .noCoincideDni{
+      opacity: 0.5;
+    }
+  </style>
 {% endblock %}
 
 {% block js_footer %}
@@ -46,42 +69,43 @@
       $("#manageTurnoModal").modal('show');
     }
 
-    //function calendarEventShow(event, element, view){
-    function calendarEventShow(){
-
-      $.each(calendar.getEvents(), function( index, value ) {
-        var state = value.extendedProps.status;
-        if ($("#documentoFilter").val() != ""){
-          let opacity = "1"
-          if ($("#documentoFilter").val() == event.event.extendedProps.patient_doc){
-            opacity = "0.5";
-          }
-        }
-        switch (state) { 
+    function calendarEventRender(info){
+      let state = info.event.extendedProps.status;
+      let num_doc = info.event.extendedProps.patient_doc;
+      let id = "event-"+info.event.id;
+      info.el.id = id;
+      switch (state) { 
         case 1: 
-          //ASIGNADO
-          value.setProp('backgroundColor','green');
+          info.el.className = info.el.className + " turnoAsignado";
           break;
         case 2:
-          //CONFIRMADO
-          value.setProp('backgroundColor','blue');
+          info.el.className = info.el.className + " turnoConfirmado";
+          break;
         case 3: 
-          //ATENDIDO
-          value.setProp('backgroundColor','yellow');
+          info.el.className = info.el.className + " turnoAtendido";
           break;		
         case 4:
-          //CANCELADO_PACIENTE
-          value.setProp('backgroundColor','red');
+          info.el.className = info.el.className + " turnoCanceladoPaciente";
           break;
         case 5: 
-          //CANCELADO_ESTABLECIMIENTO
-          value.setProp('backgroundColor','pink');
+          info.el.className = info.el.className + " turnoCanceladoEstablecimiento";
           break;
         default:
-          //DISPONIBLE
-          value.setProp('backgroundColor','white');
+          info.el.className = info.el.className + " turnoDisponible";
           break;
         }
+    }
+
+    function resaltarPorDNI(num){
+      $.each(calendar.getEvents(), function( index, value ) {
+          let doc = value.extendedProps.patient_doc;
+          let a = $("#event-"+value.id);
+          if(doc.toString() == num){
+            a.removeClass('noCoincideDni');
+          }
+          else{
+            a.addClass('noCoincideDni');
+          }
       });
     }
 
@@ -93,6 +117,7 @@
         eventSources: [{
             url: '{% url "calendario.feed" %}',
         }],
+        eventRender: calendarEventRender,
         eventClick: calendarEventClick,
         defaultView: 'dayGridWeek',
         header: {
@@ -108,9 +133,17 @@
         maxTime: 20,
         editable: true,
         themeSystem: 'bootstrap',
-        //eventAfterAllRender: calendarEventShow,
       });
       calendar.render();
+
+      $("#documentoFilter").keyup(function() {
+        if ($("#documentoFilter").val().trim() != ""){
+          resaltarPorDNI($("#documentoFilter").val().trim());
+        }
+        else{
+          $('[id^=event-]').removeClass('noCoincideDni');
+        }
+      });
     });  
   </script>
 
