@@ -11,7 +11,6 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 import logging
-
 logger = logging.getLogger(__name__)
 
 
@@ -251,12 +250,18 @@ class Consulta(TimeStampedModel):
         null=True,
         blank=True,
     )
-
+    especialidad = models.ForeignKey('centros_de_salud.Especialidad',
+                                     on_delete=models.CASCADE,
+                                     null=True,
+                                     blank=True,
+                                     related_name='consultas')
     codigo_cie_principal = models.ForeignKey(CIE10, null=True, blank=True,
                                              on_delete=models.SET_NULL,
                                              related_name='diagnositicos_principales')
-    codigos_cie_secundarios = models.ManyToManyField(CIE10, blank=True, related_name='diagnositicos_secundarios')
-    diagnostico = models.TextField()
+    codigos_cie_secundarios = models.ManyToManyField(CIE10,
+                                                     blank=True,
+                                                     related_name='diagnositicos_secundarios')
+    diagnostico = models.TextField(null=True, blank=True)
     indicaciones = models.TextField(null=True, blank=True)
     
     def __str__(self):
@@ -265,9 +270,13 @@ class Consulta(TimeStampedModel):
     def save(self, *args, **kwargs):
         """ crear la factura y analizar luego si se va a recuperar """
         super().save(*args, **kwargs)
-        for prestacion in self.prestaciones.all():
-            if prestacion.factura is None:
-                Factura.objects.create(prestacion=prestacion)
+        if not hasattr(self, 'factura'):
+        # no funciona (?) if self.factura is None:
+            f = Factura.objects.create(consulta=self)
+            logger.info(f'Factura {f.id} creada para la consulta {self}')
+        else:
+            f = self.factura
+            logger.info(f'Factura {f.id} OK para la consulta {self}')
 
 
 class Receta(TimeStampedModel):

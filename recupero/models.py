@@ -72,7 +72,8 @@ class TipoPrestacion(models.Model):
     )
 
     def __str__(self):
-        return self.nombre
+        codigo = 'S/C' if self.codigo is None else self.codigo
+        return f'{self.nombre} ({codigo})'
     
     @classmethod
     def importar_desde_nomenclador(cls):
@@ -106,7 +107,7 @@ class Prestacion(TimeStampedModel):
     observaciones = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return self.medicamento
+        return f'{self.cantidad} de {self.tipo}'
 
 
 class DocumentoAnexo(TimeStampedModel):
@@ -123,9 +124,8 @@ class DocumentoAnexo(TimeStampedModel):
 
 class Factura(TimeStampedModel):
     """ Cada una de las unidades a cobrar a una obra social o programa de salud.
-        Se crea solo en los casos en los que esperamos recuperar
         De aquí salen los formularios Anexo 2 (y otros según tipo de
-        prestación)
+        prestación).
         Ver imagen:https://github.com/cluster311/Anexo2/blob/master/originales/Anexo-II-RESOLUCION-487-2002.gif  # noqa
         Ver imagen: https://user-images.githubusercontent.com/3237309/64081477-fc091780-ccd7-11e9-88aa-6e8bfb34f6c2.png  # noqa
         Referencia de atencion en Anexo II
@@ -141,9 +141,11 @@ class Factura(TimeStampedModel):
             }
         }
         """
-    #TODO ver una forma de seguir las fechas de cada cambio
-    # quizas statusfield + monitorfield de model-utils
-    # https://django-model-utils.readthedocs.io/en/latest/fields.html#monitorfield
+    consulta = models.OneToOneField('pacientes.Consulta',
+                                    on_delete=models.CASCADE,
+                                    null=True,
+                                    blank=True,
+                                    related_name='factura')
     EST_NUEVO = 100
     EST_INICIADO = 200  # tomamos la decision de tratar de recuperlo
     EST_ENVIADO_A_OSS = 300  # se lo mandamos a la obra social
@@ -159,7 +161,6 @@ class Factura(TimeStampedModel):
                (EST_ACEPTADO, 'Pagada')
                )
     estado = models.PositiveIntegerField(choices=estados, default=EST_NUEVO)
-    prestacion = models.OneToOneField(Prestacion, on_delete=models.CASCADE)
     obra_social = models.ForeignKey(
         'obras_sociales.ObraSocial',
         on_delete=models.CASCADE,
@@ -185,4 +186,3 @@ class Factura(TimeStampedModel):
                      data=data)
         self.estado = new_status
         self.save()
-    

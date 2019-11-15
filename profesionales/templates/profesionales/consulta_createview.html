@@ -19,7 +19,7 @@
       
   <div class="card">
     
-    <div class="card-header" id="heading-{{ p }">
+    <div class="card-header" id="heading-{{ p }}">
       <h2 class="mb-0">
         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-{{ p }}" aria-expanded="true" aria-controls="collapse-{{ p }}">
           {{ formset.prefix }}
@@ -57,17 +57,19 @@
 
 
 <script type="text/javascript">
-    {% for formset in formsets %}
-    {% with formset.prefix|slugify as p %}
-        $('.{{ p }}-form').formset({
-            prefix: '{{ formset.prefix|slugify }}',
-            addText: 'Agregar otro',         
-            deleteText: 'Eliminar',        
-            deleteCssClass: 'btn btn-sm btn-danger',
-            addCssClass: 'btn btn-sm btn-success'
-        });
-    {% endwith %}
-    {% endfor %}
+$( document ).ready(function() {
+{% for formset in formsets %}
+{% with formset.prefix|slugify as p %}
+  $('.{{ p }}-form').formset({
+          prefix: '{{ formset.prefix|slugify }}',
+          addText: 'Agregar otro',         
+          deleteText: 'Eliminar',        
+          deleteCssClass: 'btn btn-sm btn-danger',
+          addCssClass: 'btn btn-sm btn-success'
+      });
+{% endwith %}
+{% endfor %}
+})
 </script>
 
 

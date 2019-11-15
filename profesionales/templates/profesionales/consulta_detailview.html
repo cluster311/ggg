@@ -21,7 +21,7 @@
                             <label>FECHA:</label>
                             <p>{{fecha}}</p>
                             <label>ATENDIDO POR DR:</label>
-                            <p>{{object.profesional}}</p>
+                            <p>{{ object.profesional }}</p>
                             {% if object.diagnostico %}
                                 <label>DIÁGNOSTICO:</label>
                                 <p>{{object.diagnostico}}</p>
@@ -32,14 +32,14 @@
                             {% endif %}
                             {% if object.recetas.count > 0 %}
                                 <label>Recetas:</label>
-                                {% for p in object.recetas %}
+                                {% for p in object.recetas.all %}
                                 <p>{{ p.medicamento}}: {{ p.posologia }}</p>
                                 <p>{{ p.observaciones }}</p>
                                 {% endfor %}
                             {% endif %}
                             {% if object.prestaciones.count > 0 %}
                                 <label>Prestaciones:</label>
-                                {% for p in object.prestaciones%}
+                                {% for p in object.prestaciones.all %}
                                 <p>{{ p.tipo.codigo }} {{ p.tipo.nombre }}: {{ p.cantidad }}</p>
                                 <p>{{ p.observaciones }}</p>
                                 {% endfor %}
@@ -47,13 +47,13 @@
                             <!-- derivaciones puede ser null -->
                             {% if object.derivaciones.count > 0 %}
                                 <label>Derivaciones:</label>
-                                {% for p in object.derivaciones %}
+                                {% for p in object.derivaciones.all %}
                                     <p>{{ p.especialidad.nombre }}</p>
                                 {% endfor %}
                             {% endif %}
                             <label>CÓDIGOS:</label>
                             <p>{{ object.codigo_cie_principal.code }}: {{ object.codigo_cie_principal.description }}</p>
-                            {% for codigo in object.codigos_cie_secundarios %}
+                            {% for codigo in object.codigos_cie_secundarios.all %}
                             <p>{{ codigo.code }}: {{ codigo.description }}</p>
                             {% endfor %}
                           </div>
