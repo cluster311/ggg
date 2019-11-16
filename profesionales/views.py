@@ -20,6 +20,8 @@ from datetime import datetime
 from pacientes.models import Consulta, Paciente
 from pacientes.forms import ConsultaForm, RecetaFormset, DerivacionFormset, PrestacionFormset
 from crispy_forms.utils import render_crispy_form
+import logging
+logger = logging.getLogger(__name__)
 
 
 class ProfesionalHome(TemplateView, GroupRequiredMixin):
@@ -275,6 +277,7 @@ class ConsultaDetailView(GroupRequiredMixin, DetailView):
         return context
 
 
+<<<<<<< HEAD
 class ConsultaCreateView(SuccessMessageMixin, GroupRequiredMixin,
                          CreateView):
     """Crea un objeto Consulta."""
@@ -301,6 +304,20 @@ class ConsultaCreateView(SuccessMessageMixin, GroupRequiredMixin,
             context["derivaciones_frm"] = DerivacionFormset(prefix='Derivaciones')
             context["prestaciones_frm"] = PrestacionFormset(prefix='Prestaciones')
 
+=======
+class ConsultaMixin:
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        instance = getattr(self, 'object', None)
+        
+        data = self.request.POST if self.request.method == "POST" else None
+        
+        context["recetas_frm"] = RecetaFormset(data, prefix='Recetas', instance=instance)
+        context["derivaciones_frm"] = DerivacionFormset(data, prefix='Derivaciones', instance=instance)
+        context["prestaciones_frm"] = PrestacionFormset(data, prefix='Prestaciones', instance=instance)
+       
+>>>>>>> d9826830d63c0d17c280c75f078249d0b17a53dc
         context["formsets"] = [
             context["recetas_frm"],
             context["derivaciones_frm"],
@@ -308,12 +325,45 @@ class ConsultaCreateView(SuccessMessageMixin, GroupRequiredMixin,
         ]
         return context
 
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        
+        rs = context["recetas_frm"]
+        ds = context["derivaciones_frm"]
+        ps = context["prestaciones_frm"]
+
+        self.object = form.save()
+        
+        if rs.is_valid():
+            rs.instance = self.object
+            rs.save()
+        
+        if ds.is_valid():
+            ds.instance = self.object
+            ds.save()
+        
+        if ps.is_valid():
+            ps.instance = self.object
+            ps.save()
+        
+        return super().form_valid(form)
+
+
+class ConsultaCreateView(ConsultaMixin, SuccessMessageMixin, PermissionRequiredMixin,
+                         CreateView, ):
+    """Crea un objeto Consulta."""
+
+    permission_required = ("can_view_tablero",)
+    template_name = "profesionales/consulta_createview.html"
+    form_class = ConsultaForm
+    success_message = "Datos guardados con éxito."
+
     def get_success_url(self):
         return reverse(
             "profesionales.consulta.lista",
             kwargs=({"dni": self.object.paciente.numero_documento}),
         )
-
 
     def get_initial(self):
         """
@@ -329,21 +379,23 @@ class ConsultaCreateView(SuccessMessageMixin, GroupRequiredMixin,
         return initial_data
 
 
-class ConsultaUpdateView(GroupRequiredMixin, UpdateView):
+class ConsultaUpdateView(ConsultaMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
     """
     Actualiza un objeto Consulta
     """
 
     model = Consulta
     form_class = ConsultaForm
-    group_required = (settings.GRUPO_PROFESIONAL, )
+    permission_required = ("can_view_tablero",)
     template_name = "profesionales/consulta_updateview.html"
     success_message = "Datos actualizados con éxito."
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
+    
+    def get_object(self):
+        return get_object_or_404(Consulta, 
+            paciente__numero_documento=self.kwargs.get('dni'),
+            pk=self.kwargs.get('pk')
+        ) 
 
     def get_success_url(self):
         return reverse(

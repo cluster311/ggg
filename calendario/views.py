@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from django import forms
+from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.dateparse import parse_datetime
@@ -11,6 +12,7 @@ import logging
 logger = logging.getLogger(__name__)
 from django.contrib.auth.decorators import permission_required
 from centros_de_salud.models import Servicio
+from pacientes.models import Paciente
 
 
 def index(request):
@@ -24,7 +26,15 @@ def index(request):
             'id="addAppointmentButton" '
             'onclick="customAppointmentFormSubmit();">Agregar</button>'
         ),
-        'form': TurnoForm(user=request.user)
+        'form': TurnoForm(user=request.user),
+        'turno_states': {
+            'DISPONIBLE' : Turno.DISPONIBLE,
+            'ASIGNADO' : Turno.ASIGNADO,
+            'ESPERANDO_EN_SALA' : Turno.ESPERANDO_EN_SALA,
+            'ATENDIDO' : Turno.ATENDIDO,
+            'CANCELADO_PACIENTE' : Turno.CANCELADO_PACIENTE,
+            'CANCELADO_ESTABLECIMIENTO' : Turno.CANCELADO_ESTABLECIMIENTO
+        }
     }
     return render(request, 'calendario.html', context)
 
@@ -124,6 +134,7 @@ def feed(request, servicio=None):
         'service': t.servicio.pk or 0,
         'status': t.estado,
         'professional': t.profesional.pk or 0,
+        'patient_doc': t.paciente.numero_documento if t.paciente else 0
         # 'patient': t.paciente.pk or 0
     } for t in turnos]
 
@@ -169,8 +180,62 @@ def agendar(request):
 def confirm_turn(request, pk):
     instance = get_object_or_404(Turno, id=pk)
     form_data = json.loads(request.body)
+    form_data['solicitante'] = request.user
     form = TurnoForm(form_data, instance=instance)
     save, result = form.update(form_data)
+    if save:
+        return JsonResponse({
+            'success': save,
+            'turno': instance.as_json()}
+        )
+    else:
+        return JsonResponse({
+            'success': save,
+            'errors': result}
+        )
+
+
+@permission_required('calendario.can_change_turno')
+@require_http_methods(["PUT"])
+def edit_turn(request, pk):
+    instance = get_object_or_404(Turno, id=pk)
+    form_data = json.loads(request.body)
+    form = TurnoForm(form_data, instance=instance)
+    save, result = form.change_state(form_data)
+    if save:
+        return JsonResponse({
+            'success': save,
+            'turno': instance.as_json()}
+        )
+    else:
+        return JsonResponse({
+            'success': save,
+            'errors': result}
+        )
+
+
+@permission_required('calendario.can_view_misturnos')
+@require_http_methods(["GET"])
+def mis_turnos(request):
+    today = datetime.now().replace(hour=0,minute=0,second=0)
+    turnos = Turno.objects.filter(
+        (Q(solicitante=request.user) | Q(paciente__user=request.user))
+        ).filter(inicio__gt=today).order_by('inicio')
+    context = {
+        'turnos' : turnos,
+        'CANCELADO_PACIENTE': Turno.CANCELADO_PACIENTE,
+        'CANCELADO_ESTABLECIMIENTO': Turno.CANCELADO_ESTABLECIMIENTO,
+    }
+    return render(request, 'mis-turnos.html', context)
+
+
+@permission_required('calendario.can_cancel_turno')
+@require_http_methods(["PUT"])
+def cancelar_turno(request, pk):
+    instance = get_object_or_404(Turno, id=pk)
+    form_data = {'state': Turno.CANCELADO_PACIENTE}
+    form = TurnoForm(form_data, instance=instance)
+    save, result = form.change_state(form_data)
     if save:
         return JsonResponse({
             'success': save,

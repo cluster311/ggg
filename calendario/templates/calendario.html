@@ -14,6 +14,29 @@
   {{ form.media }}
 
   <link href="{% static 'css/modal_extra.css' %}" rel="stylesheet">
+  <style>
+    .turnoDisponible{
+      background-color: white;
+    }
+    .turnoAsignado{
+      background-color: rgb(71, 115, 212);
+    }
+    .turnoEsperandoEnSala{
+      background-color: rgb(21, 102, 21);
+    }
+    .turnoAtendido{
+      background-color: rgb(212, 212, 54);
+    }
+    .turnoCanceladoPaciente{
+      background-color: rgb(150, 40, 40); 
+    }
+    .turnoCanceladoEstablecimiento{
+      background-color: rgb(247, 68, 68);
+    }
+    .noCoincideDni{
+      opacity: 0.5;
+    }
+  </style>
 {% endblock %}
 
 {% block js_footer %}
@@ -41,6 +64,51 @@
     'use strict';
     let calendar;
 
+    function calendarEventClick(info){
+      cargarData(info.event);
+      $("#manageTurnoModal").modal('show');
+    }
+
+    function calendarEventRender(info){
+      let state = info.event.extendedProps.status;
+      let num_doc = info.event.extendedProps.patient_doc;
+      let id = "event-"+info.event.id;
+      info.el.id = id;
+      switch (state) { 
+        case 1: 
+          info.el.className = info.el.className + " turnoAsignado";
+          break;
+        case 2:
+          info.el.className = info.el.className + " turnoEsperandoEnSala";
+          break;
+        case 3: 
+          info.el.className = info.el.className + " turnoAtendido";
+          break;		
+        case 4:
+          info.el.className = info.el.className + " turnoCanceladoPaciente";
+          break;
+        case 5: 
+          info.el.className = info.el.className + " turnoCanceladoEstablecimiento";
+          break;
+        default:
+          info.el.className = info.el.className + " turnoDisponible";
+          break;
+        }
+    }
+
+    function resaltarPorDNI(num){
+      $.each(calendar.getEvents(), function( index, value ) {
+          let doc = value.extendedProps.patient_doc;
+          let a = $("#event-"+value.id);
+          if(doc.toString() == num){
+            a.removeClass('noCoincideDni');
+          }
+          else{
+            a.addClass('noCoincideDni');
+          }
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       const calendarEl = document.getElementById('calendar');
 
@@ -49,6 +117,8 @@
         eventSources: [{
             url: '{% url "calendario.feed" %}',
         }],
+        eventRender: calendarEventRender,
+        eventClick: calendarEventClick,
         defaultView: 'dayGridWeek',
         header: {
           left: 'prev,next today',
@@ -63,11 +133,18 @@
         maxTime: 20,
         editable: true,
         themeSystem: 'bootstrap',
-        eventClick: showModalEvent
       });
-
       calendar.render();
-    });
+
+      $("#documentoFilter").keyup(function() {
+        if ($("#documentoFilter").val().trim() != ""){
+          resaltarPorDNI($("#documentoFilter").val().trim());
+        }
+        else{
+          $('[id^=event-]').removeClass('noCoincideDni');
+        }
+      });
+    });  
   </script>
 
   <script>
@@ -335,6 +412,7 @@
 {% block content %}
   <div class="row action-buttons-container">
     {% include 'base_button.html' with button_text="Cargar semana anterior" attrs='class="btn btn-info" onclick="copyPreviousWeek();"'%}
+    <input placeholder="Buscar por documento... " id="documentoFilter">
     {% include 'base_modal_button.html' with button_text=modal_title %}
   </div>
   <div id='calendar'></div>
@@ -342,4 +420,5 @@
 
 {% block unwrapped_content %}
   {% include 'base_modal.html' %}
+  {% include 'manage_turno_modal.html' %}
 {% endblock %}

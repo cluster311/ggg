@@ -1,5 +1,5 @@
 
-
+{% if user__es_administrativo or user__es_profesional %}
 {# centros de salud autorizados para este usuario #}
 Centro de salud activo
 <select class="custom-select custom-select-sm" 
@@ -13,10 +13,12 @@ Centro de salud activo
     </option>
     {% endfor %}
 </select>
+{% endif %}
 
 
 <ul class="list-unstyled components">
     <!--titulo agrupador sin link <p>Profesionales</p>-->
+    {% if perms.profesionales.view_profesional or perms.centros_de_salud.view_profesionalesenservicio %}
     <li class="active">
         <a href="#menu_profesionales" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Profesionales</a>
         <ul class="collapse list-unstyled" id="menu_profesionales">
@@ -34,7 +36,9 @@ Centro de salud activo
         
         </ul>
     </li>
+    {% endif %}
     
+    {% if perms.profesionales.can_view_tablero or perms.obras_sociales.can_view_tablero or perms.centros_de_salud.can_view_tablero %}
     <li>
         <a href="#menu_tableros" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Tableros de gestion</a>
         <ul class="collapse list-unstyled" id="menu_tableros">
@@ -67,7 +71,9 @@ Centro de salud activo
 
         </ul>
     </li>
+    {% endif %}
 
+    {% if perms.obras_sociales.view_obrasocial %}
     <!--titulo agrupador sin link <p>Atenciones</p> -->
     <li>
         <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
@@ -81,7 +87,9 @@ Centro de salud activo
             
         </ul>
     </li>
+    {% endif %}
 
+    {% if perms.centros_de_salud.view_centrodesalud or perms.centros_de_salud.view_servicio %}
     <!--titulo agrupador sin link <p>Atenciones</p> -->
     <li>
         <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
@@ -98,16 +106,40 @@ Centro de salud activo
                 <a href="{% url 'centros_de_salud.servicios' %}">Servicios</a>
             </li>
             {% endif %}
+            
+        </ul>
+    </li>
+    {% endif %}
 
+    {% if perms.centros_de_salud.view_especialidad or perms.especialidades.view_medidaanexa or perms.especialidades.view_medidasanexasespecialidad %}
+    <li>
+        <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
+        <a href="#menu_especialidades" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Especialidades</a>
+        <ul class="collapse list-unstyled" id="menu_especialidades">
+            
             {% if perms.centros_de_salud.view_especialidad %}
             <li>
                 <a href="{% url 'centros_de_salud.especialidades' %}">Especialidades</a>
             </li>
             {% endif %}
             
+            {% if perms.especialidades.view_medidaanexa %}
+            <li>
+                <a href="{% url 'especialidades.medidas_anexas' %}">Medidas Anexas</a>
+            </li>
+            {% endif %}
+
+            {% if perms.especialidades.view_medidasanexasespecialidad %}
+            <li>
+                <a href="{% url 'especialidades.medidas-anexas-en-especialidades' %}">Medidas en Especialidad</a>
+            </li>
+            {% endif %}
+
         </ul>
     </li>
+    {% endif %}
 
+    {% if perms.calendario.add_turno or perms.calendario.can_schedule_turno or perms.profesionales.add_consulta or perms.calendario.can_view_misturnos %}
     <li>
         <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
         <a href="#menu_turnos" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Turnos</a>
@@ -128,13 +160,18 @@ Centro de salud activo
         <li>
             <a href="{% url 'profesionales.crear.consulta' %}">Nueva consulta</a>
         </li>
-        
+        {% endif %}
 
+        {% if perms.calendario.can_view_misturnos %}
+        <li>
+            <a href="{% url 'calendario.mis_turnos' %}">Mis turnos</a>
+        </li>
         {% endif %}
         </ul>
     </li>
+    {% endif %}
 
-
+    {% if perms.auth.change_user or perms.usuarios.view_usuarioencentrodesalud %}
     <li>
         <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
         <a href="#menu_usuarios" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Usuarios</a>
@@ -154,13 +191,14 @@ Centro de salud activo
         
         </ul>
     </li>
-    
+    {% endif %}
 
+    {% if perms.recupero.view_factura or perms.recupero.view_tipodocumentoanexo or perms.recupero.view_tipoprestacion %}
     <li>
         <a href="#menu_recupero" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Recupero</a>
         <ul class="collapse list-unstyled" id="menu_recupero">
         {% if perms.recupero.view_factura %}
-        <liview
+        <li>
             <a href="{% url 'recupero.factura.lista-pendientes-envio' %}">Facturación pendiente de envío</a>
         </li>
             
@@ -182,4 +220,5 @@ Centro de salud activo
         {% endif %}
         </ul>
     </li>
+    {% endif %}
 </ul>

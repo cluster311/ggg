@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from datetime import datetime
 
@@ -5,13 +6,15 @@ from datetime import datetime
 class Turno(models.Model):
     DISPONIBLE = 0
     ASIGNADO = 1
-    ATENDIDO = 2
-    CANCELADO_PACIENTE = 3
-    CANCELADO_ESTABLECIMIENTO = 4
+    ESPERANDO_EN_SALA = 2
+    ATENDIDO = 3
+    CANCELADO_PACIENTE = 4
+    CANCELADO_ESTABLECIMIENTO = 5
 
     OPCIONES_ESTADO = (
         (DISPONIBLE, 'Disponible'),
         (ASIGNADO, 'Asignado'),
+        (ESPERANDO_EN_SALA, 'Esperando en sala'),
         (ATENDIDO, 'Atendido'),
         (CANCELADO_PACIENTE, 'Cancelado por el paciente'),
         (CANCELADO_ESTABLECIMIENTO, 'Cancelado por el establecimiento')
@@ -35,6 +38,12 @@ class Turno(models.Model):
         null=True,
         on_delete=models.SET_NULL
     )
+    solicitante = models.ForeignKey(
+        User, 
+        blank=True, 
+        null=True, 
+        on_delete=models.SET_NULL
+    )
     estado = models.IntegerField(choices=OPCIONES_ESTADO, default=DISPONIBLE)
 
     class Meta:
@@ -42,6 +51,14 @@ class Turno(models.Model):
             (
                 "can_schedule_turno",
                 "Puede agendar un turno",
+            ),
+            (
+                "can_view_misturnos",
+                "Puede ver Mis Turnos"
+            ),
+            (
+                "can_cancel_turno",
+                "Puede cancelar sus turnos"
             )
         ]
 
@@ -52,9 +69,11 @@ class Turno(models.Model):
         json = {
             'inicio': datetime.strftime(self.inicio, '%d/%m/%Y %H:%M'),
             'servicio': self.servicio.especialidad.nombre,
-            'paciente': '{}, {}'.format(
-                self.paciente.apellidos, self.paciente.nombres)
+            'estado': self.get_estado_display(),
         }
+        if self.paciente is not None:
+            json['paciente'] = '{}, {}'.format(
+                self.paciente.apellidos, self.paciente.nombres)
         if self.profesional is not None:
             json['profesional'] = '{}, {}'.format(
                 self.profesional.apellidos, self.profesional.nombres)
