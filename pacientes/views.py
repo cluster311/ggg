@@ -74,6 +74,7 @@ class ConsultaMixin:
             context["prestaciones_frm"]
         ]        
 
+        context['instance'] = instance
         # se requieren las consultas anteriores como historia clínica
         if instance is None or instance.paciente is None:
             context['consultas_previas'] = None
@@ -108,13 +109,13 @@ class ConsultaMixin:
         return super().form_valid(form)
 
 
-class EvolucionCreateView(ConsultaMixin, SuccessMessageMixin, 
+class EvolucionUpdateView(ConsultaMixin, SuccessMessageMixin, 
                           PermissionRequiredMixin,
-                          CreateView, ):
+                          UpdateView, ):
     """Evolución /Consulta de paciente"""
-
-    permission_required = ("add_consulta",)
-    template_name = "pacientes/evolucion_create.html"
+    model = Consulta
+    permission_required = ("change_consulta",)
+    template_name = "pacientes/evolucion.html"
     form_class = EvolucionForm
     success_message = "Datos guardados con éxito."
 
@@ -130,23 +131,9 @@ class EvolucionCreateView(ConsultaMixin, SuccessMessageMixin,
         )
 
 
-class ConsultaCreateView(ConsultaMixin, SuccessMessageMixin, PermissionRequiredMixin,
-                         CreateView, ):
-    """Crea un objeto Consulta."""
-
-    permission_required = ("can_view_tablero",)
-    template_name = "pacientes/consulta_createview.html"
-    form_class = ConsultaForm
-    success_message = "Datos guardados con éxito."
-
-    def get_success_url(self):
-        return reverse(
-            "pacientes.consulta.lista",
-            kwargs=({"dni": self.object.paciente.numero_documento}),
-        )
-
-
-class ConsultaUpdateView(ConsultaMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
+class ConsultaUpdateView(ConsultaMixin, SuccessMessageMixin,
+                         PermissionRequiredMixin,
+                         UpdateView):
     """
     Actualiza un objeto Consulta
     """
@@ -158,7 +145,6 @@ class ConsultaUpdateView(ConsultaMixin, SuccessMessageMixin, PermissionRequiredM
     template_name = "pacientes/consulta_updateview.html"
     success_message = "Datos actualizados con éxito."
 
-    
     def get_object(self):
         return get_object_or_404(Consulta, 
             paciente__numero_documento=self.kwargs.get('dni'),

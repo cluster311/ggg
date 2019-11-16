@@ -8,6 +8,17 @@
 {% block content %}
     <form method="post" novalidate>
       {% csrf_token %}
+    
+      <div class="row">
+          <div class="col-12 col-md-12">
+            <p>
+              Paciente: <b>{{ instance.paciente }}</b>. 
+              Profesional: <b>{{ instance.profesional }}</b>. 
+              Especialidad: <b>{{ instance.especialidad }}</b>. 
+              Centro: <b>{{ instance.centro_de_salud }}</b>. 
+            </p>
+          </div>
+      </div>
       
     <div class="row">
       <div class="col-6 col-md-6">

@@ -1,18 +1,18 @@
 from django.conf.urls import url, include
 from django.urls import path
 from .views import (
-    EvolucionCreateView,
+    EvolucionUpdateView,
     ConsultaListView,
     ConsultaDetailView,
-    ConsultaCreateView,
     ConsultaUpdateView,
 )
 
 
 urlpatterns = [
     path(
-        r"evolucion",
-        EvolucionCreateView.as_view(),
+        # debe crearse la consulta y luego llamar aquí
+        r"evolucion/<int:pk>",
+        EvolucionUpdateView.as_view(),
         name="pacientes.evolucion",
     ),
     
@@ -25,11 +25,6 @@ urlpatterns = [
         r"<int:dni>/historia/<int:pk>",
         ConsultaDetailView.as_view(),
         name="pacientes.consulta.detalle",
-    ),
-    path(
-        r"nueva-consulta",
-        ConsultaCreateView.as_view(),
-        name="pacientes.crear.consulta",
     ),
     path(
         r"<int:dni>/actualizar-consulta/<int:pk>",

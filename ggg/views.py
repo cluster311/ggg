@@ -25,7 +25,8 @@ def choice_homepage(request):
     elif user.groups.filter(name=settings.GRUPO_ADMIN).exists():
         return redirect('calendario.index')
     elif user.groups.filter(name=settings.GRUPO_PROFESIONAL).exists():
-        return redirect('pacientes.crear.consulta')
+        # TODO cambiar por la nueva vista para atender turnos
+        return redirect('profesionales.lista')
 
     # default para ciudadano  
     # TODO. cual es el home para el ciudadano?   

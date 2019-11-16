@@ -145,12 +145,6 @@ Centro de salud activo
         </li>
         {% endif %}
         
-        {% if perms.profesionales.add_consulta %}
-        <li>
-            <a href="{% url 'pacientes.crear.consulta' %}">Nueva consulta</a>
-        </li>
-        {% endif %}
-
         {% if perms.calendario.can_view_misturnos %}
         <li>
             <a href="{% url 'calendario.mis_turnos' %}">Mis turnos</a>
