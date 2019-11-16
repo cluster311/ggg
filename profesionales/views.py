@@ -277,7 +277,6 @@ class ConsultaDetailView(GroupRequiredMixin, DetailView):
         return context
 
 
-<<<<<<< HEAD
 class ConsultaCreateView(SuccessMessageMixin, GroupRequiredMixin,
                          CreateView):
     """Crea un objeto Consulta."""
@@ -292,19 +291,38 @@ class ConsultaCreateView(SuccessMessageMixin, GroupRequiredMixin,
         kwargs['user'] = self.request.user
         return kwargs
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
 
-        if self.request.POST:
-            context["recetas_frm"] = RecetaFormset(self.request.POST, prefix='Recetas')
-            context["derivaciones_frm"] = DerivacionFormset(self.request.POST, prefix='Derivaciones')
-            context["prestaciones_frm"] = PrestacionFormset(self.request.POST, prefix='Prestaciones')
-        else:
-            context["recetas_frm"] = RecetaFormset(prefix='Recetas')
-            context["derivaciones_frm"] = DerivacionFormset(prefix='Derivaciones')
-            context["prestaciones_frm"] = PrestacionFormset(prefix='Prestaciones')
+    #     if self.request.POST:
+    #         context["recetas_frm"] = RecetaFormset(self.request.POST, prefix='Recetas')
+    #         context["derivaciones_frm"] = DerivacionFormset(self.request.POST, prefix='Derivaciones')
+    #         context["prestaciones_frm"] = PrestacionFormset(self.request.POST, prefix='Prestaciones')
+    #     else:
+    #         context["recetas_frm"] = RecetaFormset(prefix='Recetas')
+    #         context["derivaciones_frm"] = DerivacionFormset(prefix='Derivaciones')
+    #         context["prestaciones_frm"] = PrestacionFormset(prefix='Prestaciones')
 
-=======
+    def get_success_url(self):
+        return reverse(
+            "profesionales.consulta.lista",
+            kwargs=({"dni": self.object.paciente.numero_documento}),
+        )
+
+    def get_initial(self):
+        """
+        Los datos iniciales son el médico que atiende la consulta y el paciente
+        """
+        initial_data = super(ConsultaCreateView, self).get_initial()
+        dni = self.kwargs["dni"]
+        prof = self.kwargs["prof"]
+        profesional = get_object_or_404(Profesional, id=prof)
+        paciente = get_object_or_404(Paciente, numero_documento=dni)
+        initial_data["profesional"] = profesional
+        initial_data["paciente"] = paciente
+        return initial_data
+
+
 class ConsultaMixin:
 
     def get_context_data(self, **kwargs):
@@ -316,8 +334,6 @@ class ConsultaMixin:
         context["recetas_frm"] = RecetaFormset(data, prefix='Recetas', instance=instance)
         context["derivaciones_frm"] = DerivacionFormset(data, prefix='Derivaciones', instance=instance)
         context["prestaciones_frm"] = PrestacionFormset(data, prefix='Prestaciones', instance=instance)
-       
->>>>>>> d9826830d63c0d17c280c75f078249d0b17a53dc
         context["formsets"] = [
             context["recetas_frm"],
             context["derivaciones_frm"],
@@ -348,35 +364,6 @@ class ConsultaMixin:
             ps.save()
         
         return super().form_valid(form)
-
-
-class ConsultaCreateView(ConsultaMixin, SuccessMessageMixin, PermissionRequiredMixin,
-                         CreateView, ):
-    """Crea un objeto Consulta."""
-
-    permission_required = ("can_view_tablero",)
-    template_name = "profesionales/consulta_createview.html"
-    form_class = ConsultaForm
-    success_message = "Datos guardados con éxito."
-
-    def get_success_url(self):
-        return reverse(
-            "profesionales.consulta.lista",
-            kwargs=({"dni": self.object.paciente.numero_documento}),
-        )
-
-    def get_initial(self):
-        """
-        Los datos iniciales son el médico que atiende la consulta y el paciente
-        """
-        initial_data = super(ConsultaCreateView, self).get_initial()
-        dni = self.kwargs["dni"]
-        prof = self.kwargs["prof"]
-        profesional = get_object_or_404(Profesional, id=prof)
-        paciente = get_object_or_404(Paciente, numero_documento=dni)
-        initial_data["profesional"] = profesional
-        initial_data["paciente"] = paciente
-        return initial_data
 
 
 class ConsultaUpdateView(ConsultaMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
