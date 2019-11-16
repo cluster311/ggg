@@ -121,15 +121,15 @@ class TurnoForm(forms.ModelForm):
     
 
     def change_state(self, data, *args, **kwargs):
-        if new_state == Turno.CONFIRMADO:
-            if self.instance.profesional is None:
-                error = {'profesional':'El turno deberia tener un profesional asignado'}
-                return False, error
-            elif self.instance.paciente is None:
-                error = {'paciente':'El turno deberia tener un paciente asignado'}
-                return False, error
         try:
             new_state = int(data['state'])
+            if new_state == Turno.ESPERANDO_EN_SALA:
+                if self.instance.profesional is None:
+                    error = {'profesional':'El turno deberia tener un profesional asignado'}
+                    return False, error
+                elif self.instance.paciente is None:
+                    error = {'paciente':'El turno deberia tener un paciente asignado'}
+                    return False, error
             if new_state >= 0 and new_state < len(Turno.OPCIONES_ESTADO):
                 self.instance.estado = int(data['state'])
                 self.instance.save()
@@ -140,7 +140,6 @@ class TurnoForm(forms.ModelForm):
         except expression as identifier:
             error = {'state':'Error al cambiar el estado'}
             return False, error
-        
         
 
     class Meta:
