@@ -24,7 +24,15 @@ def index(request):
             'id="addAppointmentButton" '
             'onclick="customAppointmentFormSubmit();">Agregar</button>'
         ),
-        'form': TurnoForm(user=request.user)
+        'form': TurnoForm(user=request.user),
+        'turno_states': {
+            'DISPONIBLE' : Turno.DISPONIBLE,
+            'ASIGNADO' : Turno.ASIGNADO,
+            'CONFIRMADO' : Turno.CONFIRMADO,
+            'ATENDIDO' : Turno.ATENDIDO,
+            'CANCELADO_PACIENTE' : Turno.CANCELADO_PACIENTE,
+            'CANCELADO_ESTABLECIMIENTO' : Turno.CANCELADO_ESTABLECIMIENTO
+        }
     }
     return render(request, 'calendario.html', context)
 
@@ -124,6 +132,7 @@ def feed(request, servicio=None):
         'service': t.servicio.pk or 0,
         'status': t.estado,
         'professional': t.profesional.pk or 0,
+        'patient_doc': t.paciente.numero_documento if t.paciente else 0
         # 'patient': t.paciente.pk or 0
     } for t in turnos]
 
@@ -171,6 +180,25 @@ def confirm_turn(request, pk):
     form_data = json.loads(request.body)
     form = TurnoForm(form_data, instance=instance)
     save, result = form.update(form_data)
+    if save:
+        return JsonResponse({
+            'success': save,
+            'turno': instance.as_json()}
+        )
+    else:
+        return JsonResponse({
+            'success': save,
+            'errors': result}
+        )
+
+
+@permission_required('calendario.can_change_turno')
+@require_http_methods(["PUT"])
+def edit_turn(request, pk):
+    instance = get_object_or_404(Turno, id=pk)
+    form_data = json.loads(request.body)
+    form = TurnoForm(form_data, instance=instance)
+    save, result = form.change_state(form_data)
     if save:
         return JsonResponse({
             'success': save,
