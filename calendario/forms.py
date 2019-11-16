@@ -115,6 +115,7 @@ class TurnoForm(forms.ModelForm):
             return False, error
         else:
             self.instance.paciente = paciente
+            self.instance.solicitante = data['solicitante']
             self.instance.estado = 1
             self.instance.save()
             return True, self.instance

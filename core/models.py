@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from model_utils import Choices
 from address.models import AddressField
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField
@@ -39,7 +40,11 @@ class Persona(models.Model):
         'venezolana',
         'otra',
     )
-
+    user = models.OneToOneField(
+        User,
+        null=True,
+        on_delete=models.CASCADE,
+    )
     nombres = models.CharField(max_length=50)
     apellidos = models.CharField(max_length=30)
     sexo = models.CharField(

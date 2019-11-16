@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from datetime import datetime
 
@@ -37,6 +38,12 @@ class Turno(models.Model):
         null=True,
         on_delete=models.SET_NULL
     )
+    solicitante = models.ForeignKey(
+        User, 
+        blank=True, 
+        null=True, 
+        on_delete=models.SET_NULL
+    )
     estado = models.IntegerField(choices=OPCIONES_ESTADO, default=DISPONIBLE)
 
     class Meta:
@@ -44,6 +51,14 @@ class Turno(models.Model):
             (
                 "can_schedule_turno",
                 "Puede agendar un turno",
+            ),
+            (
+                "can_view_misturnos",
+                "Puede ver Mis Turnos"
+            ),
+            (
+                "can_cancel_turno",
+                "Puede cancelar sus turnos"
             )
         ]
 
@@ -54,6 +69,7 @@ class Turno(models.Model):
         json = {
             'inicio': datetime.strftime(self.inicio, '%d/%m/%Y %H:%M'),
             'servicio': self.servicio.especialidad.nombre,
+            'estado': self.get_estado_display(),
         }
         if self.paciente is not None:
             json['paciente'] = '{}, {}'.format(
