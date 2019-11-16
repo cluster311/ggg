@@ -59,9 +59,9 @@ class ProfesionalHome(TemplateView, GroupRequiredMixin):
 
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
-class ProfesionalListView(GroupRequiredMixin, ListView):
+class ProfesionalListView(PermissionRequiredMixin, ListView):
     model = Profesional
-    group_required = (settings.GRUPO_PROFESIONAL, settings.GRUPO_ADMIN)
+    permission_required = ("view_profesional",)
     paginate_by = 10  # pagination
 
     def get_queryset(self):        
