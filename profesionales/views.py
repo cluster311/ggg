@@ -239,69 +239,58 @@ class ConsultaDetailView(PermissionRequiredMixin, DetailView):
         return context
 
 
-class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin,
-                         CreateView):
-    """Crea un objeto Consulta."""
-
-    permission_required = ("can_view_tablero",)
-    template_name = "profesionales/consulta_createview.html"
-    form_class = ConsultaForm
-    success_message = "Datos guardados con éxito."
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
-
-    def form_valid(self, form):
-        
-        context = self.get_context_data()
-        
-        rs = context["recetas_frm"]
-        ds = context["derivaciones_frm"]
-        ps = context["prestaciones_frm"]
-
-        logger.info(f'Validando consulta {form} | {rs} | {ds} | {ps}')
-        self.object = form.save()
-        
-        if rs.is_valid():
-            rs.instance = self.object
-            rs.save()
-        else:
-            raise Exception('Recetas inválidas')
-        
-        if ds.is_valid():
-            ds.instance = self.object
-            ds.save()
-        else:
-            raise Exception('Derivaciones inválidas')
-        
-        if ps.is_valid():
-            ps.instance = self.object
-            ps.save()
-        else:
-            raise Exception('Prestaciones inválidas')
-        
-        return super().form_valid(form)
+class ConsultaMixin:
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        instance = getattr(self, 'object', None)
         
-        if self.request.POST:
-            context["recetas_frm"] = RecetaFormset(self.request.POST, prefix='Recetas')
-            context["derivaciones_frm"] = DerivacionFormset(self.request.POST, prefix='Derivaciones')
-            context["prestaciones_frm"] = PrestacionFormset(self.request.POST, prefix='Prestaciones')
-        else:
-            context["recetas_frm"] = RecetaFormset(prefix='Recetas')
-            context["derivaciones_frm"] = DerivacionFormset(prefix='Derivaciones')
-            context["prestaciones_frm"] = PrestacionFormset(prefix='Prestaciones')
-
+        data = self.request.POST if self.request.method == "POST" else None
+        
+        context["recetas_frm"] = RecetaFormset(data, prefix='Recetas', instance=instance)
+        context["derivaciones_frm"] = DerivacionFormset(data, prefix='Derivaciones', instance=instance)
+        context["prestaciones_frm"] = PrestacionFormset(data, prefix='Prestaciones', instance=instance)
+       
         context["formsets"] = [
             context["recetas_frm"],
             context["derivaciones_frm"],
             context["prestaciones_frm"]
         ]        
         return context
+
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        
+        rs = context["recetas_frm"]
+        ds = context["derivaciones_frm"]
+        ps = context["prestaciones_frm"]
+
+        self.object = form.save()
+        
+        if rs.is_valid():
+            rs.instance = self.object
+            rs.save()
+        
+        if ds.is_valid():
+            ds.instance = self.object
+            ds.save()
+        
+        if ps.is_valid():
+            ps.instance = self.object
+            ps.save()
+        
+        return super().form_valid(form)
+
+
+class ConsultaCreateView(ConsultaMixin, SuccessMessageMixin, PermissionRequiredMixin,
+                         CreateView, ):
+    """Crea un objeto Consulta."""
+
+    permission_required = ("can_view_tablero",)
+    template_name = "profesionales/consulta_createview.html"
+    form_class = ConsultaForm
+    success_message = "Datos guardados con éxito."
 
     def get_success_url(self):
         return reverse(
@@ -310,71 +299,24 @@ class ConsultaCreateView(SuccessMessageMixin, PermissionRequiredMixin,
         )
 
 
-class ConsultaUpdateView(PermissionRequiredMixin, UpdateView):
+class ConsultaUpdateView(ConsultaMixin, SuccessMessageMixin, PermissionRequiredMixin, UpdateView):
     """
     Actualiza un objeto Consulta
     """
 
     model = Consulta
     form_class = ConsultaForm
-    permission_required = "can_view_tablero"
+    permission_required = ("can_view_tablero",)
+    
     template_name = "profesionales/consulta_updateview.html"
     success_message = "Datos actualizados con éxito."
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
     
-    def form_valid(self, form):
-        
-        context = self.get_context_data()
-        
-        rs = context["recetas_frm"]
-        ds = context["derivaciones_frm"]
-        ps = context["prestaciones_frm"]
-
-        logger.info(f'Validando consulta {form} | {rs} | {ds} | {ps}')
-        self.object = form.save()
-        
-        if rs.is_valid():
-            rs.instance = self.object
-            rs.save()
-        else:
-            raise Exception('Recetas inválidas')
-        
-        if ds.is_valid():
-            ds.instance = self.object
-            ds.save()
-        else:
-            raise Exception('Derivaciones inválidas')
-        
-        if ps.is_valid():
-            ps.instance = self.object
-            ps.save()
-        else:
-            raise Exception('Prestaciones inválidas')
-        
-        return super().form_valid(form)
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-        if self.request.POST:
-            context["recetas_frm"] = RecetaFormset(self.request.POST, prefix='Recetas')
-            context["derivaciones_frm"] = DerivacionFormset(self.request.POST, prefix='Derivaciones')
-            context["prestaciones_frm"] = PrestacionFormset(self.request.POST, prefix='Prestaciones')
-        else:
-            context["recetas_frm"] = RecetaFormset(prefix='Recetas')
-            context["derivaciones_frm"] = DerivacionFormset(prefix='Derivaciones')
-            context["prestaciones_frm"] = PrestacionFormset(prefix='Prestaciones')
-
-        context["formsets"] = [
-            context["recetas_frm"],
-            context["derivaciones_frm"],
-            context["prestaciones_frm"]
-        ]        
-        return context
+    def get_object(self):
+        return get_object_or_404(Consulta, 
+            paciente__numero_documento=self.kwargs.get('dni'),
+            pk=self.kwargs.get('pk')
+        ) 
 
     def get_success_url(self):
         return reverse(
