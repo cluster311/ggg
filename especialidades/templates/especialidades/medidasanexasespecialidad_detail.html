@@ -1,0 +1,14 @@
+{% extends "base_admin.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+<a role="button" class="btn btn-warning btn-sm active" href="{% url 'especialidades.medidas-anexas-en-especialidades' %}">Volver a la lista</a>
+{% if perms.especialidades.change_medidasanexasespecialidad %}
+<a role="button" class="btn btn-warning btn-sm active" href="{% url 'especialidades.medidas-anexas-en-especialidades.edit' pk=object.id %}">Editar</a>
+{% endif %}
+<p>Medida: <b>{{ object.medida.nombre }}</b></p>
+<p>Especialidad: <b>{{ object.especialidad.nombre }}</b></p>
+<p>Observaciones al que medirá: <b>{{ object.observaciones_para_el_que_mide }}</b></p>
+<p>Obligatorio en consultas de esta especialidad?</p>: <b>{{ object.obligatorio|yesno:'Sí,No'}}</b>
+{% endblock %}
