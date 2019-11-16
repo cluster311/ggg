@@ -19,6 +19,28 @@
 
 
   <script type="text/javascript">
+    function cancelarTurnoPaciente(id){
+        axios({
+            method: 'put',
+            url: "{% url 'calendario.cancelar_turn' pk=0 %}".replace(0,id),
+            headers: {'Content-Type': 'application/json'},
+        })
+        .then(response => {
+        if (!response.data.success) {
+            console.error(response.data.errors);
+        } else {
+            $("#estado-"+id).html(response.data.turno.estado);
+            $("button#"+id).prop("disabled",true);
+        }
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }   
+
+    $(".btnCancelarTurno").click(function() {
+        cancelarTurnoPaciente($( this ).attr('id'));
+    });
     </script>
 {% endblock js_footer %}
 
@@ -41,14 +63,20 @@
                 <td>Sin datos</td><td></td><td></td><td></th><td></th><td></th><td></th>
             {% else %}
             {% for turno in turnos %}
-                <tr>
+                <tr id="row-{{turno.pk}}"">
                     <td>{{turno.inicio}}</th>
                     <td>{{turno.paciente|title}}</td>
-                    <td>{{turno.estado}}</td>
+                    <td id="estado-{{turno.pk}}">{{turno.get_estado_display}}</td>
                     <td>{{turno.servicio}}</th>
-                    <td>{{turno.profesional}}</th>
-                    <td>{{turno.centro_de_salud}}</th>
-                    <td></th>
+                    <td>{{turno.profesional|title}}</th>
+                    <td>{{turno.servicio.centro|title}}</th>
+                    <td>
+                        <button id="{{turno.pk}}" class="btn btn-danger btn-sm btnCancelarTurno" 
+                        {% if turno.estado == CANCELADO_PACIENTE or turno.estado == CANCELADO_ESTABLECIMIENTO %}
+                        disabled
+                        {% endif %}
+                        >Cancelar</button>
+                    </th>
                 </tr>
             
             {% endfor %}

@@ -55,6 +55,10 @@ class Turno(models.Model):
             (
                 "can_view_misturnos",
                 "Puede ver Mis Turnos"
+            ),
+            (
+                "can_cancel_turno",
+                "Puede cancelar sus turnos"
             )
         ]
 
@@ -65,6 +69,7 @@ class Turno(models.Model):
         json = {
             'inicio': datetime.strftime(self.inicio, '%d/%m/%Y %H:%M'),
             'servicio': self.servicio.especialidad.nombre,
+            'estado': self.get_estado_display(),
         }
         if self.paciente is not None:
             json['paciente'] = '{}, {}'.format(

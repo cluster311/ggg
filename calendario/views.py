@@ -220,8 +220,29 @@ def mis_turnos(request):
     today = datetime.now().replace(hour=0,minute=0,second=0)
     turnos = Turno.objects.filter(
         (Q(solicitante=request.user) | Q(paciente__user=request.user))
-        ).filter(inicio__gt=today)
+        ).filter(inicio__gt=today).order_by('inicio')
     context = {
         'turnos' : turnos,
+        'CANCELADO_PACIENTE': Turno.CANCELADO_PACIENTE,
+        'CANCELADO_ESTABLECIMIENTO': Turno.CANCELADO_ESTABLECIMIENTO,
     }
     return render(request, 'mis-turnos.html', context)
+
+
+@permission_required('calendario.can_cancel_turno')
+@require_http_methods(["PUT"])
+def cancelar_turno(request, pk):
+    instance = get_object_or_404(Turno, id=pk)
+    form_data = {'state': Turno.CANCELADO_PACIENTE}
+    form = TurnoForm(form_data, instance=instance)
+    save, result = form.change_state(form_data)
+    if save:
+        return JsonResponse({
+            'success': save,
+            'turno': instance.as_json()}
+        )
+    else:
+        return JsonResponse({
+            'success': save,
+            'errors': result}
+        )
