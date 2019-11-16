@@ -43,9 +43,9 @@ Centro de salud activo
             <li>
                 <a href="{% url 'profesionales.tablero.por_profesion' %}">Profesionales Por profesion</a>
             </li>
-            <li>
-                <a href="{% url 'profesionales.tablero.por_departamento' %}">Profesionales Por zona</a>
-            </li>
+            <!-- <li>
+                <a href="{# url 'profesionales.tablero.por_departamento' #}">Profesionales Por zona</a>
+            </li> -->
             {% endif %}
 
             {% if perms.obras_sociales.can_view_tablero %}

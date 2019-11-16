@@ -2,7 +2,7 @@ from django.conf.urls import url, include
 from django.urls import path
 from .views import (
     TableroProfesionalesPorEspecialidadView,
-    TableroProfesionalesPorLocalidadView,
+    # revisar campos TableroProfesionalesPorLocalidadView,
     ConsultaListView,
     ConsultaDetailView,
     ConsultaCreateView,
@@ -40,11 +40,11 @@ urlpatterns = [
         ProfesionalUpdateView.as_view(),
         name="profesionales.edit",
     ),
-    url(
-        r"^por-departamento.html$",
-        TableroProfesionalesPorLocalidadView.as_view(),
-        name="profesionales.tablero.por_departamento",
-    ),
+    # url(
+    #     r"^por-departamento.html$",
+    #     TableroProfesionalesPorLocalidadView.as_view(),
+    #     name="profesionales.tablero.por_departamento",
+    # ),
     path(
         r"paciente/<int:dni>/historia",
         ConsultaListView.as_view(),
