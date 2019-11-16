@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from datetime import datetime
 
@@ -35,6 +36,12 @@ class Turno(models.Model):
         'pacientes.Paciente',
         blank=True,
         null=True,
+        on_delete=models.SET_NULL
+    )
+    solicitante = models.ForeignKey(
+        User, 
+        blank=True, 
+        null=True, 
         on_delete=models.SET_NULL
     )
     estado = models.IntegerField(choices=OPCIONES_ESTADO, default=DISPONIBLE)
