@@ -65,7 +65,7 @@
             {% for turno in turnos %}
                 <tr id="row-{{turno.pk}}"">
                     <td>{{turno.inicio}}</th>
-                    <td>{{turno.paciente|title}}</td>
+                    <td>{{turno.paciente|title}} {{turno.paciente.numero_documento}}</td>
                     <td id="estado-{{turno.pk}}">{{turno.get_estado_display}}</td>
                     <td>{{turno.servicio}}</th>
                     <td>{{turno.profesional|title}}</th>
