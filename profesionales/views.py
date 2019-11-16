@@ -5,6 +5,7 @@ from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django.db.models import Count, Q
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.models import User
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -26,30 +27,33 @@ class ProfesionalHome(TemplateView, GroupRequiredMixin):
     Home del profesional al loguearse
     """
 
-    group_required = (settings.GRUPO_PROFESIONAL,)
-    template_name = "home_profesional.html"
+    group_required = (settings.GRUPO_PROFESIONAL, )
+    template_name = "profesionales/home_profesional.html"
+
+    # ESTO ES PARA AGREGAR UN SELECTOR POR ESTADO
+    # def get_queryset(self):
+    #     objects = Turno.objects.filter(profesional=self.request)
+    #     if 'estado' in self.request.GET:
+    #         q = self.request.GET['estado']
+    #         if q is not 'TODOS':
+    #             objects = Turno.objects.filter(estado=q)
+    #         else:
+    #             # Se muestran todos los TURNOS!
+    #             # Fix: En algún momento va a ser una query pesada
+    #             objects = Turno.objects.all()
+    #     else:
+    #         # Por default, sólo se muestran los turnos confirmados
+    #         objects = Turno.objects.filter(estado=Turno.CONFIRMADO)
+    #     return objects
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         hoy = datetime.now()
         context['hoy'] = hoy
         context['estados'] = Turno.OPCIONES_ESTADO
-
-        # asegurarse de que el turno tenga medico y paciente asignado!
-        context['turnos'] = Turno.objects.all()
-
+        # context['usuario'] = usuario
+        context['turnos'] = Turno.objects.filter(inicio__day=hoy.day)
         return context
-
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['search_txt'] = self.request.GET.get('search', '')
-    #     context['title'] = 'Lista de profesionales'
-    #     context['title_url'] = 'profesionales.lista'
-    #     context['use_search_bar'] = True
-    #     if self.request.user.has_perm('profesionales.add_profesional'):
-    #         context['use_add_btn'] = True
-    #         context['add_url'] = 'profesionales.create'
-    #     return context
 
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
