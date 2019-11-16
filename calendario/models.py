@@ -51,6 +51,10 @@ class Turno(models.Model):
             (
                 "can_schedule_turno",
                 "Puede agendar un turno",
+            ),
+            (
+                "can_view_misturnos",
+                "Puede ver Mis Turnos"
             )
         ]
 

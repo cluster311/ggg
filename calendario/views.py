@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from django import forms
+from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.dateparse import parse_datetime
@@ -11,6 +12,7 @@ import logging
 logger = logging.getLogger(__name__)
 from django.contrib.auth.decorators import permission_required
 from centros_de_salud.models import Servicio
+from pacientes.models import Paciente
 
 
 def index(request):
@@ -210,3 +212,16 @@ def edit_turn(request, pk):
             'success': save,
             'errors': result}
         )
+
+
+@permission_required('calendario.can_view_misturnos')
+@require_http_methods(["GET"])
+def mis_turnos(request):
+    today = datetime.now().replace(hour=0,minute=0,second=0)
+    turnos = Turno.objects.filter(
+        (Q(solicitante=request.user) | Q(paciente__user=request.user))
+        ).filter(inicio__gt=today)
+    context = {
+        'turnos' : turnos,
+    }
+    return render(request, 'mis-turnos.html', context)

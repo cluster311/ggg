@@ -1,0 +1,68 @@
+{% extends "base_admin.html" %}
+{% load static %}
+
+{% block extra_head %}
+  <link href="{% static 'css/modal_extra.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block js_footer %}
+	{{ block.super }}
+
+  <!-- Import axios and configure it to send csrf tokens -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    'use strict';
+    axios.defaults.xsrfCookieName = 'csrftoken'
+    axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+  </script>
+
+
+
+  <script type="text/javascript">
+    </script>
+{% endblock js_footer %}
+
+{% block content %}
+    <div class="row">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Fecha</th>
+                <th scope="col">Paciente</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Servicio</th>
+                <th scope="col">Profesional</th>
+                <th scope="col">Centro de salud</th>
+                <th scope="col">Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if turnos|length == 0 %}
+                <td>Sin datos</td><td></td><td></td><td></th><td></th><td></th><td></th>
+            {% else %}
+            {% for turno in turnos %}
+                <tr>
+                    <td>{{turno.inicio}}</th>
+                    <td>{{turno.paciente|title}}</td>
+                    <td>{{turno.estado}}</td>
+                    <td>{{turno.servicio}}</th>
+                    <td>{{turno.profesional}}</th>
+                    <td>{{turno.centro_de_salud}}</th>
+                    <td></th>
+                </tr>
+            
+            {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+
+    
+
+{% endblock %}
+
+
+{% block unwrapped_content %}
+
+{% endblock %}

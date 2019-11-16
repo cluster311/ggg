@@ -1,5 +1,5 @@
 
-
+{% if user__es_administrativo or user__es_profesional %}
 {# centros de salud autorizados para este usuario #}
 Centro de salud activo
 <select class="custom-select custom-select-sm" 
@@ -13,6 +13,7 @@ Centro de salud activo
     </option>
     {% endfor %}
 </select>
+{% endif %}
 
 
 <ul class="list-unstyled components">
@@ -128,8 +129,12 @@ Centro de salud activo
         <li>
             <a href="{% url 'profesionales.crear.consulta' %}">Nueva consulta</a>
         </li>
-        
+        {% endif %}
 
+        {% if perms.calendario.can_view_misturnos %}
+        <li>
+            <a href="{% url 'calendario.mis_turnos' %}">Mis turnos</a>
+        </li>
         {% endif %}
         </ul>
     </li>
