@@ -6,12 +6,13 @@
 {% endblock %}
 
 {% block content %}
-    <h2>Evolución Paciente</h2>
     <form method="post" novalidate>
       {% csrf_token %}
       
     <div class="row">
       <div class="col-6 col-md-6">
+        <p>{{ form.fields.motivo_de_la_consulta.label }}</p>
+        {{ form.motivo_de_la_consulta }}
         <p>{{ form.fields.evolucion.label }}</p>
         {{ form.evolucion }}
         <p>{{ form.fields.indicaciones.label }}</p>

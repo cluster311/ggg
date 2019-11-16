@@ -78,7 +78,9 @@ class ConsultaMixin:
         if instance is None or instance.paciente is None:
             context['consultas_previas'] = None
         else:
-            consultas_previas = Consulta.objects.filter(paciente=instance.paciente)
+            consultas_previas = Consulta.objects.filter(
+                paciente=instance.paciente
+                )
             context['consultas_previas'] = consultas_previas
         return context
 
@@ -115,6 +117,11 @@ class EvolucionCreateView(ConsultaMixin, SuccessMessageMixin,
     template_name = "pacientes/evolucion_create.html"
     form_class = EvolucionForm
     success_message = "Datos guardados con éxito."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Evolución Paciente'
+        return context
 
     def get_success_url(self):
         return reverse(

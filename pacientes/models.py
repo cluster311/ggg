@@ -229,7 +229,7 @@ class Consulta(TimeStampedModel):
     Reunión planificada de un paciente con un profesional
     Incluye lo que el médico hace y opina de la consulta
     """
-
+    motivo_de_la_consulta = models.TextField(null=True, blank=True)
     paciente = models.ForeignKey(
         "Paciente",
         related_name="historial_clinico",

@@ -37,6 +37,7 @@ class PrestacionForm(forms.ModelForm):
 
     tipo = forms.ModelChoiceField(
         queryset=TipoPrestacion.objects.all(),
+        label='Práctica',
         widget=autocomplete.ModelSelect2(
             url="tipo_prestacion-autocomplete",
             attrs={"data-placeholder": "Ingrese código o descripción"}
@@ -83,11 +84,11 @@ class EvolucionForm(forms.ModelForm):
 
     class Meta:
         model = Consulta
-        fields = ('paciente', 'profesional', 'centro_de_salud',
-                  'especialidad', 'codigo_cie_principal',
+        fields = ('motivo_de_la_consulta', 'codigo_cie_principal',
                   'codigos_cie_secundarios',
                   'evolucion', 'indicaciones')
         widgets = {
+          'motivo_de_la_consulta': forms.Textarea(attrs={'rows': 3}),
           'evolucion': forms.Textarea(attrs={'rows': 3}),
         }
 
