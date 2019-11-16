@@ -81,7 +81,7 @@ class ConsultaMixin:
         else:
             consultas_previas = Consulta.objects.filter(
                 paciente=instance.paciente
-                )
+                ).order_by('-created')
             context['consultas_previas'] = consultas_previas
         return context
 
