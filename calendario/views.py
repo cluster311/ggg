@@ -28,7 +28,7 @@ def index(request):
         'turno_states': {
             'DISPONIBLE' : Turno.DISPONIBLE,
             'ASIGNADO' : Turno.ASIGNADO,
-            'CONFIRMADO' : Turno.CONFIRMADO,
+            'ESPERANDO_EN_SALA' : Turno.ESPERANDO_EN_SALA,
             'ATENDIDO' : Turno.ATENDIDO,
             'CANCELADO_PACIENTE' : Turno.CANCELADO_PACIENTE,
             'CANCELADO_ESTABLECIMIENTO' : Turno.CANCELADO_ESTABLECIMIENTO
