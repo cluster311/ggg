@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'calendario',
     'recupero',
     'usuarios',
+    'especialidades',
 ]
 
 MIDDLEWARE = [

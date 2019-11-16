@@ -98,13 +98,33 @@ Centro de salud activo
                 <a href="{% url 'centros_de_salud.servicios' %}">Servicios</a>
             </li>
             {% endif %}
+            
+        </ul>
+    </li>
 
+    <li>
+        <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
+        <a href="#menu_especialidades" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Especialidades</a>
+        <ul class="collapse list-unstyled" id="menu_especialidades">
+            
             {% if perms.centros_de_salud.view_especialidad %}
             <li>
                 <a href="{% url 'centros_de_salud.especialidades' %}">Especialidades</a>
             </li>
             {% endif %}
             
+            {% if perms.especialidades.view_medidaanexa %}
+            <li>
+                <a href="{% url 'especialidades.medidas_anexas' %}">Medidas Anexas</a>
+            </li>
+            {% endif %}
+
+            {% if perms.especialidades.view_medidasanexasespecialidad %}
+            <li>
+                <a href="{% url 'especialidades.medidas-anexas-en-especialidades' %}">Medidas en Especialidad</a>
+            </li>
+            {% endif %}
+
         </ul>
     </li>
 
