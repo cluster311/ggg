@@ -261,7 +261,7 @@ class Consulta(TimeStampedModel):
     codigos_cie_secundarios = models.ManyToManyField(CIE10,
                                                      blank=True,
                                                      related_name='diagnositicos_secundarios')
-    diagnostico = models.TextField(null=True, blank=True)
+    evolucion = models.TextField(null=True, blank=True)
     indicaciones = models.TextField(null=True, blank=True)
     
     def __str__(self):

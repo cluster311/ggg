@@ -13,7 +13,9 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
 from django.conf import settings
 from .models import Consulta
-from .forms import ConsultaForm, RecetaFormset, DerivacionFormset, PrestacionFormset
+from .forms import (EvolucionForm, ConsultaForm,
+                   RecetaFormset, DerivacionFormset, 
+                   PrestacionFormset)
 from crispy_forms.utils import render_crispy_form
 import logging
 logger = logging.getLogger(__name__)
@@ -71,8 +73,14 @@ class ConsultaMixin:
             context["derivaciones_frm"],
             context["prestaciones_frm"]
         ]        
-        return context
 
+        # se requieren las consultas anteriores como historia clínica
+        if instance is None or instance.paciente is None:
+            context['consultas_previas'] = None
+        else:
+            consultas_previas = Consulta.objects.filter(paciente=instance.paciente)
+            context['consultas_previas'] = consultas_previas
+        return context
 
     def form_valid(self, form):
         context = self.get_context_data()
@@ -96,6 +104,23 @@ class ConsultaMixin:
             ps.save()
         
         return super().form_valid(form)
+
+
+class EvolucionCreateView(ConsultaMixin, SuccessMessageMixin, 
+                          PermissionRequiredMixin,
+                          CreateView, ):
+    """Evolución /Consulta de paciente"""
+
+    permission_required = ("add_consulta",)
+    template_name = "pacientes/evolucion_create.html"
+    form_class = EvolucionForm
+    success_message = "Datos guardados con éxito."
+
+    def get_success_url(self):
+        return reverse(
+            "pacientes.consulta.lista",
+            kwargs=({"dni": self.object.paciente.numero_documento}),
+        )
 
 
 class ConsultaCreateView(ConsultaMixin, SuccessMessageMixin, PermissionRequiredMixin,
