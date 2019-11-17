@@ -137,8 +137,16 @@ class ConsultaMixin:
             if field.startswith('medida_'):
                 medida_en_consulta_id = field.split('_')[1]
                 medida_en_consulta = MedidaAnexaEnConsulta.objects.get(pk=medida_en_consulta_id)
-                medida_en_consulta.valor = value
-                medida_en_consulta.save()
+
+                try:
+                    a = float(value)
+                except:
+                    error = 'Valor inválido para {medida_en_consulta.medida_en_consulta.nombre}'
+                    logger.error(error)
+                    # form.add_error(None, error)
+                else:
+                    medida_en_consulta.valor = value
+                    medida_en_consulta.save()
 
         return super().form_valid(form)
 
