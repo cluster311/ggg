@@ -7,6 +7,7 @@ from .views import (
     ConsultaDetailView,
     ConsultaCreateView,
     ConsultaUpdateView,
+    ProfesionalHome,
     ProfesionalListView,
     ProfesionalCreateView,
     ProfesionalDetailView,
@@ -30,6 +31,10 @@ urlpatterns = [
         ProfesionalCreateView.as_view(),
         name="profesionales.create",
     ),
+    path(
+        r'',
+        ProfesionalHome.as_view(),
+        name='profesionales.home'),
     path(
         r"detalle-profesional.html/<int:pk>",
         ProfesionalDetailView.as_view(),
@@ -56,7 +61,7 @@ urlpatterns = [
         name="profesionales.consulta.detalle",
     ),
     path(
-        r"paciente/nueva-consulta",
+        r"paciente/nueva-consulta/<int:dni>/<int:prof>",
         ConsultaCreateView.as_view(),
         name="profesionales.crear.consulta",
     ),
