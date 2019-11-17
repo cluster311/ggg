@@ -167,6 +167,12 @@ Centro de salud activo
             <a href="{% url 'calendario.mis_turnos' %}">Mis turnos</a>
         </li>
         {% endif %}
+
+        {% if perms.calendario.can_gestionar_turnos %}
+        <li>
+            <a href="{% url 'calendario.gestion_turnos' %}">Gestion de turnos</a>
+        </li>
+        {% endif %}
         </ul>
     </li>
     {% endif %}

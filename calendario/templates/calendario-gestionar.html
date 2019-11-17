@@ -1,0 +1,129 @@
+{% extends "base_admin.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.css" rel="stylesheet" />
+
+<link href="https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.css" rel="stylesheet" />
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+  <link href="{% static 'css/modal_extra.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block js_footer %}
+  {{ block.super }}
+  
+
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/locales/es.js'></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
+
+  <script src='https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.js'></script>
+
+  <!-- Import axios and configure it to send csrf tokens -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    'use strict';
+    axios.defaults.xsrfCookieName = 'csrftoken'
+    axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+  </script>
+
+
+
+  <script type="text/javascript">
+  function initCalendar(calendarEl, servicio){
+      if (servicio == null) servicio = 0;
+      calendar = new FullCalendar.Calendar(calendarEl, {
+        plugins: [ 'dayGrid', 'timeGrid' ],
+        eventSources: [{
+          url: '{% url "calendario.feed-availables" servicio=0 %}'.replace(0,servicio),
+        }],
+        eventClick:function(info) {
+        },
+        defaultView: 'dayGridDay',
+        defaultDate: new Date(),
+        header: {
+          left: '',
+          center: 'title',
+          right: '',
+          },
+        locale: 'es',
+        weekMode: 'liquid',
+        slotMinutes: 15,
+        defaultEventMinutes: 30,
+        minTime: 8,
+        maxTime: 20,
+        editable: true,
+        themeSystem: 'bootstrap',
+      });
+
+      calendar.render();
+    }
+
+    const calendarEl = document.getElementById('calendar');
+
+    var servicios = [];
+    {% for servicio  in servicios %}
+      servicios.push({
+        'nombre':'{{servicio.especialidad.nombre}}',
+        'pk':{{servicio.pk}},
+        'centro_pk':{{servicio.centro.pk}}
+      });
+    {% endfor %}
+    
+    function initServicioSelect(){
+      $("#select2Servicios").empty();
+      servicios.forEach(function(servicio, index) {
+        if($("#usuario_elegir_centro").val() == servicio["centro_pk"]){
+          $("#select2Servicios").append(
+            "<option value="+servicio["pk"]+">"+servicio["nombre"]+"</option>");
+        }
+      });
+      $("#select2Servicios").select2();
+      $("#select2Servicios").change();
+    }
+    initServicioSelect();
+    
+    $("#select2Servicios").change(function(){
+      let servicio_id = $("#select2Servicios").val();
+      const calendarEl = document.getElementById('calendar');
+      initCalendar(calendarEl, servicio_id);
+    });
+    $("#select2Servicios").change();
+
+    $("#usuario_elegir_centro").change(function(){
+      initServicioSelect();
+    });
+
+ 
+    </script>
+{% endblock js_footer %}
+
+{% block content %}
+    <div class="row">
+      <div class="col-md-5">
+        <p>Servicio</p>
+        <select id="select2Servicios" style="width:100%">
+        </select>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div id='calendar'></div>
+    </div>
+
+
+    
+
+{% endblock %}
+
+
+{% block unwrapped_content %}
+
+{% endblock %}

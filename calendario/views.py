@@ -246,3 +246,12 @@ def cancelar_turno(request, pk):
             'success': save,
             'errors': result}
         )
+
+
+@permission_required('calendario.can_gestionar_turnos')
+@require_http_methods(["GET"])
+def gestion_turnos(request):
+    context = {
+        'servicios': Servicio.objects.all()
+    }
+    return render(request, 'calendario-gestionar.html', context)

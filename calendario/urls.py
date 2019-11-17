@@ -1,6 +1,7 @@
 from django.conf.urls import url, include
 from .views import (add_appointment, copy_appointments, feed, index, 
-                    agendar, confirm_turn, edit_turn, mis_turnos, cancelar_turno)
+                    agendar, confirm_turn, edit_turn, mis_turnos, cancelar_turno,
+                    gestion_turnos)
 
 
 urlpatterns = [
@@ -14,4 +15,5 @@ urlpatterns = [
     url(r'^edit_turn/(?P<pk>\d+)/$', edit_turn, name='calendario.edit_turn'),
     url(r'^mis_turnos$', mis_turnos, name='calendario.mis_turnos'),
     url(r'^cancelar_turn/(?P<pk>\d+)/$',cancelar_turno, name='calendario.cancelar_turn'),
+    url(r'^gestionar_turnos',gestion_turnos, name='calendario.gestion_turnos'),
 ]
