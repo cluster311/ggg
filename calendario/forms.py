@@ -2,6 +2,7 @@ import pytz
 from dal import autocomplete
 from datetime import datetime, timedelta, time
 from django import forms
+from django.db.models import Count
 from django.conf import settings
 from calendario.models import Turno
 from calendario.widgets import DateTimePicker
@@ -28,7 +29,10 @@ class TurnoForm(forms.ModelForm):
     profesional = forms.ModelChoiceField(
         label='Profesional en el servicio',
         #TODO este qs tarde varios segundos en cargar cuando es muy grande
-        queryset=Profesional.objects.all(),
+        # queryset=Profesional.objects.all(),
+        # dejar solo los profesionales que tienen al menos un servicio
+        queryset=Profesional.objects.annotate(num_servicios=Count('servicios')).filter(num_servicios__gte=1),
+        
     )
 
     servicio = forms.ModelChoiceField(
