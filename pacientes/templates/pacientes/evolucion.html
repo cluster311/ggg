@@ -29,10 +29,10 @@
         {{ form.evolucion }}
         <p>{{ form.fields.indicaciones.label }}</p>
         {{ form.indicaciones }}
-        <p>{{ form.fields.codigo_cie_principal.label }}</p>
-        {{ form.codigo_cie_principal }}
-        <p>{{ form.fields.codigos_cie_secundarios.label }}</p>
-        {{ form.codigos_cie_secundarios }}
+        <p>{{ form.fields.codigo_cie_principal.label }} {{ form.codigo_cie_principal }}</p>
+        <p>{{ form.fields.codigos_cie_secundarios.label }} 
+            {{ form.codigos_cie_secundarios }}
+          <small>Separados por comas</small></p>
 
         <h4>Medidas anexas</h4>
           {% for medida in medidas_en_consulta %}
