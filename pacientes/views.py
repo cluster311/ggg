@@ -46,7 +46,7 @@ class ConsultaDetailView(PermissionRequiredMixin, DetailView):
     """
 
     model = Consulta
-    permission_required = ("can_view_tablero",)
+    permission_required = ("view_consulta",)
     template_name = "pacientes/consulta_detailview.html"
 
     def get_context_data(self, **kwargs):
