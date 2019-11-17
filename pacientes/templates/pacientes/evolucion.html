@@ -1,6 +1,7 @@
 {% extends "base_admin.html" %}
 {% load crispy_forms_tags %}
 {% load static %}
+{% load l10n %}
 
 {% block extra_head %}
 {% endblock %}
@@ -32,12 +33,29 @@
         {{ form.codigo_cie_principal }}
         <p>{{ form.fields.codigos_cie_secundarios.label }}</p>
         {{ form.codigos_cie_secundarios }}
+
+        <h4>Medidas anexas</h4>
+          {% for medida in medidas_en_consulta %}
+            <p> {{ medida.medida_en_consulta.medida.nombre }} 
+              <input 
+                type="number" 
+                value="{{ medida.medida_en_consulta.valor|unlocalize }}" 
+                step="10.00" required="" 
+                name="medida_{{ medida.medida_en_consulta.id}}">
+              
+<small> {{ medida.medida_en_consulta.medida.observaciones_para_el_que_mide }} {{ medida.medida_en_especialidad.observaciones_para_el_que_mide }}</small>
+            </p>
+            
+          {% empty %}
+            <p>No hay medidas anexas para esta especialdiad</p>
+          {% endfor %}
+
       </div>
       <div class="col-6 col-md-6">
         <div>
-          <h3>Consultas previas</h3>
+          <h4>Consultas previas</h4>
 
-          <div class="accordion" id="accordion">
+          <div class="accordion" id="accordion_evo" style='overflow-y: scroll; height: 400px;'>
               {% for cp in consultas_previas.all %}
               <div class="card">
                 
@@ -49,7 +67,7 @@
                   </h2>
                 </div>
             
-                <div id="collapse-{{ cp.id }}" class="collapse" aria-labelledby="heading-{{ cp.id }}" data-parent="#accordion">
+                <div id="collapse-{{ cp.id }}" class="collapse" aria-labelledby="heading-{{ cp.id }}" data-parent="#accordion_evo">
                   <div class="card-body">
                       <p>Evolucion: {{ cp.evolucion }}</p>
                       <p>Profesional: {{ cp.profesional }}</p>
@@ -62,11 +80,8 @@
               <p>No se registran consultas previas</p>
               {% endfor %}
             </div>
-
-
-
-          
         </div>
+        <h4>Extras</h4>
         <div class="accordion" id="accordion">
           {% for formset in formsets %}
           {% with formset.prefix|slugify as p %}

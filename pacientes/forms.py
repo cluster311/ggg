@@ -180,6 +180,7 @@ class ConsultaForm(forms.ModelForm):
             qs = CentroDeSalud.objects.filter(pk__in=permitidos)
             self.fields['centro_de_salud'].queryset = qs
 
+
 class PacienteForm(forms.ModelForm):
     numero_documento = forms.ModelChoiceField(
         queryset=Paciente.objects.all(),
