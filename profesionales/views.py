@@ -389,3 +389,4 @@ class ConsultaUpdateView(ConsultaMixin, SuccessMessageMixin, PermissionRequiredM
             "profesionales.consulta.lista",
             kwargs=({"dni": self.object.paciente.numero_documento}),
         )
+

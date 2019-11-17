@@ -229,7 +229,7 @@ class Consulta(TimeStampedModel):
     Reunión planificada de un paciente con un profesional
     Incluye lo que el médico hace y opina de la consulta
     """
-
+    motivo_de_la_consulta = models.TextField(null=True, blank=True)
     paciente = models.ForeignKey(
         "Paciente",
         related_name="historial_clinico",
@@ -261,7 +261,7 @@ class Consulta(TimeStampedModel):
     codigos_cie_secundarios = models.ManyToManyField(CIE10,
                                                      blank=True,
                                                      related_name='diagnositicos_secundarios')
-    diagnostico = models.TextField(null=True, blank=True)
+    evolucion = models.TextField(null=True, blank=True)
     indicaciones = models.TextField(null=True, blank=True)
     
     def __str__(self):

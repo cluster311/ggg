@@ -46,9 +46,9 @@ Centro de salud activo
             <li>
                 <a href="{% url 'profesionales.tablero.por_profesion' %}">Profesionales Por profesion</a>
             </li>
-            <li>
-                <a href="{% url 'profesionales.tablero.por_departamento' %}">Profesionales Por zona</a>
-            </li>
+            <!-- <li>
+                <a href="{# url 'profesionales.tablero.por_departamento' #}">Profesionales Por zona</a>
+            </li> -->
             {% endif %}
 
             {% if perms.obras_sociales.can_view_tablero %}
@@ -156,12 +156,6 @@ Centro de salud activo
         </li>
         {% endif %}
         
-        {% if perms.profesionales.add_consulta %}
-        <li>
-            <a href="{% url 'profesionales.crear.consulta' %}">Nueva consulta</a>
-        </li>
-        {% endif %}
-
         {% if perms.calendario.can_view_misturnos %}
         <li>
             <a href="{% url 'calendario.mis_turnos' %}">Mis turnos</a>

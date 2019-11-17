@@ -30,6 +30,9 @@ def choice_homepage(request):
     elif (user.groups.filter(name=settings.GRUPO_ADMIN).exists() and
     user.groups.filter(name=settings.GRUPO_CIUDADANO).exists()):
         return redirect('calendario.index')
+    elif user.groups.filter(name=settings.GRUPO_PROFESIONAL).exists():
+        # TODO cambiar por la nueva vista para atender turnos
+        return redirect('profesionales.lista')
     else:
         return redirect('ciudadano.home')
 
