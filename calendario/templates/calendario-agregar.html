@@ -81,9 +81,9 @@
     var servicios = [];
     {% for servicio  in servicios %}
       servicios.push({
-        'nombre':'{{servicio.especialidad.nombre}}',
-        'pk':{{servicio.pk}},
-        'centro_pk':{{servicio.centro.pk}}
+        'nombre':'{{ servicio.especialidad.nombre }} en {{ servicio.centro.nombre }}',
+        'pk':{{ servicio.pk }},
+        'centro_pk':{{ servicio.centro.pk }}
       });
     {% endfor %}
     
