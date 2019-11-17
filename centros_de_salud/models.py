@@ -73,6 +73,9 @@ class Servicio(models.Model):
 
     def __str__(self):
         return f'{self.especialidad} - {self.centro}'
+    
+    class Meta:
+        unique_together = (("centro", "especialidad"),)
 
 
 class ProfesionalesEnServicio(models.Model):
@@ -89,3 +92,6 @@ class ProfesionalesEnServicio(models.Model):
 
     def __str__(self):
         return '{self.profesional} en {self.servicio}'
+    
+    class Meta:
+        unique_together = (("servicio", "profesional"),)
