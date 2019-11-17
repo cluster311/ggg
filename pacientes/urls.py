@@ -4,7 +4,6 @@ from .views import (
     EvolucionUpdateView,
     ConsultaListView,
     ConsultaDetailView,
-    ConsultaUpdateView,
 )
 
 
@@ -25,10 +24,5 @@ urlpatterns = [
         r"<int:dni>/historia/<int:pk>",
         ConsultaDetailView.as_view(),
         name="pacientes.consulta.detalle",
-    ),
-    path(
-        r"<int:dni>/actualizar-consulta/<int:pk>",
-        ConsultaUpdateView.as_view(),
-        name="pacientes.actualizar.consulta",
     ),
 ]

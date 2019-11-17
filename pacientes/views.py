@@ -13,6 +13,8 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
 from django.conf import settings
 from .models import Consulta
+from especialidades.models import MedidasAnexasEspecialidad, MedidaAnexaEnConsulta
+from especialidades.forms import MedidaAnexaEnConsultaForm
 from .forms import (EvolucionForm, ConsultaForm,
                    RecetaFormset, DerivacionFormset, 
                    PrestacionFormset)
@@ -63,7 +65,8 @@ class ConsultaMixin:
         instance = getattr(self, 'object', None)
         
         data = self.request.POST if self.request.method == "POST" else None
-        
+        context["data"] = data
+
         context["recetas_frm"] = RecetaFormset(data, prefix='Recetas', instance=instance)
         context["derivaciones_frm"] = DerivacionFormset(data, prefix='Derivaciones', instance=instance)
         context["prestaciones_frm"] = PrestacionFormset(data, prefix='Prestaciones', instance=instance)
@@ -83,6 +86,28 @@ class ConsultaMixin:
                 paciente=instance.paciente
                 ).order_by('-created')
             context['consultas_previas'] = consultas_previas
+        
+        # ver las medidas anexas que deben tomarse
+        # asegurarse de no duplicar si ya se crearon antes
+        # TODO ver si esto podría hacerse al momento de crear la consulta en la aceptación de turno
+        consulta = self.object
+        medidas_a_tomar = MedidasAnexasEspecialidad.objects.filter(
+            especialidad=consulta.especialidad
+        )
+        medidas_en_consulta = []
+        for medida in medidas_a_tomar:
+            medida_en_consulta, created = MedidaAnexaEnConsulta.objects.get_or_create(
+                consulta=consulta,
+                medida=medida.medida
+                )
+            
+            frm = MedidaAnexaEnConsultaForm(instance=medida_en_consulta)
+            medidas_en_consulta.append({'medida_en_consulta': medida_en_consulta,
+                                        'frm': frm,
+                                        'medida_en_especialidad': medida})
+        
+        context['medidas_en_consulta'] = medidas_en_consulta
+
         return context
 
     def form_valid(self, form):
@@ -106,6 +131,15 @@ class ConsultaMixin:
             ps.instance = self.object
             ps.save()
         
+        # TODO usar MedidaAnexaEnConsultaForm
+        data = context["data"]
+        for field, value in data.items():
+            if field.startswith('medida_'):
+                medida_en_consulta_id = field.split('_')[1]
+                medida_en_consulta = MedidaAnexaEnConsulta.objects.get(pk=medida_en_consulta_id)
+                medida_en_consulta.valor = value
+                medida_en_consulta.save()
+
         return super().form_valid(form)
 
 
@@ -122,6 +156,7 @@ class EvolucionUpdateView(ConsultaMixin, SuccessMessageMixin,
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Evolución Paciente'
+
         return context
 
     def get_success_url(self):
@@ -129,31 +164,3 @@ class EvolucionUpdateView(ConsultaMixin, SuccessMessageMixin,
             "pacientes.consulta.lista",
             kwargs=({"dni": self.object.paciente.numero_documento}),
         )
-
-
-class ConsultaUpdateView(ConsultaMixin, SuccessMessageMixin,
-                         PermissionRequiredMixin,
-                         UpdateView):
-    """
-    Actualiza un objeto Consulta
-    """
-
-    model = Consulta
-    form_class = ConsultaForm
-    permission_required = ("can_view_tablero",)
-    
-    template_name = "pacientes/consulta_updateview.html"
-    success_message = "Datos actualizados con éxito."
-
-    def get_object(self):
-        return get_object_or_404(Consulta, 
-            paciente__numero_documento=self.kwargs.get('dni'),
-            pk=self.kwargs.get('pk')
-        ) 
-
-    def get_success_url(self):
-        return reverse(
-            "pacientes.consulta.lista",
-            kwargs=({"dni": self.object.paciente.numero_documento}),
-        )
-
