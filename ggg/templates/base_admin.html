@@ -47,6 +47,18 @@
       background: #73a55e;
     }
   </style>
+  {% elif user__es_profesional %}
+    <style>
+      #sidebar {
+        background: #f92121;
+      }
+      #sidebar .sidebar-header,
+      #sidebar ul li.active > a,
+      a[aria-expanded="true"],
+      #sidebar ul ul a{
+        background: #fa0303;
+      }
+    </style>
   {% endif %}
 
   {% block extra_head %}{% endblock %}
@@ -61,9 +73,7 @@
                 <h3>{{ site_short_title }}</h3>
               </a>
             </div>
-{% if user__es_administrativo %}
-  {% include "menu_lat_admin.html" %}
-{% endif %}          
+          {% include "menu_lat_admin.html" %}
           <ul class="list-unstyled CTAs">
               <li>
                 <a target='_blank' 

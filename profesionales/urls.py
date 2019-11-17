@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     TableroProfesionalesPorEspecialidadView,
     # revisar campos TableroProfesionalesPorLocalidadView,
+    ProfesionalHome,
     ProfesionalListView,
     ProfesionalCreateView,
     ProfesionalDetailView,
@@ -27,6 +28,10 @@ urlpatterns = [
         name="profesionales.create",
     ),
     path(
+        r'',
+        ProfesionalHome.as_view(),
+        name='profesionales.home'),
+    path(
         r"detalle-profesional.html/<int:pk>",
         ProfesionalDetailView.as_view(),
         name="profesionales.detail",
@@ -41,4 +46,5 @@ urlpatterns = [
     #     TableroProfesionalesPorLocalidadView.as_view(),
     #     name="profesionales.tablero.por_departamento",
     # ),
+    
 ]
