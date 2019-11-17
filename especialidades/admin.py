@@ -1,3 +1,7 @@
 from django.contrib import admin
+from .models import MedidaAnexaEnConsulta
 
-# Register your models here.
+
+@admin.register(MedidaAnexaEnConsulta)
+class MedidaAnexaEnConsultaAdmin(admin.ModelAdmin):
+    list_display = ['consulta', 'medida', 'valor']

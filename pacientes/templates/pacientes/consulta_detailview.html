@@ -22,9 +22,9 @@
                             <p>{{fecha}}</p>
                             <label>ATENDIDO POR DR:</label>
                             <p>{{ object.profesional }}</p>
-                            {% if object.diagnostico %}
+                            {% if object.evolucion %}
                                 <label>DIÁGNOSTICO:</label>
-                                <p>{{object.diagnostico}}</p>
+                                <p>{{object.evolucion}}</p>
                             {% endif %}
                             {% if object.indicaciones %}
                                 <label>INDICACIONES:</label>
@@ -61,7 +61,7 @@
                     </div>
                     <div class="modal-footer">
                             <div class="col-lg-12 text-right">
-                                <a class="btn btn-primary" href="{% url 'profesionales.consulta.lista' dni=object.paciente.numero_documento %}" role="button">VOLVER AL LISTADO</a>
+                                <a class="btn btn-primary" href="{% url 'pacientes.consulta.lista' dni=object.paciente.numero_documento %}" role="button">VOLVER AL LISTADO</a>
                             </div>
                     </div>
             </div>

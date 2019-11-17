@@ -48,4 +48,4 @@ class MedidaAnexaEnConsulta(models.Model):
                                related_name='mediciones')
     # mientras no definamos objetos con formatos especificos
     # solo iremos con numeros de amplio rango
-    valor = models.DecimalField(max_digits=21, decimal_places=8, default=0.0)
+    valor = models.DecimalField(max_digits=13, decimal_places=2, default=0.0)

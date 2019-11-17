@@ -47,6 +47,18 @@
       background: #73a55e;
     }
   </style>
+  {% elif user__es_profesional %}
+    <style>
+      #sidebar {
+        background: #f92121;
+      }
+      #sidebar .sidebar-header,
+      #sidebar ul li.active > a,
+      a[aria-expanded="true"],
+      #sidebar ul ul a{
+        background: #fa0303;
+      }
+    </style>
   {% endif %}
 
   {% block extra_head %}{% endblock %}

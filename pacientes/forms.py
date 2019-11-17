@@ -37,6 +37,7 @@ class PrestacionForm(forms.ModelForm):
 
     tipo = forms.ModelChoiceField(
         queryset=TipoPrestacion.objects.all(),
+        label='Práctica',
         widget=autocomplete.ModelSelect2(
             url="tipo_prestacion-autocomplete",
             attrs={"data-placeholder": "Ingrese código o descripción"}
@@ -54,6 +55,58 @@ class PrestacionForm(forms.ModelForm):
 RecetaFormset = inlineformset_factory(Consulta, Receta, form=RecetaForm, extra=1)
 PrestacionFormset = inlineformset_factory(Consulta, Prestacion, form=PrestacionForm, extra=1)
 DerivacionFormset = inlineformset_factory(Consulta, Derivacion, form=DerivacionForm, extra=1)
+
+
+class EvolucionForm(forms.ModelForm):
+    codigo_cie_principal = forms.ModelChoiceField(
+        label='Código CIE10 principal',
+        required=False,
+        queryset=CIE10.objects.all(),
+        widget=autocomplete.ModelSelect2(
+            url="cie10-autocomplete",
+            attrs={"data-placeholder": "Ingrese código o descripción"}
+        ),
+    )
+
+    codigos_cie_secundarios = forms.ModelMultipleChoiceField(
+        label='Códigos CIE10 secundarios',
+        required=False,
+        queryset=CIE10.objects.all(),
+        widget=autocomplete.ModelSelect2Multiple(
+            url="cie10-autocomplete",
+            attrs={"data-placeholder": "Ingrese código o descripción"}
+        ),
+    )
+    indicaciones = forms.CharField(
+        label='Indicaciones adicionales',
+        widget=forms.Textarea(attrs={'rows': 2})
+    )
+
+    class Meta:
+        model = Consulta
+        fields = ('motivo_de_la_consulta', 'codigo_cie_principal',
+                  'codigos_cie_secundarios',
+                  'evolucion', 'indicaciones')
+        widgets = {
+          'motivo_de_la_consulta': forms.Textarea(attrs={'rows': 3}),
+          'evolucion': forms.Textarea(attrs={'rows': 3}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        """
+        Form update basado en lib crispy
+        """
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = "post"
+        self.helper.add_input(Submit("submit", "Actualizar"))
+
+        if user is not None:
+            csp = user.centros_de_salud_permitidos.all()
+            permitidos = [c.centro_de_salud.id for c in csp]
+            qs = CentroDeSalud.objects.filter(pk__in=permitidos)
+            self.fields['centro_de_salud'].queryset = qs
 
 
 class ConsultaForm(forms.ModelForm):
@@ -105,9 +158,9 @@ class ConsultaForm(forms.ModelForm):
         fields = ('paciente', 'profesional', 'centro_de_salud',
                   'especialidad', 'codigo_cie_principal',
                   'codigos_cie_secundarios',
-                  'diagnostico', 'indicaciones')
+                  'evolucion', 'indicaciones')
         widgets = {
-          'diagnostico': forms.Textarea(attrs={'rows':3}),
+          'evolucion': forms.Textarea(attrs={'rows':3}),
           'indicaciones': forms.Textarea(attrs={'rows':3}),
         }
 

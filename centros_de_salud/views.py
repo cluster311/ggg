@@ -14,9 +14,13 @@ class CentroDeSaludListView(PermissionRequiredMixin, ListView):
     paginate_by = 10  # pagination
 
     def get_queryset(self):
+        """ mostrar todos los centros y permitir 
+            modificar solo sobre los cuales tiene permiso
         csp = self.request.user.centros_de_salud_permitidos.all()
         permitidos = [c.centro_de_salud.id for c in csp]
         qs = CentroDeSalud.objects.filter(pk__in=permitidos)
+        """
+        qs = CentroDeSalud.objects.all()
             
         if 'search' in self.request.GET:
             q = self.request.GET['search']

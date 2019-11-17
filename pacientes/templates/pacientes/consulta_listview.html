@@ -19,14 +19,14 @@
             <div class="container-fluid">
                 <button>
                     <li class="nav-link">
-                        <a href="{% url 'profesionales.consulta.detalle' dni=consulta.paciente.numero_documento pk=consulta.id %}">
+                        <a href="{% url 'pacientes.consulta.detalle' dni=consulta.paciente.numero_documento pk=consulta.id %}">
                             Ver detalle
                         </a>
                     </li>
                 </button>
                 <button>
                     <li class="nav-link">
-                        <a href="{% url 'profesionales.actualizar.consulta' dni=consulta.paciente.numero_documento pk=consulta.id %}">
+                        <a href="{% url 'pacientes.evolucion' pk=consulta.id %}">
                             Actualizar datos
                         </a>
                     </li>
