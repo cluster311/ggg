@@ -181,7 +181,6 @@ def confirm_turn(request, pk):
     instance = get_object_or_404(Turno, id=pk)
     form_data = json.loads(request.body)
     form_data['solicitante'] = request.user
-    form_data['buscar_data'] = False
     form = TurnoForm(form_data, instance=instance)
     save, result = form.update(form_data)
     if save:
@@ -264,7 +263,6 @@ def gestion_turno(request, pk):
     instance = get_object_or_404(Turno, id=pk)
     form_data = json.loads(request.body)
     form_data['solicitante'] = request.user
-    form_data['buscar_data'] = True
     form = TurnoForm(form_data, instance=instance)
     save, result = form.update(form_data)
     if save:
