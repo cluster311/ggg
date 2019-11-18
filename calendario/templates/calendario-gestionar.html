@@ -11,6 +11,29 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
   <link href="{% static 'css/modal_extra.css' %}" rel="stylesheet">
+  <style>
+    .turnoDisponible{
+      background-color: white;
+    }
+    .turnoAsignado{
+      background-color: rgb(71, 115, 212);
+    }
+    .turnoEsperandoEnSala{
+      background-color: rgb(21, 102, 21);
+    }
+    .turnoAtendido{
+      background-color: rgb(212, 212, 54);
+    }
+    .turnoCanceladoPaciente{
+      background-color: rgb(150, 40, 40); 
+    }
+    .turnoCanceladoEstablecimiento{
+      background-color: rgb(247, 68, 68);
+    }
+    .noCoincideDni{
+      opacity: 0.5;
+    }
+  </style>
 {% endblock %}
 
 {% block js_footer %}
@@ -37,6 +60,32 @@
 
 
   <script type="text/javascript">
+    function calendarEventRender(info){
+      let state = info.event.extendedProps.status;
+      let num_doc = info.event.extendedProps.patient_doc;
+      let id = "event-"+info.event.id;
+      info.el.id = id;
+      switch (state) { 
+        case 1: 
+          info.el.className = info.el.className + " turnoAsignado";
+          break;
+        case 2:
+          info.el.className = info.el.className + " turnoEsperandoEnSala";
+          break;
+        case 3: 
+          info.el.className = info.el.className + " turnoAtendido";
+          break;		
+        case 4:
+          info.el.className = info.el.className + " turnoCanceladoPaciente";
+          break;
+        case 5: 
+          info.el.className = info.el.className + " turnoCanceladoEstablecimiento";
+          break;
+        default:
+          info.el.className = info.el.className + " turnoDisponible";
+          break;
+        }
+    }
   function initCalendar(calendarEl, servicio){
       if (servicio == null) servicio = 0;
       calendar = new FullCalendar.Calendar(calendarEl, {
@@ -44,7 +93,16 @@
         eventSources: [{
           url: '{% url "calendario.feed-availables" servicio=0 %}'.replace(0,servicio),
         }],
+        eventRender: calendarEventRender,
         eventClick:function(info) {
+          $('#modal-body-text').text(
+            "¿Desea agendar un turno para el " + 
+            info.event.start.getDate() + "/" + info.event.start.getMonth() +
+            " a las " + info.event.start.getHours() + ":" 
+            + info.event.start.getMinutes() + " horas?"
+          );
+          $("#turn_pk").val(info.event.id);
+          $('#agendarModal').modal('show');
         },
         defaultView: 'dayGridDay',
         defaultDate: new Date(),
@@ -101,6 +159,34 @@
       initServicioSelect();
     });
 
+
+    function confirmTurn() {
+      let formData = {
+        'paciente':$("#dni").val(),
+      }
+      let pk = $("#turn_pk").val()
+      axios({
+        method: 'put',
+        url: "{% url 'calendario.gestion_turno' pk=0 %}".replace(0,pk),
+        headers: {'Content-Type': 'application/json'},
+        data: formData
+      })
+        .then(response => {
+          if (!response.data.success) {
+            $("#dni-error").css('display','block');
+          } else {
+            $("#dni-error").css('display','none');
+            $("#dni").val("");
+            calendar.refetchEvents();
+            $('#agendarModal').modal('hide')
+          }
+        })
+        .catch(error => {
+          console.error(error)
+        });
+    }
+
+
  
     </script>
 {% endblock js_footer %}
@@ -125,5 +211,30 @@
 
 
 {% block unwrapped_content %}
+<div class="modal fade" id="agendarModal" tabindex="1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Agendar turno</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-body-text"></p>
+        <div class="form-group">
+          <label for="dni" class="col-form-label">DNI Paciente:</label>
+          <input class="form-control" id="dni"></input>
+          <span class="help-block" id="dni-error" style="display: none;">El dni es incorrecto</span>
+        </div>
+        <input id="turn_pk" hidden/>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" onclick="confirmTurn()">Agendar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
