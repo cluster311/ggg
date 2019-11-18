@@ -1,3 +1,5 @@
+from sisa.puco import Puco
+from django.conf import settings
 from django.db import models
 from core.models import Persona
 from recupero.models import Factura
@@ -160,7 +162,7 @@ class Paciente(Persona):
             apellidos=nombre_y_apellido[int(len(nombre_y_apellido)/2):],
         )
 
-        #Setear la oss que devuelve PUCO
+        # Setear la oss que devuelve PUCO
         value_default = {"nombre": puco.cobertura_social}
         oss, created = ObraSocial.objects.get_or_create(
             codigo=puco.rnos, defaults=value_default
