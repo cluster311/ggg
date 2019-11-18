@@ -72,34 +72,13 @@
         maxTime: 20,
         editable: true,
         themeSystem: 'bootstrap',
-        //eventClick: showModalEvent
       });
 
       calendar.render();
     }
+  
 
-    var servicios = [];
-    {% for servicio  in servicios %}
-      servicios.push({
-        'nombre':'{{ servicio.especialidad.nombre }} en {{ servicio.centro.nombre }}',
-        'pk':{{ servicio.pk }},
-        'centro_pk':{{ servicio.centro.pk }}
-      });
-    {% endfor %}
-    
-    function initServicioSelect(){
-      $("#select2Servicios").empty();
-      servicios.forEach(function(servicio, index) {
-        if($("#usuario_elegir_centro").val() == servicio["centro_pk"]){
-          $("#select2Servicios").append(
-            "<option value="+servicio["pk"]+">"+servicio["nombre"]+"</option>");
-        }
-      });
-      $("#select2Servicios").select2();
-      $("#select2Servicios").change();
-    }
-    initServicioSelect();
-    
+    $("#select2Servicios").select2();
     $("#select2Servicios").change(function(){
       let servicio_id = $("#select2Servicios").val();
       const calendarEl = document.getElementById('calendar');
@@ -107,9 +86,6 @@
     });
     $("#select2Servicios").change();
 
-    $("#usuario_elegir_centro").change(function(){
-      initServicioSelect();
-    });
   </script>
 
 
@@ -182,6 +158,9 @@
       <div class="col-md-5">
         <p>Servicio</p>
         <select id="select2Servicios" style="width:100%">
+        {% for servicio  in servicios %}
+          <option value="{{servicio.pk}}">{{servicio}}</option>
+        {% endfor %}
         </select>
       </div>
     </div>
