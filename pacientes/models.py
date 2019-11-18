@@ -119,6 +119,13 @@ class Paciente(Persona):
     def edad(self):
         return (now().date() - self.fecha_nacimiento).days / 365
 
+    def as_json(self):
+        return {
+            'nombres': self.nombres,
+            'apellidos': self.apellidos,
+            'numero_documento': self.numero_documento,
+        }
+
     def agregar_dato_de_contacto(self, tipo, valor):
         type_ = ContentType.objects.get_for_model(self)
         try:

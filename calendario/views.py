@@ -134,7 +134,7 @@ def feed(request, servicio=None):
         'service': t.servicio.pk or 0,
         'status': t.estado,
         'professional': t.profesional.pk or 0,
-        'patient_doc': t.paciente.numero_documento if t.paciente else 0
+        'patient': t.paciente.as_json() if t.paciente else 0
         # 'patient': t.paciente.pk or 0
     } for t in turnos]
 
