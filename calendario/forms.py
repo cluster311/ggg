@@ -115,8 +115,24 @@ class TurnoForm(forms.ModelForm):
     def update(self, data, *args, **kwargs):
         paciente = Paciente.objects.filter(numero_documento=data['paciente']).first()
         if paciente is None:
-            error = {'paciente':'El dni ingresado no corresponde a un paciente del sistema'}
-            return False, error
+            if data['buscar_data']:
+                save, result = Paciente.create_from_sisa(data['paciente'])
+                if not save and ('nombres' in data and 'apellidos' in data):
+                    paciente = Paciente.objects.create(
+                        numero_documento=data['paciente'],
+                        nombres=data['nombres'],
+                        apellidos=data['apellidos'],
+                    )
+                    self.instance.paciente = paciente
+                    self.instance.solicitante = data['solicitante']
+                    self.instance.estado = 1
+                    self.instance.save()
+                    return True, self.instance
+                else:
+                    return save, result
+            else:
+                error = {'paciente':'El dni ingresado no corresponde a un paciente del sistema'}
+                return False, error
         else:
             self.instance.paciente = paciente
             self.instance.solicitante = data['solicitante']

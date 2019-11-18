@@ -1,0 +1,319 @@
+{% extends "base_admin.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.css" rel="stylesheet" />
+
+<link href="https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.css" rel="stylesheet" />
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+  <link href="{% static 'css/modal_extra.css' %}" rel="stylesheet">
+  <style>
+    .turnoDisponible{
+      background-color: white;
+    }
+    .turnoAsignado{
+      background-color: rgb(71, 115, 212);
+    }
+    .turnoEsperandoEnSala{
+      background-color: rgb(21, 102, 21);
+    }
+    .turnoAtendido{
+      background-color: rgb(212, 212, 54);
+    }
+    .turnoCanceladoPaciente{
+      background-color: rgb(150, 40, 40); 
+    }
+    .turnoCanceladoEstablecimiento{
+      background-color: rgb(247, 68, 68);
+    }
+    .noCoincideDni{
+      opacity: 0.5;
+    }
+  </style>
+{% endblock %}
+
+{% block js_footer %}
+  {{ block.super }}
+  
+
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/bootstrap/main.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/locales/es.js'></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
+
+  <script src='https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.js'></script>
+
+  <!-- Import axios and configure it to send csrf tokens -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    'use strict';
+    axios.defaults.xsrfCookieName = 'csrftoken'
+    axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+  </script>
+
+
+
+  <script type="text/javascript">
+    function calendarEventRender(info){
+      let state = info.event.extendedProps.status;
+      let num_doc = info.event.extendedProps.patient_doc;
+      let id = "event-"+info.event.id;
+      info.el.id = id;
+      switch (state) { 
+        case 1: 
+          info.el.className = info.el.className + " turnoAsignado";
+          break;
+        case 2:
+          info.el.className = info.el.className + " turnoEsperandoEnSala";
+          break;
+        case 3: 
+          info.el.className = info.el.className + " turnoAtendido";
+          break;		
+        case 4:
+          info.el.className = info.el.className + " turnoCanceladoPaciente";
+          break;
+        case 5: 
+          info.el.className = info.el.className + " turnoCanceladoEstablecimiento";
+          break;
+        default:
+          info.el.className = info.el.className + " turnoDisponible";
+          break;
+        }
+    }
+  function initCalendar(calendarEl, servicio){
+      if (servicio == null) servicio = 0;
+      calendar = new FullCalendar.Calendar(calendarEl, {
+        plugins: [ 'dayGrid', 'timeGrid' ],
+        eventSources: [{
+          url: '{% url "calendario.feed-availables" servicio=0 %}'.replace(0,servicio),
+        }],
+        eventRender: calendarEventRender,
+        eventClick:function(info) {
+          $('#modal-body-text').text(
+            "¿Desea agendar un turno para el " + 
+            info.event.start.getDate() + "/" + info.event.start.getMonth() +
+            " a las " + info.event.start.getHours() + ":" 
+            + info.event.start.getMinutes() + " horas?"
+          );
+          $("#turn_pk").val(info.event.id);
+          $('#agendarModal').modal('show');
+        },
+        defaultView: 'dayGridDay',
+        defaultDate: new Date(),
+        header: {
+          left: '',
+          center: 'title',
+          right: '',
+          },
+        locale: 'es',
+        weekMode: 'liquid',
+        slotMinutes: 15,
+        defaultEventMinutes: 30,
+        minTime: 8,
+        maxTime: 20,
+        editable: true,
+        themeSystem: 'bootstrap',
+      });
+
+      calendar.render();
+    }
+
+    const calendarEl = document.getElementById('calendar');
+
+    var servicios = [];
+    {% for servicio  in servicios %}
+      servicios.push({
+        'nombre':'{{servicio.especialidad.nombre}}',
+        'pk':{{servicio.pk}},
+        'centro_pk':{{servicio.centro.pk}}
+      });
+    {% endfor %}
+    
+    function initServicioSelect(){
+      $("#select2Servicios").empty();
+      servicios.forEach(function(servicio, index) {
+        if($("#usuario_elegir_centro").val() == servicio["centro_pk"]){
+          $("#select2Servicios").append(
+            "<option value="+servicio["pk"]+">"+servicio["nombre"]+"</option>");
+        }
+      });
+      $("#select2Servicios").select2();
+      $("#select2Servicios").change();
+    }
+    initServicioSelect();
+    
+    $("#select2Servicios").change(function(){
+      let servicio_id = $("#select2Servicios").val();
+      const calendarEl = document.getElementById('calendar');
+      initCalendar(calendarEl, servicio_id);
+    });
+    $("#select2Servicios").change();
+
+    $("#usuario_elegir_centro").change(function(){
+      initServicioSelect();
+    });
+
+
+    function confirmTurn() {
+      let formData = {
+        'paciente':$("#dni").val(),
+      }
+      let pk = $("#turn_pk").val()
+      axios({
+        method: 'PUT',
+        url: "{% url 'calendario.gestion_turno' pk=0 %}".replace(0,pk),
+        headers: {'Content-Type': 'application/json'},
+        data: formData
+      })
+        .then(response => {
+          if (!response.data.success) {
+            $("#cargar_dni").val($("#dni").val());
+            $("#cargar_dni").prop("disabled","disabled");
+            $("#cargar_turn_pk").val(pk);
+            $('#crearPacienteModal').modal('show');
+            $('#agendarModal').modal('hide');
+            $("#dni-error").css('display','none');
+            $("#dni").val("");
+          } else {
+            $("#dni-error").css('display','none');
+            $("#dni").val("");
+            calendar.refetchEvents();
+            $('#agendarModal').modal('hide');
+          }
+        })
+        .catch(error => {
+          console.error(error)
+        });
+    }
+
+
+    function cargarPaciente(){
+      if ($("#cargar_apellidos").val() == ""){
+        $("#cargar_apellidos-error").css("display","block");
+        return
+      }
+      if ($("#cargar_nombres").val() == ""){
+        $("#cargar_nombres-error").css("display","block");
+        return
+      }
+      let formData = {
+        'paciente':$("#cargar_dni").val(),
+        'apellidos':$("#cargar_apellidos").val(),
+        'nombres':$("#cargar_nombres").val(),
+      }
+      let pk = $("#cargar_turn_pk").val()
+      axios({
+        method: 'PUT',
+        url: "{% url 'calendario.gestion_turno' pk=0 %}".replace(0,pk),
+        headers: {'Content-Type': 'application/json'},
+        data: formData
+      })
+        .then(response => {
+          if (!response.data.success) {
+            console.error(response.data);
+          } else {
+            $(".cargar-inputs").val("");
+            $(".cargar-errores").css('display','none');
+            calendar.refetchEvents();
+            $('#crearPacienteModal').modal('hide');
+          }
+        })
+        .catch(error => {
+          console.error(error)
+      });
+    }
+
+
+ 
+    </script>
+{% endblock js_footer %}
+
+{% block content %}
+    <div class="row">
+      <div class="col-md-5">
+        <p>Servicio</p>
+        <select id="select2Servicios" style="width:100%">
+        </select>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div id='calendar'></div>
+    </div>
+
+
+    
+
+{% endblock %}
+
+
+{% block unwrapped_content %}
+<div class="modal fade" id="agendarModal" tabindex="1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Agendar turno</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-body-text"></p>
+        <div class="form-group">
+          <label for="dni" class="col-form-label">DNI Paciente:</label>
+          <input class="form-control" id="dni"></input>
+          <span class="help-block" id="dni-error" style="display: none;">El dni es incorrecto</span>
+        </div>
+        <input id="turn_pk" hidden/>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" onclick="confirmTurn()">Agendar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="crearPacienteModal" tabindex="1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Cargar Datos</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-body-text">El paciente no estaba registrado en el sistema, ingresa los siguientes datos para el alta del mismo y agendar el turno.</p>
+        <div class="form-group">
+          <label for="dni" class="col-form-label">DNI Paciente:</label>
+          <input class="form-control cargar-inputs" id="cargar_dni"></input>
+          <span class="help-block cargar-errores" id="cargar_dni-error" style="display: none;">El dni es incorrecto</span>
+        </div>
+        <div class="form-group">
+          <label for="dni" class="col-form-label">Nombres:</label>
+          <input class="form-control cargar-inputs" id="cargar_nombres"></input>
+          <span class="help-block cargar-errores" id="cargar_nombres-error" style="display: none;">El nombre no puede estar vacio</span>
+        </div>
+        <div class="form-group">
+          <label for="dni" class="col-form-label">Apellidos:</label>
+          <input class="form-control cargar-inputs" id="cargar_apellidos"></input>
+          <span class="help-block cargar-errores" id="cargar_apellidos-error" style="display: none;">El apellido no puede estar vacio</span>
+        </div>
+        <input id="cargar_turn_pk" calss="cargar-inputs" hidden/>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" onclick="cargarPaciente()">Cargar y agendar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -10,6 +10,7 @@ from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation
 )
 from django.contrib.contenttypes.models import ContentType
+from obras_sociales.models import ObraSocial, ObraSocialPaciente
 import logging
 logger = logging.getLogger(__name__)
 
@@ -136,6 +137,41 @@ class Paciente(Persona):
 
     def __str__(self):
         return f"{self.apellidos}, {self.nombres}"
+
+
+    @classmethod
+    def create_from_sisa(cls, dni):
+        puco = Puco(dni=dni)
+        resp = puco.get_info_ciudadano()
+        if not resp["ok"]:
+            error = f"Error de sistema: {puco.last_error}"
+            logger.info(error)
+            return False, error
+
+        if not resp["persona_encontrada"]:
+            logger.info("Persona no encontrada")
+            return False, f"Persona no encontrada: {puco.last_error}"
+
+        nombre_y_apellido = puco.denominacion.split(" ")
+        paciente = Paciente.objects.create(
+            tipo_documento=puco.tipo_doc,
+            numero_documento=dni,
+            nombres=nombre_y_apellido[:int(len(nombre_y_apellido)/2)],
+            apellidos=nombre_y_apellido[int(len(nombre_y_apellido)/2):],
+        )
+
+        #Setear la oss que devuelve PUCO
+        value_default = {"nombre": puco.cobertura_social}
+        oss, created = ObraSocial.objects.get_or_create(
+            codigo=puco.rnos, defaults=value_default
+        )
+        ObraSocialPaciente.objects.create(
+            data_source=settings.SOURCE_OSS_SISA,
+            paciente=paciente,
+            obra_social_updated=now(),
+            obra_social=oss,
+        )
+        return True, paciente
 
     def get_obras_sociales_from_sisa(self, force_update=False):
         """ Obtener la obra social de este paciente segun SISA
