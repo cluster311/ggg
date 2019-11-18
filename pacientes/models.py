@@ -1,6 +1,8 @@
 from sisa.puco import Puco
-from django.conf import settings
+from sisa.renaper import Renaper
 from django.db import models
+from django.conf import settings
+from django.utils.timezone import now
 from core.models import Persona
 from recupero.models import Factura
 from profesionales.models import Profesional
@@ -143,29 +145,31 @@ class Paciente(Persona):
 
     @classmethod
     def create_from_sisa(cls, dni):
-        puco = Puco(dni=dni)
-        resp = puco.get_info_ciudadano()
+        rena = Renaper(dni=dni)
+        # puco = Puco(dni=dni)
+        resp = rena.get_info_ciudadano()
         if not resp["ok"]:
-            error = f"Error de sistema: {puco.last_error}"
-            logger.info(error)
+            error = f"Error de sistema SISA: {rena.last_error}"
+            logger.error(error)
             return False, error
 
         if not resp["persona_encontrada"]:
-            logger.info("Persona no encontrada")
-            return False, f"Persona no encontrada: {puco.last_error}"
+            logger.error("Persona no encontrada en SISA")
+            return False, f"Persona no encontrada: {rena.last_error}"
 
-        nombre_y_apellido = puco.denominacion.split(" ")
+        logger.info(f'SISA persona encontrada: {rena.dni} {rena.nombre} {rena.apellido} RNOS: {rena.rnos}')
+
         paciente = Paciente.objects.create(
-            tipo_documento=puco.tipo_doc,
+            tipo_documento=rena.tipo_doc,
             numero_documento=dni,
-            nombres=nombre_y_apellido[:int(len(nombre_y_apellido)/2)],
-            apellidos=nombre_y_apellido[int(len(nombre_y_apellido)/2):],
+            nombres=rena.nombre,
+            apellidos=rena.apellido,
         )
 
         # Setear la oss que devuelve PUCO
-        value_default = {"nombre": puco.cobertura_social}
+        value_default = {"nombre": rena.cobertura_social}
         oss, created = ObraSocial.objects.get_or_create(
-            codigo=puco.rnos, defaults=value_default
+            codigo=rena.rnos, defaults=value_default
         )
         ObraSocialPaciente.objects.create(
             data_source=settings.SOURCE_OSS_SISA,
