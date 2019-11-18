@@ -142,7 +142,6 @@ class Paciente(Persona):
     def __str__(self):
         return f"{self.apellidos}, {self.nombres}"
 
-
     @classmethod
     def create_from_sisa(cls, dni):
         rena = Renaper(dni=dni)
@@ -166,17 +165,18 @@ class Paciente(Persona):
             apellidos=rena.apellido,
         )
 
-        # Setear la oss que devuelve PUCO
-        value_default = {"nombre": rena.cobertura_social}
-        oss, created = ObraSocial.objects.get_or_create(
-            codigo=rena.rnos, defaults=value_default
-        )
-        ObraSocialPaciente.objects.create(
-            data_source=settings.SOURCE_OSS_SISA,
-            paciente=paciente,
-            obra_social_updated=now(),
-            obra_social=oss,
-        )
+        # Si los devuelve, setear la oss que devuelve PUCO
+        if rena.rnos is not None and rena.rnos != '':
+            value_default = {"nombre": rena.cobertura_social}
+            oss, created = ObraSocial.objects.get_or_create(
+                codigo=rena.rnos, defaults=value_default
+            )
+            ObraSocialPaciente.objects.create(
+                data_source=settings.SOURCE_OSS_SISA,
+                paciente=paciente,
+                obra_social_updated=now(),
+                obra_social=oss,
+            )
         return True, paciente
 
     def get_obras_sociales_from_sisa(self, force_update=False):

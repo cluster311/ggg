@@ -173,8 +173,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -197,7 +195,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': 'ggg.log',
+            'filename': 'ggginfo.log',
             'formatter': 'verbose'
         },
  
@@ -205,6 +203,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console', 'file'],
+            'level': 'INFO',
             'propagate': False,
         },
         'cie10_django': {
@@ -214,6 +213,7 @@ LOGGING = {
         },
         '': {
             'handlers': ['console', 'file'],
+            'level': 'INFO',
             'propagate': False,
         },
     }
