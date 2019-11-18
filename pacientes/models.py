@@ -10,6 +10,7 @@ from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation
 )
 from django.contrib.contenttypes.models import ContentType
+from obras_sociales.models import ObraSocial, ObraSocialPaciente
 import logging
 logger = logging.getLogger(__name__)
 
@@ -157,6 +158,18 @@ class Paciente(Persona):
             numero_documento=dni,
             nombres=nombre_y_apellido[:int(len(nombre_y_apellido)/2)],
             apellidos=nombre_y_apellido[int(len(nombre_y_apellido)/2):],
+        )
+
+        #Setear la oss que devuelve PUCO
+        value_default = {"nombre": puco.cobertura_social}
+        oss, created = ObraSocial.objects.get_or_create(
+            codigo=puco.rnos, defaults=value_default
+        )
+        ObraSocialPaciente.objects.create(
+            data_source=settings.SOURCE_OSS_SISA,
+            paciente=paciente,
+            obra_social_updated=now(),
+            obra_social=oss,
         )
         return True, paciente
 
