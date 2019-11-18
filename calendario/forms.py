@@ -8,6 +8,7 @@ from calendario.models import Turno
 from calendario.widgets import DateTimePicker
 from profesionales.models import Profesional
 from pacientes.models import Paciente
+from obras_sociales.models import ObraSocialPaciente, ObraSocial
 from centros_de_salud.models import ProfesionalesEnServicio, Servicio
 import logging
 logger = logging.getLogger(__name__)
@@ -116,13 +117,22 @@ class TurnoForm(forms.ModelForm):
         paciente = Paciente.objects.filter(numero_documento=data['paciente']).first()
         if paciente is None:
             if data['buscar_data']:
-                save, result = Paciente.create_from_sisa(data['paciente'])
+                #save, result = Paciente.create_from_sisa(data['paciente'])
+                save, result = (False, '')
                 if not save and ('nombres' in data and 'apellidos' in data):
+                    #Se esta inicializando por medio de la gestion de un administrativo
                     paciente = Paciente.objects.create(
                         numero_documento=data['paciente'],
                         nombres=data['nombres'],
                         apellidos=data['apellidos'],
                     )
+                    ObraSocialPaciente.objects.create(
+                        data_source=settings.SOURCE_OSS_SISA,
+                        paciente=paciente,
+                        obra_social_updated=datetime.now(),
+                        obra_social=ObraSocial.objects.get(pk=data['oss']),
+                    )
+                    #TODO: Guardar el numero de afiliado data['numero-afiliado']
                     self.instance.paciente = paciente
                     self.instance.solicitante = data['solicitante']
                     self.instance.estado = 1
