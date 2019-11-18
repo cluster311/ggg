@@ -20,6 +20,7 @@ class CarpetaFamiliarAdmin(admin.ModelAdmin):
 
 class ConsultaAdmin(admin.ModelAdmin):
     form = ConsultaForm
+    list_display = ['paciente', 'turno', 'profesional', 'centro_de_salud', 'especialidad', 'codigo_cie_principal']
 
 
 class ConsultaInLine(admin.StackedInline):

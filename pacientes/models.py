@@ -278,6 +278,11 @@ class Consulta(TimeStampedModel):
     Reunión planificada de un paciente con un profesional
     Incluye lo que el médico hace y opina de la consulta
     """
+    # en general las consultas van a venir creadas por los turnos cuando son cofirmados
+    turno = models.OneToOneField('calendario.Turno',
+                                 on_delete=models.SET_NULL,
+                                 null=True,
+                                 blank=True)
     motivo_de_la_consulta = models.TextField(null=True, blank=True)
     paciente = models.ForeignKey(
         "Paciente",
