@@ -2,6 +2,15 @@
 var states = ['DISPONILE','ASIGNADO','ESPERANDO_EN_SALA','ATENDIDO','CANCELADO_PACIENTE','CANCELADO_ESTABLECIMIENTO']
 
 function cargarData(data){
+  if (data.extendedProps.patient == 0){
+    $(".paciente-p").css("display","none");
+  }
+  else{
+    $(".paciente-p").css("display","block");
+    $("#paciente-apellido").html(data.extendedProps.patient.apellidos);
+    $("#paciente-nombre").html(data.extendedProps.patient.nombres);
+    $("#paciente-doc").html(data.extendedProps.patient.numero_documento);
+  }
   const ASIGNADO = "{{turno_states.ASIGNADO}}";
   $("#title").html(data.title);
   $("#start").html(formatDatetime(data.start));
@@ -65,6 +74,10 @@ function cancelarTurno(){
         <h1 id="title"></h1>
         <p>Fecha: <strong id="start"></strong></p>
         <p>Estado: <strong id="state"></strong></p>
+        <p class="paciente-p">Paciente: 
+          <strong id="paciente-apellido"></strong>, 
+          <strong id="paciente-nombre"></strong></p>
+        <p class="paciente-p">Documento: <strong id="paciente-doc"></strong></p>
       </div>
       <input hidden id="idTurno">
       <div class="modal-footer">
