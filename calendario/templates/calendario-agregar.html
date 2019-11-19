@@ -15,6 +15,29 @@
   {{ form.media }}
 
   <link href="{% static 'css/modal_extra.css' %}" rel="stylesheet">
+  <style>
+    .turnoDisponible{
+      background-color: white;
+    }
+    .turnoAsignado{
+      background-color: rgb(71, 115, 212);
+    }
+    .turnoEsperandoEnSala{
+      background-color: rgb(21, 102, 21);
+    }
+    .turnoAtendido{
+      background-color: rgb(212, 212, 54);
+    }
+    .turnoCanceladoPaciente{
+      background-color: rgb(150, 40, 40); 
+    }
+    .turnoCanceladoEstablecimiento{
+      background-color: rgb(247, 68, 68);
+    }
+    .noCoincideDni{
+      opacity: 0.5;
+    }
+  </style>
 {% endblock %}
 
 {% block js_footer %}
@@ -41,6 +64,32 @@
     'use strict';
     let calendar;
 
+    function calendarEventRender(info){
+      let state = info.event.extendedProps.status;
+      let id = "event-"+info.event.id;
+      info.el.id = id;
+      switch (state) { 
+        case 1: 
+          info.el.className = info.el.className + " turnoAsignado";
+          break;
+        case 2:
+          info.el.className = info.el.className + " turnoEsperandoEnSala";
+          break;
+        case 3: 
+          info.el.className = info.el.className + " turnoAtendido";
+          break;		
+        case 4:
+          info.el.className = info.el.className + " turnoCanceladoPaciente";
+          break;
+        case 5: 
+          info.el.className = info.el.className + " turnoCanceladoEstablecimiento";
+          break;
+        default:
+          info.el.className = info.el.className + " turnoDisponible";
+          break;
+        }
+    }
+
     function initCalendar(calendarEl, servicio){
       if (servicio == null) servicio = 0;
       calendar = new FullCalendar.Calendar(calendarEl, {
@@ -48,6 +97,7 @@
         eventSources: [{
             url: '{% url "calendario.feed-availables" servicio=0 %}'.replace(0,servicio),
         }],
+        eventRender: calendarEventRender,
         eventClick: function(info) {
           $('#modal-body-text').text(
             "¿Desea agendar un turno para el " + 
