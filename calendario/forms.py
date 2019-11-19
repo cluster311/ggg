@@ -116,8 +116,13 @@ class TurnoForm(forms.ModelForm):
         paciente = Paciente.objects.filter(numero_documento=data['paciente']).first()
         if paciente is None:
             save, result = Paciente.create_from_sisa(data['paciente'])
-            if not save and ('nombres' in data and 'apellidos' in data):
-                #Se esta inicializando por medio de la gestion de un administrativo
+            if save:
+                self.instance.paciente = result
+                self.instance.solicitante = data['solicitante']
+                self.instance.estado = Turno.ASIGNADO
+                self.instance.save()
+                return save, result
+            elif not save and ('nombres' in data and 'apellidos' in data):
                 paciente = Paciente.objects.create(
                     numero_documento=data['paciente'],
                     nombres=data['nombres'],
