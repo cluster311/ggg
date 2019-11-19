@@ -123,7 +123,7 @@ class TurnoForm(forms.ModelForm):
                 )
                 self.instance.paciente = paciente
                 self.instance.solicitante = data['solicitante']
-                self.instance.estado = 1
+                self.instance.estado = Turno.ASIGNADO
                 self.instance.save()
                 return True, self.instance
             else:
@@ -131,7 +131,7 @@ class TurnoForm(forms.ModelForm):
         else:
             self.instance.paciente = paciente
             self.instance.solicitante = data['solicitante']
-            self.instance.estado = 1
+            self.instance.estado = Turno.ASIGNADO
             self.instance.save()
             return True, self.instance
     
