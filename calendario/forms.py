@@ -115,30 +115,26 @@ class TurnoForm(forms.ModelForm):
     def update(self, data, *args, **kwargs):
         paciente = Paciente.objects.filter(numero_documento=data['paciente']).first()
         if paciente is None:
-            if data['buscar_data']:
-                #save, result = Paciente.create_from_sisa(data['paciente'])
-                save, result = (False, '')
-                if not save and ('nombres' in data and 'apellidos' in data):
-                    #Se esta inicializando por medio de la gestion de un administrativo
-                    paciente = Paciente.objects.create(
-                        numero_documento=data['paciente'],
-                        nombres=data['nombres'],
-                        apellidos=data['apellidos'],
-                    )
-                    ObraSocialPaciente.objects.create(
-                        data_source=settings.SOURCE_OSS_SISA,
-                        paciente=paciente,
-                        obra_social_updated=datetime.now(),
-                        obra_social=ObraSocial.objects.get(pk=data['oss']),
-                        numero_afiliado=data['numero-afiliado'] if 'numero-afiliado' in data else None
-                    )
-                    self.instance.paciente = paciente
-                    self.instance.solicitante = data['solicitante']
-                    self.instance.estado = Turno.ASIGNADO
-                    self.instance.save()
-                    return True, self.instance
-                else:
-                    return save, result
+            save, result = Paciente.create_from_sisa(data['paciente'])
+            if not save and ('nombres' in data and 'apellidos' in data):
+                #Se esta inicializando por medio de la gestion de un administrativo
+                paciente = Paciente.objects.create(
+                    numero_documento=data['paciente'],
+                    nombres=data['nombres'],
+                    apellidos=data['apellidos'],
+                )
+                ObraSocialPaciente.objects.create(
+                    data_source=settings.SOURCE_OSS_SISA,
+                    paciente=paciente,
+                    obra_social_updated=datetime.now(),
+                    obra_social=ObraSocial.objects.get(pk=data['oss']),
+                    numero_afiliado=data['numero-afiliado'] if 'numero-afiliado' in data else None
+                )
+                self.instance.paciente = paciente
+                self.instance.solicitante = data['solicitante']
+                self.instance.estado = Turno.ASIGNADO
+                self.instance.save()
+                return True, self.instance
             else:
                 return save, result
         else:
