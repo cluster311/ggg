@@ -62,7 +62,6 @@
   <script type="text/javascript">
     function calendarEventRender(info){
       let state = info.event.extendedProps.status;
-      let num_doc = info.event.extendedProps.patient_doc;
       let id = "event-"+info.event.id;
       info.el.id = id;
       switch (state) { 

@@ -3,7 +3,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django.db.models import Count, Q
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -151,15 +151,23 @@ class ConsultaMixin:
         return super().form_valid(form)
 
 
-class EvolucionUpdateView(ConsultaMixin, SuccessMessageMixin, 
+class EvolucionUpdateView(ConsultaMixin, 
+                          SuccessMessageMixin, 
+                          UserPassesTestMixin,
                           PermissionRequiredMixin,
                           UpdateView, ):
     """Evolución /Consulta de paciente"""
     model = Consulta
-    permission_required = ("change_consulta",)
+    permission_required = ("add_consulta",)
     template_name = "pacientes/evolucion.html"
     form_class = EvolucionForm
     success_message = "Datos guardados con éxito."
+
+    def test_func(self):
+        # ver si este profesional es el dueño de la consulta
+        user = self.request.user
+        pk = self.kwargs['pk']
+        return Consulta.objects.filter(pk=pk, profesional__user=user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

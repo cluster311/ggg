@@ -119,6 +119,13 @@ class Paciente(Persona):
     def edad(self):
         return (now().date() - self.fecha_nacimiento).days / 365
 
+    def as_json(self):
+        return {
+            'nombres': self.nombres,
+            'apellidos': self.apellidos,
+            'numero_documento': self.numero_documento,
+        }
+
     def agregar_dato_de_contacto(self, tipo, valor):
         type_ = ContentType.objects.get_for_model(self)
         try:
@@ -271,6 +278,11 @@ class Consulta(TimeStampedModel):
     Reunión planificada de un paciente con un profesional
     Incluye lo que el médico hace y opina de la consulta
     """
+    # en general las consultas van a venir creadas por los turnos cuando son cofirmados
+    turno = models.OneToOneField('calendario.Turno',
+                                 on_delete=models.SET_NULL,
+                                 null=True,
+                                 blank=True)
     motivo_de_la_consulta = models.TextField(null=True, blank=True)
     paciente = models.ForeignKey(
         "Paciente",

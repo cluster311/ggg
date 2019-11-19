@@ -44,7 +44,13 @@
                     <td>{{ turno.servicio.especialidad.nombre }}</td>
                     <td>{{ turno.get_estado_display }}</td>
                     <th scope="row">
-                        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'profesionales.crear.consulta' dni=turno.paciente.numero_documento prof=turno.profesional.id %}">ingresar</a>
+                        {% if turno.consulta %}
+                        <a role="button" 
+                            class="btn btn-warning btn-sm active" 
+                            href="{% url 'pacientes.evolucion' pk=turno.consulta.id %}">ingresar</a>
+                        {% else %}
+                        Sin consulta asignada aún.
+                        {% endif %}
                     </th>
                 </tr>
                 {% empty %}

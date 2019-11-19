@@ -112,7 +112,6 @@ class TurnoForm(forms.ModelForm):
             turno_date = turno_date + timedelta(days=1)
         return turno
 
-    
     def update(self, data, *args, **kwargs):
         paciente = Paciente.objects.filter(numero_documento=data['paciente']).first()
         if paciente is None:
@@ -135,43 +134,40 @@ class TurnoForm(forms.ModelForm):
                     )
                     self.instance.paciente = paciente
                     self.instance.solicitante = data['solicitante']
-                    self.instance.estado = 1
+                    self.instance.estado = Turno.ASIGNADO
                     self.instance.save()
                     return True, self.instance
                 else:
                     return save, result
             else:
-                error = {'paciente':'El dni ingresado no corresponde a un paciente del sistema'}
-                return False, error
+                return save, result
         else:
             self.instance.paciente = paciente
             self.instance.solicitante = data['solicitante']
-            self.instance.estado = 1
+            self.instance.estado = Turno.ASIGNADO
             self.instance.save()
             return True, self.instance
     
-
     def change_state(self, data, *args, **kwargs):
         try:
             new_state = int(data['state'])
             if new_state == Turno.ESPERANDO_EN_SALA:
                 if self.instance.profesional is None:
-                    error = {'profesional':'El turno deberia tener un profesional asignado'}
+                    error = {'profesional': 'El turno deberia tener un profesional asignado'}
                     return False, error
                 elif self.instance.paciente is None:
-                    error = {'paciente':'El turno deberia tener un paciente asignado'}
+                    error = {'paciente': 'El turno deberia tener un paciente asignado'}
                     return False, error
             if new_state >= 0 and new_state < len(Turno.OPCIONES_ESTADO):
                 self.instance.estado = int(data['state'])
                 self.instance.save()
                 return True, self.instance
             else:
-                error = {'state':'No es un estado valido'}
+                error = {'state': 'No es un estado valido'}
                 return False, error
-        except expression as identifier:
-            error = {'state':'Error al cambiar el estado'}
+        except Exception as e:
+            error = {'state': f'Error al cambiar el estado: {e}'}
             return False, error
-        
 
     class Meta:
         model = Turno
