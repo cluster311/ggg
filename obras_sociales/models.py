@@ -72,3 +72,4 @@ class ObraSocialPaciente(models.Model):
     # los datos pueden venir de SISA, de SSSalud y quizas en el futuro desde
     # otros lugares
     data_source = models.CharField(max_length=90)
+    numero_afiliado = models.CharField(max_length=50, null=True, blank=True)

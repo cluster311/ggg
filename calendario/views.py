@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 from django.contrib.auth.decorators import permission_required
 from centros_de_salud.models import Servicio
 from pacientes.models import Paciente
+from obras_sociales.models import ObraSocial
 
 
 def index(request):
@@ -252,7 +253,8 @@ def cancelar_turno(request, pk):
 @require_http_methods(["GET"])
 def gestion_turnos(request):
     context = {
-        'servicios': Servicio.objects.all()
+        'servicios': Servicio.objects.all(),
+        'obras_sociales': ObraSocial.objects.all()
     }
     return render(request, 'calendario-gestionar.html', context)
 
