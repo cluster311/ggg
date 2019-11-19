@@ -42,9 +42,9 @@ class Turno(models.Model):
         on_delete=models.SET_NULL
     )
     solicitante = models.ForeignKey(
-        User, 
-        blank=True, 
-        null=True, 
+        User,
+        blank=True,
+        null=True,
         on_delete=models.SET_NULL
     )
     estado = models.IntegerField(choices=OPCIONES_ESTADO, default=DISPONIBLE)
