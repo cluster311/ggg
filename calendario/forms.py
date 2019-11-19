@@ -131,8 +131,8 @@ class TurnoForm(forms.ModelForm):
                         paciente=paciente,
                         obra_social_updated=datetime.now(),
                         obra_social=ObraSocial.objects.get(pk=data['oss']),
+                        numero_afiliado=data['numero-afiliado'] if 'numero-afiliado' in data else None
                     )
-                    #TODO: Guardar el numero de afiliado data['numero-afiliado']
                     self.instance.paciente = paciente
                     self.instance.solicitante = data['solicitante']
                     self.instance.estado = 1
