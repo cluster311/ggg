@@ -71,7 +71,6 @@
 
     function calendarEventRender(info){
       let state = info.event.extendedProps.status;
-      let num_doc = info.event.extendedProps.patient_doc;
       let id = "event-"+info.event.id;
       info.el.id = id;
       switch (state) { 
@@ -98,7 +97,10 @@
 
     function resaltarPorDNI(num){
       $.each(calendar.getEvents(), function( index, value ) {
-          let doc = value.extendedProps.patient_doc;
+          let doc = 0;
+          if (value.extendedProps.patient != 0) {
+            doc = value.extendedProps.patient.numero_documento;
+          }
           let a = $("#event-"+value.id);
           if(doc.toString() == num){
             a.removeClass('noCoincideDni');

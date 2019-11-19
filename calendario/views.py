@@ -29,12 +29,12 @@ def index(request):
         ),
         'form': TurnoForm(user=request.user),
         'turno_states': {
-            'DISPONIBLE' : Turno.DISPONIBLE,
-            'ASIGNADO' : Turno.ASIGNADO,
-            'ESPERANDO_EN_SALA' : Turno.ESPERANDO_EN_SALA,
-            'ATENDIDO' : Turno.ATENDIDO,
-            'CANCELADO_PACIENTE' : Turno.CANCELADO_PACIENTE,
-            'CANCELADO_ESTABLECIMIENTO' : Turno.CANCELADO_ESTABLECIMIENTO
+            'DISPONIBLE': Turno.DISPONIBLE,
+            'ASIGNADO': Turno.ASIGNADO,
+            'ESPERANDO_EN_SALA': Turno.ESPERANDO_EN_SALA,
+            'ATENDIDO': Turno.ATENDIDO,
+            'CANCELADO_PACIENTE': Turno.CANCELADO_PACIENTE,
+            'CANCELADO_ESTABLECIMIENTO': Turno.CANCELADO_ESTABLECIMIENTO
         }
     }
     return render(request, 'calendario.html', context)
@@ -135,7 +135,7 @@ def feed(request, servicio=None):
         'service': t.servicio.pk or 0,
         'status': t.estado,
         'professional': t.profesional.pk or 0,
-        'patient_doc': t.paciente.numero_documento if t.paciente else 0
+        'patient': t.paciente.as_json() if t.paciente else 0
         # 'patient': t.paciente.pk or 0
     } for t in turnos]
 
@@ -182,7 +182,6 @@ def confirm_turn(request, pk):
     instance = get_object_or_404(Turno, id=pk)
     form_data = json.loads(request.body)
     form_data['solicitante'] = request.user
-    form_data['buscar_data'] = False
     form = TurnoForm(form_data, instance=instance)
     save, result = form.update(form_data)
     if save:
@@ -265,8 +264,8 @@ def gestion_turnos(request):
 def gestion_turno(request, pk):
     instance = get_object_or_404(Turno, id=pk)
     form_data = json.loads(request.body)
+    logger.info(f'Gestion de turno {pk}: {form_data}')
     form_data['solicitante'] = request.user
-    form_data['buscar_data'] = True
     form = TurnoForm(form_data, instance=instance)
     save, result = form.update(form_data)
     if save:

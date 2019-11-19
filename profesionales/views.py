@@ -32,29 +32,18 @@ class ProfesionalHome(TemplateView, GroupRequiredMixin):
     group_required = (settings.GRUPO_PROFESIONAL, )
     template_name = "profesionales/home_profesional.html"
 
-    # ESTO ES PARA AGREGAR UN SELECTOR POR ESTADO
-    # def get_queryset(self):
-    #     objects = Turno.objects.filter(profesional=self.request)
-    #     if 'estado' in self.request.GET:
-    #         q = self.request.GET['estado']
-    #         if q is not 'TODOS':
-    #             objects = Turno.objects.filter(estado=q)
-    #         else:
-    #             # Se muestran todos los TURNOS!
-    #             # Fix: En algún momento va a ser una query pesada
-    #             objects = Turno.objects.all()
-    #     else:
-    #         # Por default, sólo se muestran los turnos confirmados
-    #         objects = Turno.objects.filter(estado=Turno.CONFIRMADO)
-    #     return objects
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         hoy = datetime.now()
         context['hoy'] = hoy
         context['estados'] = Turno.OPCIONES_ESTADO
-        # context['usuario'] = usuario
-        context['turnos'] = Turno.objects.filter(inicio__day=hoy.day)
+        user = self.request.user
+        context['user'] = user
+        # que solo vea SUS turnos
+        context['turnos'] = Turno.objects.filter(
+            inicio__day=hoy.day,
+            profesional__user=user
+            )
         return context
 
 
