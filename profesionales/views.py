@@ -37,13 +37,17 @@ class ProfesionalHome(TemplateView, GroupRequiredMixin):
         hoy = datetime.now()
         context['hoy'] = hoy
         context['estados'] = Turno.OPCIONES_ESTADO
-        user = self.request.user
-        context['user'] = user
-        # que solo vea SUS turnos
-        context['turnos'] = Turno.objects.filter(
-            inicio__day=hoy.day,
-            profesional__user=user
-            )
+
+        # sólo se muestran los turnos si está autenticado(y además debe
+        # estar dentro del grupo profesionales).
+        if self.request.user.is_authenticated:
+            user = self.request.user
+            context['user'] = user
+            # que solo vea SUS turnos
+            context['turnos'] = Turno.objects.filter(
+                inicio__day=hoy.day,
+                profesional__user=user
+                )
         return context
 
 
