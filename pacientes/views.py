@@ -67,6 +67,8 @@ class ConsultaMixin:
         
         data = self.request.POST if self.request.method == "POST" else None
         context["data"] = data
+        if data is not None:
+            logger.info(f'POST consulta {data}')
 
         context["recetas_frm"] = RecetaFormset(data, prefix='Recetas', instance=instance)
         context["derivaciones_frm"] = DerivacionFormset(data, prefix='Derivaciones', instance=instance)
@@ -119,7 +121,7 @@ class ConsultaMixin:
         ps = context["prestaciones_frm"]
 
         self.object = form.save()
-        logger.info('Pasando el turno {self.object.turno} a "atendido"')
+        logger.info(f'Pasando el turno {self.object.turno} a "atendido"')
         # avisar al turno que fue atendido
         self.object.turno.estado = Turno.ATENDIDO
         self.object.turno.save()
