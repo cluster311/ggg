@@ -39,11 +39,12 @@ class ProfesionalHome(TemplateView, GroupRequiredMixin):
         context['estados'] = Turno.OPCIONES_ESTADO
         user = self.request.user
         context['user'] = user
+        context['profesional'] = user.profesional
         # que solo vea SUS turnos
         context['turnos'] = Turno.objects.filter(
             inicio__day=hoy.day,
             profesional__user=user
-            )
+            ).order_by('inicio')
         return context
 
 
