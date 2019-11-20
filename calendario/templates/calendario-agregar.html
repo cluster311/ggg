@@ -191,13 +191,16 @@
     }
 
     function crearTicket(data){
-      $("#impServicio").text(data.servicio);
+      $("#impServicio").text(data.servicio.especialidad);
       if (data.profesional != undefined){
         $("#pImpProfesional").css('display','block');
         $("#impProfesional").text(data.profesional);
       }
       $("#impFecha").text(data.inicio);
       $("#impPaciente").text(data.paciente);
+      $("#impCentroNombre").text(data.servicio.centro.nombre);
+      $("#impCentroDireccion").text(data.servicio.centro.direccion);
+      $("#impCentroObservaciones").text(data.servicio.centro.descripcion);
     }
 
   </script>
@@ -270,6 +273,10 @@
           Profesional: <strong id="impProfesional"></strong></p>
         <p>Fecha: <strong id="impFecha"></strong></p>
         <p>Paciente: <strong id="impPaciente"></strong></p>
+        <br>
+        <p>Centro de salud: <strong id="impCentroNombre"></strong></p>
+        <p><strong id="impCentroDireccion"></strong></p>
+        <p><strong id="impCentroObservaciones"></strong></p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>

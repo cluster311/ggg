@@ -85,6 +85,8 @@ class Turno(models.Model):
         if self.profesional is not None:
             json['profesional'] = '{}, {}'.format(
                 self.profesional.apellidos, self.profesional.nombres)
+        if self.servicio is not None:
+            json['servicio'] = self.servicio.as_json()
         return json
         
     def save(self, *args, **kwargs):

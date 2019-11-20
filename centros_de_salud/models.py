@@ -42,6 +42,13 @@ class CentroDeSalud(models.Model):
     def __str__(self):
         return self.nombre
 
+    def as_json(self):
+        return {
+            'nombre': self.nombre,
+            'descripcion': self.descripcion,
+            'direccion': str(self.direccion),
+        }
+
     class Meta:
         verbose_name = 'Centro de Salud'
         verbose_name_plural = 'Centros de Salud'
@@ -73,6 +80,12 @@ class Servicio(models.Model):
 
     def __str__(self):
         return f'{self.especialidad} - {self.centro}'
+    
+    def as_json(self):
+        return {
+            'centro': self.centro.as_json(),
+            'especialidad': str(self.especialidad),
+        }
     
     class Meta:
         unique_together = (("centro", "especialidad"),)
