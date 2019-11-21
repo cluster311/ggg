@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
 from django.conf.urls import url, include
+from django.contrib.staticfiles.urls import static
 from .views import LandingPage, choice_homepage, CiudadanoHome
 
 
@@ -21,4 +23,6 @@ urlpatterns = [
     url(r'^$', LandingPage.as_view(), name='landing'),
     url(r'^ciudadano/$', CiudadanoHome.as_view(), name='ciudadano.home'),
     url(r'^home$', choice_homepage, name='home'),
-]
+] 
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

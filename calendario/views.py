@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from django import forms
+from django.conf import settings
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, render
@@ -171,7 +172,8 @@ def get_appointments_list(servicio, user, **kwargs):
 @require_http_methods(["GET"])
 def agendar(request):
     context = {
-        'especialidades': Especialidad.objects.all(),
+        'servicios': Servicio.objects.all(),
+        'sys_logo': "".join([settings.MEDIA_URL, settings.SYS_LOGO])
     }
     return render(request, 'calendario-agregar.html', context)
 
