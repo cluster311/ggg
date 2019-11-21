@@ -15,6 +15,7 @@ from django.conf import settings
 from .models import Consulta
 from especialidades.models import MedidasAnexasEspecialidad, MedidaAnexaEnConsulta
 from especialidades.forms import MedidaAnexaEnConsultaForm
+from calendario.models import Turno
 from .forms import (EvolucionForm, ConsultaForm,
                    RecetaFormset, DerivacionFormset, 
                    PrestacionFormset)
@@ -118,6 +119,10 @@ class ConsultaMixin:
         ps = context["prestaciones_frm"]
 
         self.object = form.save()
+        logger.info('Pasando el turno {self.object.turno} a "atendido"')
+        # avisar al turno que fue atendido
+        self.object.turno.estado = Turno.ATENDIDO
+        self.object.turno.save()
         
         if rs.is_valid():
             rs.instance = self.object
@@ -155,7 +160,7 @@ class EvolucionUpdateView(ConsultaMixin,
                           SuccessMessageMixin, 
                           UserPassesTestMixin,
                           PermissionRequiredMixin,
-                          UpdateView, ):
+                          UpdateView):
     """Evolución /Consulta de paciente"""
     model = Consulta
     permission_required = ("add_consulta",)
@@ -177,6 +182,6 @@ class EvolucionUpdateView(ConsultaMixin,
 
     def get_success_url(self):
         return reverse(
-            "pacientes.consulta.lista",
+            "profesionales.home",
             kwargs=({"dni": self.object.paciente.numero_documento}),
         )

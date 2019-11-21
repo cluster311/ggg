@@ -47,7 +47,9 @@ class ProfesionalHome(TemplateView, GroupRequiredMixin):
             context['turnos'] = Turno.objects.filter(
                 inicio__day=hoy.day,
                 profesional__user=user
-                )
+                ).order_by('inicio')
+            context['profesional'] = user.profesional
+
         return context
 
 

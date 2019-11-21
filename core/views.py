@@ -1,6 +1,6 @@
 from dal import autocomplete
 from cie10_django.models import CIE10
-from pacientes.models import Paciente
+from pacientes.models import Paciente, CarpetaFamiliar
 from profesionales.models import Profesional
 from centros_de_salud.models import CentroDeSalud, ProfesionalesEnServicio
 from recupero.models import TipoPrestacion
@@ -114,3 +114,28 @@ class TipoPrestacionAutocomplete(autocomplete.Select2QuerySetView):
                            )
 
         return qs.order_by("nombre")[:5]
+
+
+class CarpetaFamiliarAutocomplete(autocomplete.Select2QuerySetView):
+    """
+    Base de autompletado para pacientes.
+    """
+
+    def get_result_label(self, item):
+        return f"{item.apellido_principal} - {item.direccion}"
+
+    def get_selected_result_label(self, item):
+        return item.apellido_principal
+
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return CarpetaFamiliar.objects.none()
+
+        qs = CarpetaFamiliar.objects.all()
+
+        if self.q:
+            qs = qs.filter(Q(apellido_principal__icontains=self.q) |
+                           Q(direccion__icontains=self.q)
+                           )
+
+        return qs.order_by("apellido_principal")[:10]

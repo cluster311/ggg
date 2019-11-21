@@ -9,7 +9,7 @@
 {% if not request.user.is_authenticated %}
 <a class="btn btn-link btn-primary" href="{% url 'account_login' %}"> Acceso </a>
 {% else %}
-    <h4>Fecha: {{hoy|date:"d M, Y"}}</h4>
+    <h4>Profesional: {{ profesional }} Fecha: {{hoy|date:"d M, Y"}}</h4>
     <br>
 <!-- Boton para filtrar turnos por estado -->
 <!--     <div class="row align-items-center">
