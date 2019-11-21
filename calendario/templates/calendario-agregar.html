@@ -127,8 +127,22 @@
       calendar.render();
     }
   
+    $("#select2Especialidad").select2();
 
-    $("#select2Servicios").select2();
+    $("#select2Especialidad").change(function(){
+      $("#select2Servicios").val('').change();
+      $('#select2Servicios').select2("destroy");
+      $('#select2Servicios').select2({
+        ajax: {
+          url: "{% url 'centros_de_salud.servicio-by-especialidad' pk=0 %}".replace(0,$("#select2Especialidad").val()),
+          dataType: 'json'
+        }
+      });
+      $("#select2Servicios").change();
+    });
+    $('#select2Servicios').select2();
+    $("#select2Especialidad").change();
+
     $("#select2Servicios").change(function(){
       let servicio_id = $("#select2Servicios").val();
       const calendarEl = document.getElementById('calendar');
@@ -206,11 +220,16 @@
 {% block content %}
     <div class="row">
       <div class="col-md-5">
+          <p>Especialidad</p>
+          <select id="select2Especialidad" style="width:100%">
+          {% for especialidad  in especialidades %}
+            <option value="{{especialidad.pk}}">{{especialidad}}</option>
+          {% endfor %}
+          </select>
+      </div>
+      <div class="col-md-5">
         <p>Servicio</p>
         <select id="select2Servicios" style="width:100%">
-        {% for servicio  in servicios %}
-          <option value="{{servicio.pk}}">{{servicio}}</option>
-        {% endfor %}
         </select>
       </div>
     </div>

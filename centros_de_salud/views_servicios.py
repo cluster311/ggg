@@ -1,13 +1,17 @@
+from django.views.decorators.http import require_http_methods
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 from django.db.models import Count, Q
+from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from crispy_forms.utils import render_crispy_form
 
-from .models import Servicio, CentroDeSalud
+from .models import Servicio, CentroDeSalud, Especialidad
 from .forms import ServicioForm
 
 
@@ -102,3 +106,17 @@ class ServicioUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse(
             "centros_de_salud.servicios"
         )
+
+
+@permission_required('calendario.can_schedule_turno')
+@require_http_methods(["GET"])
+def servicios_by_especialidad(request, pk):
+    instance = get_object_or_404(Especialidad, id=pk)
+    servicios = Servicio.objects.filter(especialidad=instance)
+    data = {'results': [] }
+    for servicio in servicios:
+        data['results'].append({
+            'id': servicio.pk,
+            'text': servicio.centro.nombre
+        })
+    return JsonResponse(data)
