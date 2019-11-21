@@ -21,6 +21,7 @@ class MedidasAnexasEspecialidadForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
+
         super().__init__(*args, **kwargs)    
     
     class Meta:
@@ -30,12 +31,13 @@ class MedidasAnexasEspecialidadForm(forms.ModelForm):
 
 class MedidaAnexaEnConsultaForm(forms.ModelForm):
 
-    valor = forms.DecimalField(initial=0.0,
-                               widget=forms.NumberInput(attrs={'step': 0.25})) 
+    valor = forms.DecimalField(widget=forms.NumberInput(attrs={'step': 0.25})) 
     
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
-        super().__init__(*args, **kwargs)    
+        obligatorio = kwargs.pop('obligatorio', False)
+        super().__init__(*args, **kwargs)  
+        self.fields['valor'].required = obligatorio    
     
     class Meta:
         model = MedidaAnexaEnConsulta
