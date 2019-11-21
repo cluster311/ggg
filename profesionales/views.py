@@ -4,6 +4,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django.db.models import Count, Q
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.messages.views import SuccessMessageMixin
@@ -31,6 +32,7 @@ class ProfesionalHome(TemplateView, GroupRequiredMixin):
 
     group_required = (settings.GRUPO_PROFESIONAL, )
     template_name = "profesionales/home_profesional.html"
+    permission_required = ("pacientes.view_consulta",)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -48,8 +50,11 @@ class ProfesionalHome(TemplateView, GroupRequiredMixin):
                 inicio__day=hoy.day,
                 profesional__user=user
                 ).order_by('inicio')
-            context['profesional'] = user.profesional
-
+            if hasattr(user, 'profesional'):
+                context['profesional'] = user.profesional
+            else:
+                # este usuario no tiene un profesional conectado
+                raise PermissionDenied
         return context
 
 
