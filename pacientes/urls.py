@@ -27,8 +27,8 @@ urlpatterns = [
         name="pacientes.consulta.detalle",
     ),
     path(
-        r"carpeta-familiar",
+        r"crear-carpeta-familiar",
         CarpetaFamiliarCreateView.as_view(),
-        name="pacientes.carpeta-familiar",
+        name="pacientes.carpeta-familiar.crear",
     ),
 ]
