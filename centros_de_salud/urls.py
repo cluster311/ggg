@@ -4,7 +4,8 @@ from .views import CentroDeSaludListView
 from .views_servicios import (ServicioListView,
                               ServicioCreateView,
                               ServicioDetailView,
-                              ServicioUpdateView)
+                              ServicioUpdateView,
+                              servicios_by_especialidad)
 
 from .views_especialidad import (EspecialidadListView,
                                  EspecialidadCreateView,
@@ -87,5 +88,11 @@ urlpatterns = [
         r"editar-profesional-en-servicio/<int:pk>",
         ProfesionalesEnServicioUpdateView.as_view(),
         name="centros_de_salud.profesionales-en-servicio.edit",
+    ),
+
+    path(
+        r"servicio-by-especialidad/<int:pk>",
+        servicios_by_especialidad,
+        name="centros_de_salud.servicio-by-especialidad",
     ),
 ]

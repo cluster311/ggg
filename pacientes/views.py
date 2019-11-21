@@ -1,3 +1,4 @@
+from braces.views import GroupRequiredMixin
 from django.views.generic import TemplateView, ListView, UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
@@ -12,13 +13,13 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
 from django.conf import settings
-from .models import Consulta
+from .models import Consulta, CarpetaFamiliar
 from especialidades.models import MedidasAnexasEspecialidad, MedidaAnexaEnConsulta
 from especialidades.forms import MedidaAnexaEnConsultaForm
 from calendario.models import Turno
 from .forms import (EvolucionForm, ConsultaForm,
                    RecetaFormset, DerivacionFormset, 
-                   PrestacionFormset)
+                   PrestacionFormset, CarpetaFamiliarForm)
 from crispy_forms.utils import render_crispy_form
 import logging
 logger = logging.getLogger(__name__)
@@ -67,6 +68,8 @@ class ConsultaMixin:
         
         data = self.request.POST if self.request.method == "POST" else None
         context["data"] = data
+        if data is not None:
+            logger.info(f'POST consulta {data}')
 
         context["recetas_frm"] = RecetaFormset(data, prefix='Recetas', instance=instance)
         context["derivaciones_frm"] = DerivacionFormset(data, prefix='Derivaciones', instance=instance)
@@ -102,7 +105,7 @@ class ConsultaMixin:
                 medida=medida.medida
                 )
             
-            frm = MedidaAnexaEnConsultaForm(instance=medida_en_consulta)
+            frm = MedidaAnexaEnConsultaForm(instance=medida_en_consulta, obligatorio=medida.obligatorio)
             medidas_en_consulta.append({'medida_en_consulta': medida_en_consulta,
                                         'frm': frm,
                                         'medida_en_especialidad': medida})
@@ -119,7 +122,7 @@ class ConsultaMixin:
         ps = context["prestaciones_frm"]
 
         self.object = form.save()
-        logger.info('Pasando el turno {self.object.turno} a "atendido"')
+        logger.info(f'Pasando el turno {self.object.turno} a "atendido"')
         # avisar al turno que fue atendido
         self.object.turno.estado = Turno.ATENDIDO
         self.object.turno.save()
@@ -184,4 +187,26 @@ class EvolucionUpdateView(ConsultaMixin,
         return reverse(
             "profesionales.home",
             kwargs=({"dni": self.object.paciente.numero_documento}),
+        )
+
+
+class CarpetaFamiliarCreateView(PermissionRequiredMixin,
+                               CreateView,
+                               SuccessMessageMixin):
+    model = CarpetaFamiliar
+    success_message = "Carpeta creada con éxito."
+    form_class = CarpetaFamiliarForm
+    permission_required = ("calendario.can_gestionar_turnos",)
+
+    # descomentar si queremos un boton con link arriba a la derecha
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['title'] = 'Carpeta Familiar'
+    #     context['subtitle'] = 'Nueva Carpeta Familiar'
+    #     context['title_url'] = 'profesionales.lista'
+    #     return context
+
+    def get_success_url(self):
+        return reverse(
+            "calendario.gestion_turno"
         )
