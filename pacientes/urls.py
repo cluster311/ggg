@@ -4,6 +4,7 @@ from .views import (
     EvolucionUpdateView,
     ConsultaListView,
     ConsultaDetailView,
+    CarpetaFamiliarCreateView
 )
 
 
@@ -24,5 +25,10 @@ urlpatterns = [
         r"<int:dni>/historia/<int:pk>",
         ConsultaDetailView.as_view(),
         name="pacientes.consulta.detalle",
+    ),
+    path(
+        r"carpeta-familiar",
+        CarpetaFamiliarCreateView.as_view(),
+        name="pacientes.carpeta-familiar",
     ),
 ]
