@@ -188,13 +188,13 @@ class EvolucionUpdateView(ConsultaMixin,
         )
 
 
-class CarpetaFamiliarCreateView(#GroupRequiredMixin,
+class CarpetaFamiliarCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
     model = CarpetaFamiliar
-    # group_required = (settings.GRUPO_ADMIN, )
     success_message = "Carpeta creada con éxito."
     form_class = CarpetaFamiliarForm
+    permission_required = ("calendario.can_gestionar_turnos",)
 
     # descomentar si queremos un boton con link arriba a la derecha
     # def get_context_data(self, **kwargs):
@@ -206,6 +206,5 @@ class CarpetaFamiliarCreateView(#GroupRequiredMixin,
 
     def get_success_url(self):
         return reverse(
-            "profesionales.lista"
-            #"calendario.gestion_turno"
+            "calendario.gestion_turno"
         )
