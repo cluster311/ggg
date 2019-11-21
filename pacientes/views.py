@@ -1,3 +1,4 @@
+from braces.views import GroupRequiredMixin
 from django.views.generic import TemplateView, ListView, UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
@@ -12,13 +13,13 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
 from django.conf import settings
-from .models import Consulta
+from .models import Consulta, CarpetaFamiliar
 from especialidades.models import MedidasAnexasEspecialidad, MedidaAnexaEnConsulta
 from especialidades.forms import MedidaAnexaEnConsultaForm
 from calendario.models import Turno
 from .forms import (EvolucionForm, ConsultaForm,
                    RecetaFormset, DerivacionFormset, 
-                   PrestacionFormset)
+                   PrestacionFormset, CarpetaFamiliarForm)
 from crispy_forms.utils import render_crispy_form
 import logging
 logger = logging.getLogger(__name__)
@@ -186,4 +187,26 @@ class EvolucionUpdateView(ConsultaMixin,
         return reverse(
             "profesionales.home",
             kwargs=({"dni": self.object.paciente.numero_documento}),
+        )
+
+
+class CarpetaFamiliarCreateView(PermissionRequiredMixin,
+                               CreateView,
+                               SuccessMessageMixin):
+    model = CarpetaFamiliar
+    success_message = "Carpeta creada con éxito."
+    form_class = CarpetaFamiliarForm
+    permission_required = ("calendario.can_gestionar_turnos",)
+
+    # descomentar si queremos un boton con link arriba a la derecha
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['title'] = 'Carpeta Familiar'
+    #     context['subtitle'] = 'Nueva Carpeta Familiar'
+    #     context['title_url'] = 'profesionales.lista'
+    #     return context
+
+    def get_success_url(self):
+        return reverse(
+            "calendario.gestion_turno"
         )

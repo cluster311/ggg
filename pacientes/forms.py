@@ -1,8 +1,11 @@
+from address.forms import AddressField, AddressWidget
 from dal import autocomplete
 from django import forms
 from django.forms.models import inlineformset_factory
+from django.utils.translation import gettext_lazy as _
 from cie10_django.models import CIE10
-from pacientes.models import Consulta, Paciente, Receta, Derivacion
+from pacientes.models import (Consulta, Paciente, Receta, Derivacion,
+                              CarpetaFamiliar)
 from profesionales.models import Profesional
 from recupero.models import Prestacion, TipoPrestacion
 from centros_de_salud.models import CentroDeSalud, Servicio
@@ -196,3 +199,25 @@ class PacienteForm(forms.ModelForm):
     class Meta:
         model = Paciente
         fields = ("numero_documento",)
+
+
+class CarpetaFamiliarForm(forms.ModelForm):
+
+    class Meta:
+        model = CarpetaFamiliar
+        fields = [
+                  "direccion",
+                  "apellido_principal",
+                  "tipo_familia"
+                  ]
+        # field_classes = {
+        #     'direccion': AddressField,
+        # }
+        # widgets = {
+        #   'direccion': AddressWidget,
+        # }
+        help_texts = {
+            'direccion': _("Ingrese calle, número y ciudad. Ejemplo: Avenida "
+                           "Colón 4230, Córdoba"),
+            'apellido_principal': _("Apellido identificatorio de la familia.")
+        }
