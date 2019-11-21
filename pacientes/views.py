@@ -104,7 +104,7 @@ class ConsultaMixin:
                 medida=medida.medida
                 )
             
-            frm = MedidaAnexaEnConsultaForm(instance=medida_en_consulta)
+            frm = MedidaAnexaEnConsultaForm(instance=medida_en_consulta, obligatorio=medida.obligatorio)
             medidas_en_consulta.append({'medida_en_consulta': medida_en_consulta,
                                         'frm': frm,
                                         'medida_en_especialidad': medida})

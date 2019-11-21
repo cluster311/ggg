@@ -21,6 +21,7 @@ class MedidasAnexasEspecialidadForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
+
         super().__init__(*args, **kwargs)    
     
     class Meta:
@@ -35,7 +36,9 @@ class MedidaAnexaEnConsultaForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
-        super().__init__(*args, **kwargs)    
+        obligatorio = kwargs.pop('obligatorio', False)
+        super().__init__(*args, **kwargs)  
+        self.fields['valor'].required = obligatorio    
     
     class Meta:
         model = MedidaAnexaEnConsulta
