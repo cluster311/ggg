@@ -172,7 +172,7 @@ def get_appointments_list(servicio, user, **kwargs):
 @require_http_methods(["GET"])
 def agendar(request):
     context = {
-        'servicios': Servicio.objects.all(),
+        'especialidades': Especialidad.objects.all(),
         'sys_logo': "".join([settings.MEDIA_URL, settings.SYS_LOGO])
     }
     return render(request, 'calendario-agregar.html', context)
