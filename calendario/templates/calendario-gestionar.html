@@ -94,9 +94,10 @@
         }],
         eventRender: calendarEventRender,
         eventClick:function(info) {
+          let fkn_month = info.event.start.getMonth() + 1;
           $('#modal-body-text').text(
             "¿Desea agendar un turno para el " + 
-            info.event.start.getDate() + "/" + info.event.start.getMonth() +
+            info.event.start.getDate() + "/" + fkn_month +
             " a las " + info.event.start.getHours() + ":" 
             + info.event.start.getMinutes() + " horas?"
           );
