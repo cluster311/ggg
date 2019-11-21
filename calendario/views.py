@@ -173,7 +173,7 @@ def get_appointments_list(servicio, user, **kwargs):
 def agendar(request):
     context = {
         'especialidades': Especialidad.objects.all(),
-        'sys_logo': "".join([settings.MEDIA_URL, settings.SYS_LOGO])
+        'sys_logo': settings.SYS_LOGO
     }
     return render(request, 'calendario-agregar.html', context)
 

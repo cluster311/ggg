@@ -213,8 +213,10 @@
       $("#impFecha").text(data.inicio);
       $("#impPaciente").text(data.paciente);
       $("#impCentroNombre").text(data.servicio.centro.nombre);
+      if (!data.servicio.centro.direccion | data.servicio.centro.direccion == 'None')
+        {data.servicio.centro.direccion = '';}
       $("#impCentroDireccion").text(data.servicio.centro.direccion);
-      $("#impCentroObservaciones").text(data.servicio.centro.descripcion);
+      $("#impCentroObservaciones").html(data.servicio.centro.descripcion);
     }
 
   </script>
@@ -291,7 +293,7 @@
           <div class="col-md-12">
               <h1 id="impServicio"></h1>
               <img src="{{sys_logo}}" alt="logo" 
-              style="position:absolute;top:0;right:15%;width: 50px;height: 50px;">
+              style="position:absolute;top:0;right:15%;max-width: 75px;max-height: 75px;">
           </div>
         </div>
         <p id="pImpProfesional" style="display: none;">

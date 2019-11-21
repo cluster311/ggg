@@ -238,7 +238,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 SYS_SHORT_TITLE = 'HCD/R'
 SYS_TITLE = 'HCD/R[ecupero]'
 SYS_DESCRIPTION = 'Sistema de información de salud para historia clínica y recupero de gasto en Argentina'
-SYS_LOGO = 'sys_logo.png'
+SYS_LOGO = '/static/sys_logo.png'
 
 # dummy to avoid errors
 EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
