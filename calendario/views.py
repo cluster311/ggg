@@ -11,7 +11,7 @@ from calendario.forms import BulkTurnoForm, FeedForm, TurnoForm
 import logging
 logger = logging.getLogger(__name__)
 from django.contrib.auth.decorators import permission_required
-from centros_de_salud.models import Servicio
+from centros_de_salud.models import Servicio, Especialidad
 from pacientes.models import Paciente
 from obras_sociales.models import ObraSocial
 
@@ -171,7 +171,7 @@ def get_appointments_list(servicio, user, **kwargs):
 @require_http_methods(["GET"])
 def agendar(request):
     context = {
-        'servicios': Servicio.objects.all()
+        'especialidades': Especialidad.objects.all(),
     }
     return render(request, 'calendario-agregar.html', context)
 
