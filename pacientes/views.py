@@ -86,9 +86,10 @@ class ConsultaMixin:
         if instance is None or instance.paciente is None:
             context['consultas_previas'] = None
         else:
+            # evitar la consulta automática que se creo en relacion al turno
             consultas_previas = Consulta.objects.filter(
                 paciente=instance.paciente
-                ).order_by('-created')
+                ).exclude(pk=instance.pk).order_by('-created')
             context['consultas_previas'] = consultas_previas
         
         # ver las medidas anexas que deben tomarse
