@@ -1,5 +1,5 @@
 from django.conf.urls import url, include
-from .views import TableroObraSocialPorPorvinciaView, ObraSocialListView
+from .views import TableroObraSocialPorPorvinciaView, ObraSocialListView, ObraSocialCreateView
 
 
 urlpatterns = [
@@ -12,5 +12,10 @@ urlpatterns = [
         r'^lista.html$',
         ObraSocialListView.as_view(),
         name='obras-sociales.lista'
+    ),
+    url(
+        r"^crear-obra-social.html$",
+        ObraSocialCreateView.as_view(),
+        name="obras-sociales.create",
     ),
 ]

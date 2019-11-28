@@ -1,0 +1,22 @@
+{% extends "base_admin.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block content %}
+    <h2>{{subtitle}}</h2>
+    <a role="button" class="btn btn-warning btn-sm active" href="{% url 'obras-sociales.lista' %}">Volver a la lista</a>
+    <form method="post" novalidate>
+    {% csrf_token %}
+        {{ form|crispy}}
+        <button type="submit" class="btn btn-success">Guardar Obra Sociial</button>
+    </form>
+    <div class="line"></div>
+
+{% endblock %}
+{% block js_footer %}
+    <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+{% endblock js_footer %}
