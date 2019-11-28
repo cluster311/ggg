@@ -317,6 +317,12 @@
   <script>
     'use strict';
     $('#modalForm').on('hidden.bs.modal', () => {
+      document.getElementById('id_inicio').value = null;
+      document.getElementById('id_fin').value = null;
+      document.getElementById('id_servicio').value = null;
+      document.getElementById('id_profesional').value = null;
+      // $("#id_servicio").val(-1);
+
       document.getElementById('appointmentId').value = null;
       document.getElementById('deleteAppointment').value = null;
       document.getElementById('closeModalButton').hidden = false;
