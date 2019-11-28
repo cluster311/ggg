@@ -1,0 +1,21 @@
+{% extends "base_admin.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+<a role="button" class="btn btn-warning btn-sm active" href="{% url 'obras-sociales.lista' %}">Volver a la lista</a>
+{% if perms.profesionales.change_profesional %}
+<a role="button" class="btn btn-warning btn-sm active" href="{% url 'obras-sociales.edit' pk=object.id %}">Editar</a>
+{% endif %}
+<h2>{{ object.nombre }}</h2>
+<p>Codigo: <b> {{ object.codigo }}</b></p>
+<p>Siglas: <b> {{ object.siglas }}</b></p>
+<p>Provincia: <b> {{ object.provincia }}</b></p>
+<p>Localidad: <b> {{ object.localidad }}</b></p>
+<p>Domicilio: <b> {{ object.domicilio }}</b></p>
+<p>Codigo Postal: <b> {{ object.cp }}</b></p>
+{% if object.web %}<p>Web:<b> {{ object.web }}</b></p>{% endif %}
+{% if object.telefonos %}<p>Telefonos:<b> {{ object.telefonos }}</b></p>{% endif %}
+{% if object.emails %}<p>Emails:<b> {{ object.emails }}</b></p>{% endif %}
+
+{% endblock %}

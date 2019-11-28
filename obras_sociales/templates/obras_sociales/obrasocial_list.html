@@ -20,7 +20,7 @@
     <td>{{ oss.siglas }}</td>
     <td>{{ oss.provincia }}</td>
     <th scope="row">
-        <a role="button" class="btn btn-warning btn-sm active" href="">Detalles</a>
+        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'obras-sociales.detail' pk=oss.id %}">Detalles</a>
         {% if perms.obras_sociales.change_obrasocial %}
         <a role="button" class="btn btn-warning btn-sm active" href="{% url 'obras-sociales.edit' pk=oss.id %}">Editar</a>
         {% endif %}

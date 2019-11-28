@@ -1,4 +1,5 @@
 from django.views.generic import TemplateView, UpdateView
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django.db.models import Count, Q
@@ -81,6 +82,17 @@ class ObraSocialUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse(
             "obras-sociales.lista"
         )
+
+
+class ObraSocialDetailView(PermissionRequiredMixin, DetailView):
+    model = ObraSocial
+    permission_required = ("view_obrasocial",)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Obras Sociales'
+        context['title_url'] = 'obras-sociales.lista'
+        return context
 
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
