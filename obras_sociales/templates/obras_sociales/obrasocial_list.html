@@ -9,6 +9,7 @@
         <th scope="col">Codigo</th>
         <th scope="col">Siglas</th>
         <th scope="col">Provincia</th>
+        <th scope="col">Acciones</th>
     </tr>
     </thead>
     <tbody>
@@ -18,6 +19,12 @@
     <td>{{ oss.codigo }}</td>
     <td>{{ oss.siglas }}</td>
     <td>{{ oss.provincia }}</td>
+    <th scope="row">
+        <a role="button" class="btn btn-warning btn-sm active" href="">Detalles</a>
+        {% if perms.obras_sociales.change_obrasocial %}
+        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'obras-sociales.edit' pk=oss.id %}">Editar</a>
+        {% endif %}
+    </th>
 </tr>
         {% empty %}
         <td>Sin datos</td><td></td><td></td>

@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, UpdateView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django.db.models import Count, Q
@@ -56,6 +56,24 @@ class ObraSocialCreateView(PermissionRequiredMixin,
         context = super().get_context_data(**kwargs)
         context['title'] = 'Obras Sociales'
         context['subtitle'] = 'Nuevo obra social'
+        context['title_url'] = 'obras-sociales.lista'
+        return context
+
+    def get_success_url(self):
+        return reverse(
+            "obras-sociales.lista"
+        )
+
+class ObraSocialUpdateView(PermissionRequiredMixin, UpdateView):
+    model = ObraSocial
+    permission_required = "change_obrasocia"
+    fields =  '__all__'
+    success_message = "Actualizado con éxito."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Obras Sociales'
+        context['subtitle'] = 'Editar obra social'
         context['title_url'] = 'obras-sociales.lista'
         return context
 
