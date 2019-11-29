@@ -95,4 +95,5 @@ class CentroDeSaludDetailView(PermissionRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Centros de Saludos'
         context['title_url'] = 'centros_de_salud.lista'
+        context['GOOGLE_API_LEY'] = settings.GOOGLE_API_KEY
         return context
