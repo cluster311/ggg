@@ -263,59 +263,6 @@
 
   <script>
     'use strict';
-    function copyPreviousWeek() {
-      if (calendar.state.viewType.indexOf('Week') === -1) {
-        showCopyWeekErrors('Selecciona la vista semanal primero.');
-        return;
-      }
-      axios({
-        method: 'get',
-        url: "{% url 'copy_appointments' %}",
-        params: {
-          start: calendar.state.dateProfile.currentRange.start,
-          end: calendar.state.dateProfile.currentRange.end
-        }
-      })
-        .then(response => {
-          if (response.data.appointments.length === 0) {
-            showCopyWeekErrors(
-              'No hay turnos cargados para la semana anterior.'
-            );
-          } else {
-            dismissCopyWeekErrors();
-            calendar.refetchEvents();
-          }
-        })
-        .catch(error => {
-          showCopyWeekErrors(error.toString());
-        });
-    }
-
-
-    function showCopyWeekErrors(errorText) {
-      const copyWeekErrors = getOrCreateCopyWeekErrors();
-      copyWeekErrors.innerHTML = errorText;
-    }
-
-    function getOrCreateCopyWeekErrors() {
-      let copyWeekErrors = document.getElementById('copyWeekErrors');
-      if (!copyWeekErrors) {
-        copyWeekErrors = document.createElement('div');
-        copyWeekErrors.setAttribute('id', 'copyWeekErrors');
-        copyWeekErrors.classList.add('errors', 'alert', 'alert-danger');
-        calendar.el.prepend(copyWeekErrors);
-      }
-      return copyWeekErrors;
-    }
-
-    function dismissCopyWeekErrors() {
-      const errorsDiv = document.getElementById('copyWeekErrors');
-      if (errorsDiv) errorsDiv.remove();
-    }
-  </script>
-
-  <script>
-    'use strict';
     $('#modalForm').on('hidden.bs.modal', () => {
       document.getElementById('appointmentId').value = null;
       document.getElementById('deleteAppointment').value = null;
@@ -409,6 +356,110 @@
       }
     }
   </script>
+
+  <script>
+
+
+    function getMonday(d) {
+      d = new Date(d);
+      var day = d.getDay(),
+          diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
+      return new Date(d.setDate(diff));
+    }
+
+    function dismissCopyWeekErrors() {
+      const errorsDiv = document.getElementById('copyWeekErrors');
+      if (errorsDiv) errorsDiv.remove();
+    }
+    function getOrCreateCopyWeekErrors() {
+      let copyWeekErrors = document.getElementById('copyWeekErrors');
+      if (!copyWeekErrors) {
+        copyWeekErrors = document.createElement('div');
+        copyWeekErrors.setAttribute('id', 'copyWeekErrors');
+        copyWeekErrors.classList.add('errors', 'alert', 'alert-danger');
+        calendar.el.prepend(copyWeekErrors);
+      }
+      return copyWeekErrors;
+    }
+    
+    function showCopyWeekErrors(errorText) {
+      const copyWeekErrors = getOrCreateCopyWeekErrors();
+      copyWeekErrors.innerHTML = errorText;
+    }
+
+    function tieneTurnosSemana(id_servicio, semana){
+      //Chequear si ese servicio tiene algun turno esa semana
+      return true;
+    }
+
+    function copyAppointment(){
+      let actual_monday = getMonday(calendar.getDate());
+      let aweekago = actual_monday;
+      aweekago.setDate(aweekago.getDate() - 7);
+      formData = {
+        sourceDate : aweekago,
+        targetDate : actual_monday,
+        servicio : $("#id_servicio").val()
+      }
+      axios({
+        method: 'post',
+        url: "{% url 'copy_appointments' %}",
+        headers: {'Content-Type': 'application/json'},
+        data: formData
+      })
+      .then(response => {
+        if (response.data.appointments.length === 0) {
+          showCopyWeekErrors(
+            'No hay turnos cargados para la semana anterior.'
+          );
+        } else {
+          dismissCopyWeekErrors();
+          calendar.refetchEvents();
+        }
+      })
+      .catch(error => {
+        showCopyWeekErrors(error.toString());
+      });
+    }
+
+    function copyModal(){
+      let actual_monday = getMonday(calendar.getDate());
+      let aweekago = new Date()
+      aweekago.setDate(actual_monday.getDate() - 7);
+      $("#confirmCopyModal .modal-body p").css("display","none");
+      if($("#id_servicio").val() != ""){
+        if(tieneTurnosSemana($("#id_servicio").val(), aweekago)){
+          $("#modalBodyCopiar").css("display","block");
+          $("#confirmCopy").prop("disabled","");
+          $("#servicioCopiar").text($("#id_servicio option:selected").text());
+          $("#sourceCopyDate").text(aweekago.getDate() + "/" + (aweekago.getMonth()+1));
+          $("#targetCopyDate").text(actual_monday.getDate() + "/" + (actual_monday.getMonth()+1)  );
+        }
+        else{
+          $("#modalBodyInvalido").css("display","block");
+          $("#confirmCopy").prop("disabled","disabled");
+        }
+      }
+      else{
+        $("#modalBodyInvalido").css("display","block");
+        $("#confirmCopy").prop("disabled","disabled");
+      }
+      $("#confirmCopyModal").modal("show");
+    }
+    
+    function copyPreviousWeek() {
+      if (calendar.state.viewType.indexOf('Week') === -1) {
+        showCopyWeekErrors('Selecciona la vista semanal primero.');
+        return;
+      }
+      if ($("#id_servicio").val() == ""){
+        showCopyWeekErrors('Debe seleccionar un servicio.');
+        return;
+      }
+      copyModal();
+    }
+  
+  </script>
 {% endblock js_footer %}
 
 {% block content %}
@@ -423,4 +474,30 @@
 {% block unwrapped_content %}
   {% include 'base_modal.html' %}
   {% include 'manage_turno_modal.html' %}
+
+  <div class="modal fade" id="confirmCopyModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Copiar turnos de la semana anterior</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p id="modalBodyCopiar" style="display: none;">
+            Se copiaran los turnos del servicio <strong id="servicioCopiar"></strong> 
+            de la semana del lunes <strong id="sourceCopyDate"></strong> a la del lunes <strong id="targetCopyDate">
+          </p>
+          <p id="modalBodyInvalido" style="display: none;">
+            Debe seleccionar un servicio con turnos la semana anterior.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="confirmCopy" onclick="copyAppointment()">Confirmar</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

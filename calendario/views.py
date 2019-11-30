@@ -27,6 +27,9 @@ def index(request):
             '<button type="button" class="btn btn-success" '
             'id="addAppointmentButton" '
             'onclick="customAppointmentFormSubmit();">Agregar</button>'
+            '<button type="button" class="btn btn-primary" '
+            'id="copyAppointmentButton" '
+            'onclick="copyPreviousWeek()">Copiar turnos de la semana anterior</button>'
         ),
         'form': TurnoForm(user=request.user),
         'turno_states': {
@@ -78,48 +81,43 @@ def add_appointment(request):
     return JsonResponse(response_data)
 
 
+@permission_required('calendario.add_turno')
+@require_http_methods(["POST"])
 def copy_appointments(request):
-    if 'start' in request.GET:
-        c_start = parse_datetime(request.GET['start'])
-    else:
-        c_start = datetime.now()
-    start = c_start - timedelta(days=7)
+    form_data = json.loads(request.body)
 
-    if 'end' in request.GET:
-        c_end = parse_datetime(request.GET['end'])
-    else:
-        c_end = datetime.now() - timedelta(days=1)
-    end = c_end - timedelta(days=7)
+    sourceInitDate = parse_datetime(form_data['sourceDate'])
+    targetInitDate = parse_datetime(form_data['targetDate'])
+    servicio = form_data['servicio']
 
-    current_appointments = get_appointments_list(
+    #Obtener turnos desde el lunes solicitado hasta el viernes
+    aweekago_appointments = get_appointments_list(
         user=request.user,
-        start=c_start.strftime('%Y-%m-%d %H:%M:%S'),
-        end=c_end.strftime('%Y-%m-%d %H:%M:%S')
-    )
-    appointments = get_appointments_list(
-        user=request.user,
-        start=start.strftime('%Y-%m-%d %H:%M:%S'),
-        end=end.strftime('%Y-%m-%d %H:%M:%S')
+        servicio=servicio,
+        start=sourceInitDate.strftime('%Y-%m-%d 00:00:00'),
+        end=(sourceInitDate + timedelta(days=4)).strftime('%Y-%m-%d 23:59:59')
     )
 
     new_appointments = []
-    # TODO: Define what to do with existent appointments
-    if c_start != start and c_end != end and len(appointments) > 0:
-        current_appointments.delete()
-
-    for a in appointments:
+    for a in aweekago_appointments:
+        #TODO: Chequear si es feriado
+        #TODO: Que pasa con los turnos que ya estan creados en la semana target
         a.pk = None
         a.inicio += timedelta(days=7)
         a.fin += timedelta(days=7)
+        a.estado = Turno.DISPONIBLE
+        a.paciente = None
+        a.solicitante = None
         a.save()
         new_appointments.append(a)
-
+    
     response_appointments = [{
         'id': a.id,
         'title': str(a),
         'start': a.inicio.isoformat(),
         'end': a.fin.isoformat(),
-    } for a in appointments]
+    } for a in aweekago_appointments]
+
     return JsonResponse({
         'success': True,
         'appointments': response_appointments}
@@ -127,7 +125,8 @@ def copy_appointments(request):
 
 
 def feed(request, servicio=None):
-    turnos = get_appointments_list(servicio, user=request.user, **request.GET)
+    turnos = get_appointments_list(
+        user=request.user, servicio=servicio, estado=Turno.DISPONIBLE, **request.GET)
     turnos = [{
         'id': t.id,
         'title': str(t),
@@ -143,7 +142,7 @@ def feed(request, servicio=None):
     return JsonResponse(turnos, safe=False)
 
 
-def get_appointments_list(servicio, user, **kwargs):
+def get_appointments_list(user, servicio = None, estado = None, **kwargs):
     if 'id' in kwargs:
         pk = kwargs['id'][0] if isinstance(kwargs['id'], list) else \
              kwargs['id']
@@ -157,9 +156,10 @@ def get_appointments_list(servicio, user, **kwargs):
         end = kwargs['end'][0] if isinstance(kwargs['end'], list) else \
               kwargs['end']
         kw['fin__lte'] = parse_datetime(end)
+    if estado is not None:
+        kw['estado'] = estado
     if servicio is not None:
         kw['servicio__pk'] = servicio
-        kw['estado'] = 0
         return Turno.objects.filter(**kw)
     else:
         csp = user.centros_de_salud_permitidos.all()
