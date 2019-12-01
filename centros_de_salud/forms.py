@@ -1,5 +1,6 @@
 from dal import autocomplete
 from django import forms
+from django.contrib.gis import forms as gisforms
 from .models import ProfesionalesEnServicio, Servicio
 from profesionales.models import Profesional
 from centros_de_salud.models import CentroDeSalud
@@ -49,3 +50,17 @@ class ServicioForm(forms.ModelForm):
     class Meta:
         model = Servicio
         fields = ['centro', 'especialidad']
+
+
+class CentroDeSaludForm(gisforms.ModelForm):
+    ubicacion = gisforms.PointField(
+        widget=gisforms.OSMWidget(
+            attrs={'map_width': 600,
+                   'map_height': 400,
+                   'template_name': 'gis/openlayers-osm.html',
+                   'default_lat':-34.6037673975556,
+                   'default_lon':-58.38164806365966,
+                   'default_zoom': 12}))
+    class Meta:
+        model = CentroDeSalud
+        fields = '__all__'

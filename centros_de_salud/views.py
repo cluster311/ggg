@@ -10,6 +10,7 @@ from django.views.decorators.cache import cache_page
 from django.conf import settings
 from django.urls import reverse
 from .models import CentroDeSalud
+from .forms import CentroDeSaludForm
 
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
@@ -53,7 +54,7 @@ class CentroDeSaludCreateView(PermissionRequiredMixin,
                                SuccessMessageMixin):
     model = CentroDeSalud
     permission_required = ("add_centrodesalud",)
-    fields =  '__all__'
+    form_class = CentroDeSaludForm
     success_message = "Creado con éxito."
 
     def get_context_data(self, **kwargs):
@@ -71,7 +72,7 @@ class CentroDeSaludCreateView(PermissionRequiredMixin,
 class CentroDeSaludUpdateView(PermissionRequiredMixin, UpdateView):
     model = CentroDeSalud
     permission_required = "change_centrodesalud"
-    fields =  '__all__'
+    form_class = CentroDeSaludForm
     success_message = "Actualizado con éxito."
 
     def get_context_data(self, **kwargs):
