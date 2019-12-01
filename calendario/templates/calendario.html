@@ -152,6 +152,15 @@
   <script>
     'use strict';
     $('#id_bulk').bootstrapSwitch();
+
+    document.querySelector('select[name="servicio"]').onchange=function() {
+      if($('select[name="servicio"]').val() != ""){
+        $("#copyAppointmentButton").css("display","block");
+      }
+      else{
+        $("#copyAppointmentButton").css("display","none");
+      }
+    };
   </script>
 
   <script>
@@ -358,8 +367,6 @@
   </script>
 
   <script>
-
-
     function getMonday(d) {
       d = new Date(d);
       var day = d.getDay(),
@@ -385,11 +392,6 @@
     function showCopyWeekErrors(errorText) {
       const copyWeekErrors = getOrCreateCopyWeekErrors();
       copyWeekErrors.innerHTML = errorText;
-    }
-
-    function tieneTurnosSemana(id_servicio, semana){
-      //Chequear si ese servicio tiene algun turno esa semana
-      return true;
     }
 
     function copyAppointment(){
@@ -428,17 +430,11 @@
       aweekago.setDate(actual_monday.getDate() - 7);
       $("#confirmCopyModal .modal-body p").css("display","none");
       if($("#id_servicio").val() != ""){
-        if(tieneTurnosSemana($("#id_servicio").val(), aweekago)){
-          $("#modalBodyCopiar").css("display","block");
-          $("#confirmCopy").prop("disabled","");
-          $("#servicioCopiar").text($("#id_servicio option:selected").text());
-          $("#sourceCopyDate").text(aweekago.getDate() + "/" + (aweekago.getMonth()+1));
-          $("#targetCopyDate").text(actual_monday.getDate() + "/" + (actual_monday.getMonth()+1)  );
-        }
-        else{
-          $("#modalBodyInvalido").css("display","block");
-          $("#confirmCopy").prop("disabled","disabled");
-        }
+        $("#modalBodyCopiar").css("display","block");
+        $("#confirmCopy").prop("disabled","");
+        $("#servicioCopiar").text($("#id_servicio option:selected").text());
+        $("#sourceCopyDate").text(aweekago.getDate() + "/" + (aweekago.getMonth()+1));
+        $("#targetCopyDate").text(actual_monday.getDate() + "/" + (actual_monday.getMonth()+1)  );
       }
       else{
         $("#modalBodyInvalido").css("display","block");

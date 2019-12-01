@@ -28,7 +28,7 @@ def index(request):
             'id="addAppointmentButton" '
             'onclick="customAppointmentFormSubmit();">Agregar</button>'
             '<button type="button" class="btn btn-primary" '
-            'id="copyAppointmentButton" '
+            'id="copyAppointmentButton" style="display:none;" '
             'onclick="copyPreviousWeek()">Copiar turnos de la semana anterior</button>'
         ),
         'form': TurnoForm(user=request.user),
