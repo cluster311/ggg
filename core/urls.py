@@ -5,11 +5,17 @@ from core.views import (CIE10Autocomplete,
                         ProfesionalAutocomplete,
                         CentroDeSaludAutocomplete,
                         TipoPrestacionAutocomplete,
-                        CarpetaFamiliarAutocomplete
+                        CarpetaFamiliarAutocomplete,
+                        ServicioAutocomplete
                         )
 
 
 urlpatterns = [
+    path(
+        r"servicio-autocomplete",
+        ServicioAutocomplete.as_view(),
+        name="servicio-autocomplete",
+    ),
     path(
         r"carpeta-familiar-autocomplete",
         CarpetaFamiliarAutocomplete.as_view(),
