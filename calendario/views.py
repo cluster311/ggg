@@ -280,3 +280,20 @@ def gestion_turno(request, pk):
             'success': save,
             'errors': result}
         )
+
+@permission_required('calendario.can_gestionar_turnos')
+@require_http_methods(["POST"])
+def crear_sobreturno(request, pk):
+    instance = get_object_or_404(Turno, id=pk)
+    form = TurnoForm({}, instance=instance)
+    save, result = form.sobreturno()
+    if save:
+        return JsonResponse({
+            'success': save,
+            'turno': result.as_json()}
+        )
+    else:
+        return JsonResponse({
+            'success': save,
+            'errors': result}
+        )
