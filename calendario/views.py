@@ -17,6 +17,8 @@ from pacientes.models import Paciente
 from obras_sociales.models import ObraSocial
 
 
+@permission_required('calendario.view_turno')
+@require_http_methods(["GET"])
 def index(request):
     context = {
         'modal_title': 'Agregar turno',
@@ -42,6 +44,7 @@ def index(request):
 
 
 @permission_required('calendario.add_turno')
+@require_http_methods(["POST"])
 def add_appointment(request):
     form_data = json.loads(request.body)
     if form_data['bulk']:
@@ -126,6 +129,9 @@ def copy_appointments(request):
     )
 
 
+
+@permission_required('calendario.view_turno')
+@require_http_methods(["GET"])
 def feed(request, servicio=None):
     turnos = get_appointments_list(servicio, user=request.user, **request.GET)
     turnos = [{
