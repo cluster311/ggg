@@ -60,6 +60,27 @@ function cancelarTurno(){
   const CANCELADO_ESTABLECIMIENTO = "{{turno_states.CANCELADO_ESTABLECIMIENTO}}";
   editarEstadoTurno(CANCELADO_ESTABLECIMIENTO);
 }
+
+
+function crearSobreturno(){
+  axios({
+    method: 'post',
+    url: "{% url 'calendario.crear_sobreturno' pk=0 %}".replace(0,$("#idTurno").val()),
+    headers: {'Content-Type': 'application/json'},
+  })
+    .then(response => {
+      if (!response.data.success) {
+        console.error(response.data.errors);
+        alert('Error al crear el sobreturno: ' + response.data.errors.state)
+      } else {
+        calendar.refetchEvents();
+        $('#manageTurnoModal').modal('hide');
+      }
+    })
+    .catch(error => {
+      showFormErrors({Error: [error.toString().slice(7)]});
+    });
+}
 </script>
 
 <div class="modal fade" id="manageTurnoModal" tabindex="1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -82,6 +103,7 @@ function cancelarTurno(){
       </div>
       <input hidden id="idTurno">
       <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="crearSobreturno()">Crear Sobreturno</button>
         <button type="button" class="btn btn-danger" onclick="cancelarTurno()">Cancelar Turno</button>
         <button type="button" class="btn btn-primary" id='btnConfirmar'
           onclick="confirmarTurno()">Confirmar</button>

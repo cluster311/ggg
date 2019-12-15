@@ -3,6 +3,7 @@ from dal import autocomplete
 from datetime import datetime, timedelta, time
 from django import forms
 from django.db.models import Count
+from django.db.models import Q
 from django.conf import settings
 from calendario.models import Turno
 from calendario.widgets import DateTimePicker
@@ -10,6 +11,7 @@ from profesionales.models import Profesional
 from pacientes.models import Paciente
 from obras_sociales.models import ObraSocialPaciente, ObraSocial
 from centros_de_salud.models import ProfesionalesEnServicio, Servicio
+import math
 import logging
 logger = logging.getLogger(__name__)
 
@@ -174,6 +176,31 @@ class TurnoForm(forms.ModelForm):
         except Exception as e:
             error = {'state': f'Error al cambiar el estado: {e}'}
             return False, error
+    
+
+    def sobreturno(self):
+        try:
+            self.instance.pk = None
+            inicio = self.instance.inicio
+            init = datetime(inicio.year,inicio.month,inicio.day,0,0,0)
+            end = datetime(inicio.year,inicio.month,inicio.day,23,59,59)
+            ultimo = Turno.objects.filter(
+                (Q(inicio__gte=init) & Q(inicio__lte=end))
+            ).filter(servicio=self.instance.servicio, 
+                    profesional=self.instance.profesional).order_by('inicio').last()
+            duracion = math.trunc((self.instance.fin - self.instance.inicio).seconds / 60)
+            self.instance.inicio = ultimo.fin
+            self.instance.fin = self.instance.inicio + timedelta(minutes=duracion)
+            self.instance.paciente = None
+            self.instance.solicitante = None
+            self.instance.estado = Turno.DISPONIBLE
+            self.instance.save()
+            return True, self.instance
+        except Exception as e:
+            error = {'state': f'Error al crear el sobreturno: {e}'}
+            return False, error
+        
+
 
     class Meta:
         model = Turno
