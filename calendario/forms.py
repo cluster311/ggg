@@ -39,9 +39,14 @@ class TurnoForm(forms.ModelForm):
     servicio = forms.ModelChoiceField(
         label='Servicios',
         queryset=Servicio.objects.all(),
-        widget=autocomplete.ModelSelect2(),
+        empty_label="Seleccione un valor",
+        # widget=autocomplete.ModelSelect2(
+        #     url="servicio-autocomplete",
+        #     attrs={"data-placeholder": "Ingrese nombre del servicio",
+        #            "data-minimum-input-length": 3,},
+        #         ),
     )
-        
+
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
@@ -51,7 +56,7 @@ class TurnoForm(forms.ModelForm):
             if field == 'estado':
                 classes_to_ad += ' custom-select'
             self.fields[field].widget.attrs.update({'class': classes_to_ad})
-        
+
         if user is not None:
             csp = user.centros_de_salud_permitidos.all()
             centros_de_salud_permitidos = [c.centro_de_salud for c in csp]

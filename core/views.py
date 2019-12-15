@@ -2,7 +2,8 @@ from dal import autocomplete
 from cie10_django.models import CIE10
 from pacientes.models import Paciente, CarpetaFamiliar
 from profesionales.models import Profesional
-from centros_de_salud.models import CentroDeSalud, ProfesionalesEnServicio
+from centros_de_salud.models import (CentroDeSalud, ProfesionalesEnServicio,
+                                     Servicio)
 from recupero.models import TipoPrestacion
 from django.db.models import Q
 import logging
@@ -139,3 +140,26 @@ class CarpetaFamiliarAutocomplete(autocomplete.Select2QuerySetView):
                            )
 
         return qs.order_by("apellido_principal")[:10]
+
+
+class ServicioAutocomplete(autocomplete.Select2QuerySetView):
+    """
+    Base de autocompletado para tipos de prestaciones.
+    """
+
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Servicio.objects.none()
+
+        # if user is not None:
+        #     csp = user.centros_de_salud_permitidos.all()
+        #     centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
+        #     qs = Servicio.objects.filter(centro__in=centros_de_salud_permitidos)
+        #     self.fields['servicio'].queryset = qs
+
+        qs = Servicio.objects.all()
+
+        if self.q:
+            qs = qs.filter(especialidad__nombre__icontains=self.q)
+
+        return qs
