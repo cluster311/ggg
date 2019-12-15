@@ -1,5 +1,7 @@
 from django.conf.urls import url, include
-from .views import TableroObraSocialPorPorvinciaView, ObraSocialListView
+from django.urls import path
+from .views import (TableroObraSocialPorPorvinciaView, ObraSocialListView, 
+                    ObraSocialCreateView, ObraSocialUpdateView, ObraSocialDetailView)
 
 
 urlpatterns = [
@@ -12,5 +14,20 @@ urlpatterns = [
         r'^lista.html$',
         ObraSocialListView.as_view(),
         name='obras-sociales.lista'
+    ),
+    url(
+        r"^crear-obra-social.html$",
+        ObraSocialCreateView.as_view(),
+        name="obras-sociales.create",
+    ),
+    path(
+        r"detalle-obra-social.html/<int:pk>",
+        ObraSocialDetailView.as_view(),
+        name="obras-sociales.detail",
+    ),
+    path(
+        r"editar-obra-social.html/<int:pk>",
+        ObraSocialUpdateView.as_view(),
+        name="obras-sociales.edit",
     ),
 ]

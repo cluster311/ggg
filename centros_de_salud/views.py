@@ -1,10 +1,16 @@
+from django.views.generic import UpdateView
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django.db.models import Q
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.conf import settings
+from django.urls import reverse
 from .models import CentroDeSalud
+from .forms import CentroDeSaludForm
 
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
@@ -37,4 +43,58 @@ class CentroDeSaludListView(PermissionRequiredMixin, ListView):
         context['title'] = 'Lista de Centros de salud'
         context['title_url'] = 'centros_de_salud.lista'
         context['use_search_bar'] = True
+        if self.request.user.has_perm('centros_de_salud.add_centrodesalud'):
+            context['use_add_btn'] = True
+            context['add_url'] = 'centros_de_salud.create'
+        return context
+
+
+class CentroDeSaludCreateView(PermissionRequiredMixin,
+                               CreateView,
+                               SuccessMessageMixin):
+    model = CentroDeSalud
+    permission_required = ("add_centrodesalud",)
+    form_class = CentroDeSaludForm
+    success_message = "Creado con éxito."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Centros de Salud'
+        context['subtitle'] = 'Nuevo centro de salud'
+        context['title_url'] = 'centros_de_salud.lista'
+        return context
+
+    def get_success_url(self):
+        return reverse(
+            "centros_de_salud.lista"
+        )
+
+class CentroDeSaludUpdateView(PermissionRequiredMixin, UpdateView):
+    model = CentroDeSalud
+    permission_required = "change_centrodesalud"
+    form_class = CentroDeSaludForm
+    success_message = "Actualizado con éxito."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Centros de Salud'
+        context['subtitle'] = 'Editar centro de salud'
+        context['title_url'] = 'centros_de_salud.lista'
+        return context
+
+    def get_success_url(self):
+        return reverse(
+            "centros_de_salud.lista"
+        )
+
+
+class CentroDeSaludDetailView(PermissionRequiredMixin, DetailView):
+    model = CentroDeSalud
+    permission_required = ("view_centrodesalud",)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Centros de Saludos'
+        context['title_url'] = 'centros_de_salud.lista'
+        context['GOOGLE_API_LEY'] = settings.GOOGLE_API_KEY
         return context

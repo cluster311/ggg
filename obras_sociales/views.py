@@ -1,11 +1,15 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, UpdateView
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django.db.models import Count, Q
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.conf import settings
 from .models import ObraSocial
 
@@ -35,6 +39,59 @@ class ObraSocialListView(PermissionRequiredMixin, ListView):
         context['title'] = 'Lista de Obras sociales'
         context['title_url'] = 'obras-sociales.lista'
         context['use_search_bar'] = True
+        if self.request.user.has_perm('obras-sociales.add_obrasocial'):
+            context['use_add_btn'] = True
+            context['add_url'] = 'obras-sociales.create'
+        return context
+
+
+class ObraSocialCreateView(PermissionRequiredMixin,
+                               CreateView,
+                               SuccessMessageMixin):
+    model = ObraSocial
+    permission_required = ("add_obrasocial",)
+    fields =  '__all__'
+    success_message = "Creado con éxito."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Obras Sociales'
+        context['subtitle'] = 'Nuevo obra social'
+        context['title_url'] = 'obras-sociales.lista'
+        return context
+
+    def get_success_url(self):
+        return reverse(
+            "obras-sociales.lista"
+        )
+
+class ObraSocialUpdateView(PermissionRequiredMixin, UpdateView):
+    model = ObraSocial
+    permission_required = "change_obrasocia"
+    fields =  '__all__'
+    success_message = "Actualizado con éxito."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Obras Sociales'
+        context['subtitle'] = 'Editar obra social'
+        context['title_url'] = 'obras-sociales.lista'
+        return context
+
+    def get_success_url(self):
+        return reverse(
+            "obras-sociales.lista"
+        )
+
+
+class ObraSocialDetailView(PermissionRequiredMixin, DetailView):
+    model = ObraSocial
+    permission_required = ("view_obrasocial",)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Obras Sociales'
+        context['title_url'] = 'obras-sociales.lista'
         return context
 
 

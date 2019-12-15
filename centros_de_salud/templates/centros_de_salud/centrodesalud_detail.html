@@ -1,0 +1,51 @@
+{% extends "base_admin.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block extra_head %}
+<script src="https://maps.googleapis.com/maps/api/js?key={{GOOGLE_API_LEY}}&callback=initMap"
+    async defer></script>
+<style>
+    #map {
+        height: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<a role="button" class="btn btn-warning btn-sm active" href="{% url 'centros_de_salud.lista' %}">Volver a la lista</a>
+{% if perms.profesionales.change_profesional %}
+<a role="button" class="btn btn-warning btn-sm active" href="{% url 'centros_de_salud.edit' pk=object.id %}">Editar</a>
+{% endif %}
+<div class="row">
+    <div class="col-md-6">
+        <h2>{{ object.nombre }}</h2>
+        <p>Institucion: <b> {{ object.institucion }}</b></p>
+        <p>Codigo HPGD: <b> {{ object.codigo_hpgd }}</b></p>
+        <p>Descripcion: <b> {{ object.descripcion }}</b></p>
+        <p>Horario de atencion: <b> {{ object.horario_de_atencion }}</b></p>
+        <p>Telefonos: <b> {{ object.telefonos }}</b></p>
+        <p>Direccion:<b> {{ object.direccion }}</b></p>
+    </div>
+    <div class="col-md-6">
+        {% if object.ubicacion %}
+        <div id="map" lng='{{object.ubicacion.x}}' lat='{{object.ubicacion.y}}'></div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    var map;
+    var ubication = {
+        lat: parseFloat($("#map").attr("lat").replace(",",".")),
+        lng: parseFloat($("#map").attr("lng").replace(",","."))
+    }
+    function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: ubication.lat, lng: ubication.lng},
+        zoom: 8
+      });
+      var marker = new google.maps.Marker({position: ubication, map: map});
+    }
+  </script>
+{% endblock %}

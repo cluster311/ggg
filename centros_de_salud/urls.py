@@ -1,6 +1,7 @@
 from django.conf.urls import url, include
 from django.urls import path
-from .views import CentroDeSaludListView
+from .views import (CentroDeSaludListView, CentroDeSaludCreateView,
+                    CentroDeSaludDetailView, CentroDeSaludUpdateView)
 from .views_servicios import (ServicioListView,
                               ServicioCreateView,
                               ServicioDetailView,
@@ -23,8 +24,21 @@ urlpatterns = [
         CentroDeSaludListView.as_view(),
         name='centros_de_salud.lista'
     ),
-
-
+    url(
+        r"^crear.html$",
+        CentroDeSaludCreateView.as_view(),
+        name="centros_de_salud.create",
+    ),
+    path(
+        r"detalle.html/<int:pk>",
+        CentroDeSaludDetailView.as_view(),
+        name="centros_de_salud.detail",
+    ),
+    path(
+        r"editar.html/<int:pk>",
+        CentroDeSaludUpdateView.as_view(),
+        name="centros_de_salud.edit",
+    ),
     url(
         r"^servicios.html$",
         ServicioListView.as_view(),

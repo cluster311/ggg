@@ -7,6 +7,7 @@
     <tr>
         <th scope="col">Nombre</th>
         <th scope="col">Codigo HPGD</th>
+        <th scope="col">Acciones</th>
     </tr>
     </thead>
     <tbody>
@@ -14,6 +15,12 @@
 <tr>
     <th scope="row">{{ cs.nombre }}</th>
     <td>{{ oss.codigo_hpgd }}</td>
+    <th scope="row">
+        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'centros_de_salud.detail' pk=cs.id %}">Detalles</a>
+        {% if perms.centros_de_salud.change_centrodesalud %}
+        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'centros_de_salud.edit' pk=cs.id %}">Editar</a>
+        {% endif %}
+    </th>
 </tr>
         {% empty %}
         <td>Sin datos</td><td></td><td></td>
