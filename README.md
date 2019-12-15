@@ -4,6 +4,10 @@ Propuesto por la Municipalidad de Córdoba y con la
 financiación de la Organización Mundial de la Salud 
 nace este sistema abierto de información para la salud.
 
+## Manual
+
+Versión en desarrollo del manual [aquí](https://docs.google.com/document/d/1ePgRHtQiG81u2eF4qf48ozq4RMyviwgu/export?format=pdf)
+
 ## Objetivo del sistema
 
 Objetivos del sistema:
