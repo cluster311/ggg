@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/cluster311/ggg.svg?branch=master)](https://travis-ci.org/cluster311/ggg)
 # Sistema abierto de información de la Salud
 
 Propuesto por la Municipalidad de Córdoba y con la 
