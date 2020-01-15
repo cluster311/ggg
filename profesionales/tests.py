@@ -41,6 +41,7 @@ class ProfesionalesTests(TestCase):
         # c.get('/customers/details/', {'name': 'fred', 'age': 7})
         # response.content
 
+    # https://docs.djangoproject.com/en/3.0/topics/testing/advanced/
     class ProfesionalHomeTest(TestCase):
         def test_environment_set_in_context(self):
             request = RequestFactory().get('/')
