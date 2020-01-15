@@ -112,7 +112,8 @@ DATABASES = {
          'NAME': 'ggg_db',
          'USER': 'ggg_user',
          'PASSWORD': 'ggg_pass',
-         # 'HOST': 'localhost'  # SIN ESTA PORONGA, NO ANDA EN PROD
+         'HOST': 'localhost',
+         'PORT': 5432
     },
 }
 
