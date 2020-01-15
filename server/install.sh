@@ -70,5 +70,17 @@ sudo apt install binutils libproj-dev gdal-bin
 
 # obtener un API KEY de google y agregarlo a local_settings como GOOGLE_API_KEY
 
-# importar datos
+Importar datos
 
+Al iniciar se requiere tener algunos datos cargados a la base.
+ - Los códigos CIE se importan automáticamente con el migrate de la librería
+ - Los códigos del Nomenclador de Hospitales Públicos de Gestión Descentralizada no 
+   son obligatorios y por lo tanto pueden cargarse con la función 
+   importar_desde_nomenclador de la clase TipoPrestacion de la app de Recupero:
+    TipoPrestacion.importar_desde_nomenclador()
+ - Las Obras Sociales se cargan con la funcion startdb de la clase ObraSocial. Por ahora no esta agregado al migrate: ObraSocial.startdb()
+ - Importar Profesionales: ./manage.py import_profesionales. Comando hecho 
+   específicamente para los profesionales de córdoba (la base no está 
+   publicada en el repositorio)
+ - Centros de salud de Córdoba ciudad: ./manage.py import_centros_salud_cba. 
+   Los datos están abiertos y en el repo, son públicos.
