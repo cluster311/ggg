@@ -69,3 +69,6 @@ sudo certbot --nginx -d lala.com
 sudo apt install binutils libproj-dev gdal-bin
 
 # obtener un API KEY de google y agregarlo a local_settings como GOOGLE_API_KEY
+
+# importar datos
+
