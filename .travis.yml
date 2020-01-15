@@ -1,15 +1,15 @@
 language: python
-  python:
-    - 3.7
-    - 3.8
-  services: 
-    - postgres
-  env:
-    -DJANGO=2.2.8 DB=postgres
-  install:
-    - pip install -r requirements.txt
-    - pip install flake8
-  before_script:
-    - flake8 .
-  script:
-    - python manage.py test
+python:
+  - 3.7
+  - 3.8
+services: 
+  - postgresql
+env:
+  -DJANGO=2.2.8 DB=postgres
+install:
+  - pip install -r requirements.txt
+  - pip install flake8
+before_script:
+  - flake8 .
+script:
+  - python manage.py test
