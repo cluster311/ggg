@@ -6,6 +6,8 @@ services:
   - postgresql
 env:
   -DJANGO=2.2.8 DB=postgres
+before_install:
+  - apt-get install binutils libproj-dev gdal-bin
 install:
   - pip install -r requirements.txt
   - pip install flake8
