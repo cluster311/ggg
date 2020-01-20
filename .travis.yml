@@ -13,6 +13,7 @@ before_script:
   - psql -c 'create database test_db;' -U postgres
 env:
   -DJANGO=2.2.8 DB=postgres
+  -DJANGO=3.0.2 DB=postgres
 before_install:
   - sudo apt-get update
   - sudo apt-get install binutils libproj-dev gdal-bin
