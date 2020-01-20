@@ -71,7 +71,7 @@ class DatoDeContactoModelForm(forms.ModelForm):
         validator = URLValidator()
         try:
             validator(valor)
-        except ValidationError:
+        except forms.ValidationError:
             self.add_error("valor", "No es una dirección web válida")
 
     def clean(self):
