@@ -103,18 +103,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ggg.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
+# to fill in local_settings.py or use like this for travis CI
 DATABASES = {
     'default': {
-         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-         'NAME': 'ggg_db',
-         'USER': 'ggg_user',
-         'PASSWORD': 'ggg_pass',
-         'HOST': 'localhost',
-         'PORT': 5432
-    },
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': os.environ['DATABASE_NAME'],
+        'USER': os.environ['DATABASE_USER'],
+        'PASSWORD': os.environ['DATABASE_PASSWORD'],
+    }
 }
 
 # Password validation
