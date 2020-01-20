@@ -8,7 +8,7 @@ addons:
   postgresql: "9.6"
   apt:
     packages:
-    - postgresql-9.6-postgis-2.3
+    - postgresql-9.6-postgis-2.4
 env:
   -DJANGO=2.2.8 DB=postgres
   -DJANGO=3.0.2 DB=postgres
