@@ -10,8 +10,7 @@ addons:
     packages:
     - postgresql-9.6-postgis-2.4
 env:
-  -DJANGO=2.2.8 DB=postgres
-  -DJANGO=3.0.2 DB=postgres
+  - DJANGO=2.2.8 DB=postgres
 before_install:
   - sudo apt-get update
   - sudo apt-get install binutils libproj-dev gdal-bin
