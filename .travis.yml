@@ -9,20 +9,19 @@ addons:
   apt:
     packages:
     - postgresql-9.6-postgis-2.3
-before_script:
-  - psql -c 'create database test_db;' -U postgres
 env:
   -DJANGO=2.2.8 DB=postgres
   -DJANGO=3.0.2 DB=postgres
 before_install:
   - sudo apt-get update
   - sudo apt-get install binutils libproj-dev gdal-bin
+  - psql -c 'create database test_db;' -U postgres
+  - psql -U postgres -c "create extension postgis"
 install:
   - pip install -r requirements.txt
   - pip install flake8
 before_script:
   - flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
   - flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-  - psql -U postgres -c "create extension postgis"
 script:
   - python manage.py test
