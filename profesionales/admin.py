@@ -1,15 +1,16 @@
 from django.contrib import admin
 from .models import Profesional
 from django.conf.urls import url
+from .views import calendario
 
 
 class ProfesionalSite(admin.AdminSite):
     def get_urls(self):
-        urls = super(CustomAdminSite, self).get_urls()
+        urls = super().get_urls()
         custom_urls = [
             url(
                 r"calendario$",
-                self.admin_view(organization_admin.calendario),
+                self.admin_view(calendario),
                 name="preview",
             )
         ]

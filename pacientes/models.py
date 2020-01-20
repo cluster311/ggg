@@ -3,7 +3,7 @@ from sisa.renaper import Renaper
 from django.db import models
 from django.conf import settings
 from django.utils.timezone import now
-from core.models import Persona
+from core.models import Persona, DatoDeContacto
 from recupero.models import Factura
 from profesionales.models import Profesional
 from model_utils import Choices
