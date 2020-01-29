@@ -20,3 +20,6 @@ Instrucciones de instalación y uso:
 ## Como contribuir
 
 Como contribuir con este proyecto abierto:
+
+Crear un PR contra la rama predeterminada _develop_.  
+
