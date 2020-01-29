@@ -22,6 +22,8 @@ from pacientes.models import Consulta, Paciente
 from pacientes.forms import ConsultaForm, RecetaFormset, DerivacionFormset, PrestacionFormset
 from crispy_forms.utils import render_crispy_form
 import logging
+
+
 logger = logging.getLogger(__name__)
 
 
