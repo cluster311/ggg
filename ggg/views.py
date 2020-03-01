@@ -22,21 +22,14 @@ def choice_homepage(request):
     redirige a un dashboard distinto en funcion del tipo de usuario
     """
     user = request.user
+    es_profesional = user.groups.filter(name=settings.GRUPO_PROFESIONAL).exists()
+    # es_ciudadano = user.groups.filter(name=settings.GRUPO_CIUDADANO)
+    es_administrativo = user.groups.filter(name=settings.GRUPO_ADMIN)
 
     # todo usuario pertenece al grupo ciudano
-    if (user.groups.filter(name=settings.GRUPO_PROFESIONAL).exists() and
-        user.groups.filter(name=settings.GRUPO_CIUDADANO).exists()):
+    if es_profesional:
         return redirect('profesionales.home')
-    elif (user.groups.filter(name=settings.GRUPO_ADMIN).exists() and
-    user.groups.filter(name=settings.GRUPO_CIUDADANO).exists()):
+    elif es_administrativo:
         return redirect('calendario.index')
-    elif user.groups.filter(name=settings.GRUPO_PROFESIONAL).exists():
-        # TODO cambiar por la nueva vista para atender turnos
-        return redirect('profesionales.lista')
     else:
         return redirect('ciudadano.home')
-
-    # default para ciudadano  
-    # TODO. cual es el home para el ciudadano?   
-    # return redirect('ciudadano.home')
-
