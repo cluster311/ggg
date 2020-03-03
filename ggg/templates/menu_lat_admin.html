@@ -168,7 +168,7 @@ Centro de salud activo
         </li>
         {% endif %}
 
-        {% if perms.profesionales.add_consulta %}
+        {% if perms.pacientes.view_consulta %}
         <li>
             <a href="{% url 'profesionales.home' %}">Turnos profesional</a>
         </li>

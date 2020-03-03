@@ -262,6 +262,13 @@ GRUPO_CIUDADANO = 'grupo_ciudadano'
 GRUPO_ADMIN = 'grupo_administrativo'
 # Profesionales médicos que dan servicios en el municipio
 GRUPO_PROFESIONAL = 'grupo_profesional'
+# Analistas de datos
+GRUPO_DATOS = 'grupo_datos'
+# Administradores generales (acceso a modificar las listas base)
+GRUPO_SUPER_ADMIN = 'grupo_super_admin'
+# Recupero de gasto
+GRUPO_RECUPERO = 'grupo_recupero'
+
 # ------------------------------------------
 # ------------------------------------------
 try:

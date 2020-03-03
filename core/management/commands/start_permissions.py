@@ -1,0 +1,92 @@
+# !/usr/bin/python
+
+from django.core.management.base import BaseCommand
+from django.conf import settings
+from django.db import transaction
+from django.contrib.auth.models import Group, Permission
+from profesionales.models import Profesional
+import sys
+import pyexcel as pe
+
+
+class Command(BaseCommand):
+    help = """Crear los grupos y permisos iniciales"""
+
+    def handle(self, *args, **options):
+        self.stdout.write(self.style.SUCCESS("--- Creando grupos ---"))
+
+        group_city, created = Group.objects.get_or_create(name=settings.GRUPO_CIUDADANO)
+        group_admin, created = Group.objects.get_or_create(name=settings.GRUPO_ADMIN)
+        group_prof, created = Group.objects.get_or_create(name=settings.GRUPO_PROFESIONAL)
+        group_data, created = Group.objects.get_or_create(name=settings.GRUPO_DATOS)
+        group_super, created = Group.objects.get_or_create(name=settings.GRUPO_SUPER_ADMIN)
+        group_recupero, created = Group.objects.get_or_create(name=settings.GRUPO_RECUPERO)
+
+        perm_schedule_turno = Permission.objects.get(codename='can_schedule_turno', content_type__app_label='calendario')
+        perm_viewmy_turno = Permission.objects.get(codename='can_view_misturnos', content_type__app_label='calendario')
+        # Definir perm_cancelmy_turno = Permission.objects.get(codename='can_cancel_turno', content_type__app_label='calendario')
+        # Definir perm_gestionar_turno = Permission.objects.get(codename='can_gestionar_turnos', content_type__app_label='calendario')
+        perm_add_turno = Permission.objects.get(codename='add_turno', content_type__app_label='calendario')
+        perm_view_turno = Permission.objects.get(codename='view_turno', content_type__app_label='calendario')
+        perm_change_turno = Permission.objects.get(codename='change_turno', content_type__app_label='calendario')
+
+        group_admin.permissions.add(perm_add_turno, perm_change_turno, perm_schedule_turno, perm_view_turno)
+        group_city.permissions.add(perm_viewmy_turno)
+
+        perm_add_consulta = Permission.objects.get(codename='add_consulta', content_type__app_label='pacientes')
+        perm_view_consulta = Permission.objects.get(codename='view_consulta', content_type__app_label='pacientes')
+        group_prof.permissions.add(perm_view_consulta, perm_add_consulta)
+
+        perm_prof_en_serv = Permission.objects.get(codename='view_profesionalesenservicio', content_type__app_label='centros_de_salud')
+        perm_view_prof = Permission.objects.get(codename='view_profesional', content_type__app_label='profesionales')
+        perm_chg_prof = Permission.objects.get(codename='change_profesional', content_type__app_label='profesionales')
+        perm_tablero_prof = Permission.objects.get(codename='can_view_tablero', content_type__app_label='profesionales')
+        group_data.permissions.add(perm_tablero_prof)
+        group_super.permissions.add(perm_prof_en_serv, perm_view_prof, perm_chg_prof)
+        
+        perm_tablero_oss = Permission.objects.get(codename='can_view_tablero', content_type__app_label='obras_sociales')
+        perm_view_oss = Permission.objects.get(codename='view_obrasocial', content_type__app_label='obras_sociales')
+        perm_add_oss = Permission.objects.get(codename='add_obrasocial', content_type__app_label='obras_sociales')
+        perm_chg_oss = Permission.objects.get(codename='change_obrasocial', content_type__app_label='obras_sociales')
+
+        group_data.permissions.add(perm_tablero_oss)
+        group_super.permissions.add(perm_view_oss, perm_add_oss, perm_chg_oss)
+        
+        perm_tablero_cds = Permission.objects.get(codename='can_view_tablero', content_type__app_label='centros_de_salud')
+        perm_view_serv = Permission.objects.get(codename='view_servicio', content_type__app_label='centros_de_salud')
+        perm_chg_serv = Permission.objects.get(codename='change_servicio', content_type__app_label='centros_de_salud')
+        perm_view_esp = Permission.objects.get(codename='view_especialidad', content_type__app_label='centros_de_salud')
+        perm_chg_esp = Permission.objects.get(codename='change_especialidad', content_type__app_label='centros_de_salud')
+        perm_view_cds = Permission.objects.get(codename='view_centrodesalud', content_type__app_label='centros_de_salud')
+        perm_chg_cds = Permission.objects.get(codename='change_centrodesalud', content_type__app_label='centros_de_salud')
+        perm_view_pes = Permission.objects.get(codename='view_profesionalesenservicio', content_type__app_label='centros_de_salud')
+        perm_chg_pes = Permission.objects.get(codename='change_profesionalesenservicio', content_type__app_label='centros_de_salud')
+
+        group_data.permissions.add(perm_tablero_cds)
+        group_super.permissions.add(perm_view_serv, perm_chg_serv, perm_view_esp, perm_chg_esp,
+                                    perm_view_cds, perm_chg_cds, perm_view_pes, perm_chg_pes)
+
+        perm_view_ma = Permission.objects.get(codename='view_medidaanexa', content_type__app_label='especialidades')
+        perm_chg_ma = Permission.objects.get(codename='change_medidaanexa', content_type__app_label='especialidades')
+        perm_view_maesp = Permission.objects.get(codename='view_medidasanexasespecialidad', content_type__app_label='especialidades')
+        perm_chg_maesp = Permission.objects.get(codename='change_medidasanexasespecialidad', content_type__app_label='especialidades')
+
+        group_super.permissions.add(perm_view_ma, perm_chg_ma, perm_view_maesp, perm_chg_maesp)
+
+        perm_view_fact = Permission.objects.get(codename='view_factura', content_type__app_label='recupero')
+        perm_chg_fact = Permission.objects.get(codename='change_factura', content_type__app_label='recupero')
+        perm_view_tda = Permission.objects.get(codename='view_tipodocumentoanexo', content_type__app_label='recupero')
+        perm_chg_tda = Permission.objects.get(codename='change_tipodocumentoanexo', content_type__app_label='recupero')
+        perm_view_tp = Permission.objects.get(codename='view_tipoprestacion', content_type__app_label='recupero')
+        perm_chg_tp = Permission.objects.get(codename='change_tipoprestacion', content_type__app_label='recupero')
+
+        group_recupero.permissions.add(perm_view_fact, perm_chg_fact, perm_view_tda,
+                                       perm_chg_tda, perm_view_tp, perm_chg_tp)
+        
+        perm_view_uecds = Permission.objects.get(codename='view_usuarioencentrodesalud', content_type__app_label='usuarios')
+        perm_add_uecds = Permission.objects.get(codename='add_usuarioencentrodesalud', content_type__app_label='usuarios')
+        perm_chg_uecds = Permission.objects.get(codename='change_usuarioencentrodesalud', content_type__app_label='usuarios')
+        
+        group_super.permissions.add(perm_view_uecds, perm_add_uecds, perm_chg_uecds)
+        
+        
