@@ -63,7 +63,7 @@ class ProfesionalHome(TemplateView, GroupRequiredMixin):
 @method_decorator(cache_page(60 * 5), name='dispatch')
 class ProfesionalListView(PermissionRequiredMixin, ListView):
     model = Profesional
-    permission_required = ("view_profesional",)
+    permission_required = ("profesionales.view_profesional",)
     paginate_by = 10  # pagination
 
     def get_queryset(self):        
@@ -96,7 +96,7 @@ class ProfesionalCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
     model = Profesional
-    permission_required = ("view_profesional",)
+    permission_required = ("profesionales.view_profesional",)
     fields =  '__all__'
     success_message = "Creado con éxito."
 
@@ -115,7 +115,7 @@ class ProfesionalCreateView(PermissionRequiredMixin,
 
 class ProfesionalDetailView(PermissionRequiredMixin, DetailView):
     model = Profesional
-    permission_required = ("view_profesional",)
+    permission_required = ("profesionales.view_profesional",)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -126,7 +126,7 @@ class ProfesionalDetailView(PermissionRequiredMixin, DetailView):
 
 class ProfesionalUpdateView(PermissionRequiredMixin, UpdateView):
     model = Profesional
-    permission_required = "change_profesional"
+    permission_required = "profesionales.change_profesional"
     fields =  '__all__'
     success_message = "Actualizado con éxito."
 
@@ -149,7 +149,7 @@ class TableroProfesionalesPorEspecialidadView(
     """ mostrar datos de los profesionales """
 
     model = Profesional
-    permission_required = ("can_view_tablero",)
+    permission_required = ("profesionales.can_view_tablero",)
     template_name = "profesionales/tableros.html"
     # https://bootstrapious.com/tutorial/sidebar/index5.html
 
@@ -199,7 +199,7 @@ class TableroProfesionalesPorLocalidadView(
     """ mostrar datos de los profesionales """
 
     model = Profesional
-    permission_required = ("can_view_tablero",)
+    permission_required = ("profesionales.can_view_tablero",)
     template_name = "profesionales/tableros.html"
     # https://bootstrapious.com/tutorial/sidebar/index5.html
 
