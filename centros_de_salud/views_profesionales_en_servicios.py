@@ -15,7 +15,7 @@ class ProfesionalesEnServicioListView(PermissionRequiredMixin, ListView):
     Lista de Profesionales en Servicios
     """
     model = ProfesionalesEnServicio
-    permission_required = ("view_profesionalesenservicio",)
+    permission_required = ("centros_de_salud.view_profesionalesenservicio",)
     paginate_by = 10
 
     def get_queryset(self):
@@ -51,7 +51,7 @@ class ProfesionalesEnServicioCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
     model = ProfesionalesEnServicio
-    permission_required = ("view_profesionalesenservicio",)
+    permission_required = ("centros_de_salud.view_profesionalesenservicio",)
     form_class = ProfesionalesEnServicioForm
     success_message = "Creado con éxito."
 
@@ -74,7 +74,7 @@ class ProfesionalesEnServicioCreateView(PermissionRequiredMixin,
 
 class ProfesionalesEnServicioDetailView(PermissionRequiredMixin, DetailView):
     model = ProfesionalesEnServicio
-    permission_required = ("view_profesionalesenservicio",)
+    permission_required = ("centros_de_salud.view_profesionalesenservicio",)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -85,7 +85,7 @@ class ProfesionalesEnServicioDetailView(PermissionRequiredMixin, DetailView):
 
 class ProfesionalesEnServicioUpdateView(PermissionRequiredMixin, UpdateView):
     model = ProfesionalesEnServicio
-    permission_required = "change_profesionalesenservicio"
+    permission_required = "centros_de_salud.change_profesionalesenservicio"
     form_class = ProfesionalesEnServicioForm
     success_message = "Actualizado con éxito."
 

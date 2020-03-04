@@ -17,7 +17,7 @@ from .models import ObraSocial
 @method_decorator(cache_page(60 * 5), name='dispatch')
 class ObraSocialListView(PermissionRequiredMixin, ListView):
     model = ObraSocial
-    permission_required = ("view_obrasocial",)
+    permission_required = ("obras_sociales.view_obrasocial",)
     paginate_by = 10  # pagination
 
     def get_queryset(self):        
@@ -49,7 +49,7 @@ class ObraSocialCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
     model = ObraSocial
-    permission_required = ("add_obrasocial",)
+    permission_required = ("obras_sociales.add_obrasocial",)
     fields =  '__all__'
     success_message = "Creado con éxito."
 
@@ -67,7 +67,7 @@ class ObraSocialCreateView(PermissionRequiredMixin,
 
 class ObraSocialUpdateView(PermissionRequiredMixin, UpdateView):
     model = ObraSocial
-    permission_required = "change_obrasocia"
+    permission_required = "obras_sociales.change_obrasocia"
     fields =  '__all__'
     success_message = "Actualizado con éxito."
 
@@ -86,7 +86,7 @@ class ObraSocialUpdateView(PermissionRequiredMixin, UpdateView):
 
 class ObraSocialDetailView(PermissionRequiredMixin, DetailView):
     model = ObraSocial
-    permission_required = ("view_obrasocial",)
+    permission_required = ("obras_sociales.view_obrasocial",)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -99,7 +99,7 @@ class ObraSocialDetailView(PermissionRequiredMixin, DetailView):
 class TableroObraSocialPorPorvinciaView(PermissionRequiredMixin, TemplateView):
     """ mostrar datos de los profesionales """
     model = ObraSocial
-    permission_required = ('can_view_tablero', )
+    permission_required = ('obras_sociales.can_view_tablero', )
     template_name = 'profesionales/tableros.html'
     # https://bootstrapious.com/tutorial/sidebar/index5.html
 

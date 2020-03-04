@@ -15,7 +15,7 @@ class MedidasAnexasEspecialidadListView(PermissionRequiredMixin, ListView):
     Lista de Profesionales en Servicios
     """
     model = MedidasAnexasEspecialidad
-    permission_required = ("view_medidasanexasespecialidad",)
+    permission_required = ("especialidades.view_medidasanexasespecialidad",)
     paginate_by = 10
 
     def get_queryset(self):
@@ -47,7 +47,7 @@ class MedidasAnexasEspecialidadCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
     model = MedidasAnexasEspecialidad
-    permission_required = ("view_medidasanexasespecialidad",)
+    permission_required = ("especialidades.view_medidasanexasespecialidad",)
     form_class = MedidasAnexasEspecialidadForm
     success_message = "Creado con éxito."
 
@@ -70,7 +70,7 @@ class MedidasAnexasEspecialidadCreateView(PermissionRequiredMixin,
 
 class MedidasAnexasEspecialidadDetailView(PermissionRequiredMixin, DetailView):
     model = MedidasAnexasEspecialidad
-    permission_required = ("view_medidasanexasespecialidad",)
+    permission_required = ("especialidades.view_medidasanexasespecialidad",)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -81,7 +81,7 @@ class MedidasAnexasEspecialidadDetailView(PermissionRequiredMixin, DetailView):
 
 class MedidasAnexasEspecialidadUpdateView(PermissionRequiredMixin, UpdateView):
     model = MedidasAnexasEspecialidad
-    permission_required = "change_medidasanexasespecialidad"
+    permission_required = "especialidades.change_medidasanexasespecialidad"
     form_class = MedidasAnexasEspecialidadForm
     success_message = "Actualizado con éxito."
 

@@ -15,7 +15,7 @@ class EspecialidadListView(PermissionRequiredMixin, ListView):
     Lista de Especialidades
     """
     model = Especialidad
-    permission_required = ("view_especialidad",)
+    permission_required = ("centros_de_salud.view_especialidad",)
     paginate_by = 10
 
     def get_queryset(self):   
@@ -44,7 +44,7 @@ class EspecialidadCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
     model = Especialidad
-    permission_required = ("view_especialidad",)
+    permission_required = ("centros_de_salud.view_especialidad",)
     fields = ['nombre', 'tiempo_predeterminado_turno']
     success_message = "Creado con éxito."
 
@@ -62,7 +62,7 @@ class EspecialidadCreateView(PermissionRequiredMixin,
 
 class EspecialidadDetailView(PermissionRequiredMixin, DetailView):
     model = Especialidad
-    permission_required = ("view_especialidad",)
+    permission_required = ("centros_de_salud.view_especialidad",)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -73,7 +73,7 @@ class EspecialidadDetailView(PermissionRequiredMixin, DetailView):
 
 class EspecialidadUpdateView(PermissionRequiredMixin, UpdateView):
     model = Especialidad
-    permission_required = "change_especialidad"
+    permission_required = "centros_de_salud.change_especialidad"
     fields = ['nombre', 'tiempo_predeterminado_turno']
     success_message = "Actualizado con éxito."
 

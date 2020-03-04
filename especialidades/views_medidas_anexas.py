@@ -15,7 +15,7 @@ class MedidaAnexaListView(PermissionRequiredMixin, ListView):
     Lista de Medidas Anexas
     """
     model = MedidaAnexa
-    permission_required = ("view_medidaanexa",)
+    permission_required = ("especialidades.view_medidaanexa",)
     paginate_by = 10
 
     def get_queryset(self):
@@ -43,7 +43,7 @@ class MedidaAnexaCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
     model = MedidaAnexa
-    permission_required = ("view_medidaanexa",)
+    permission_required = ("especialidades.view_medidaanexa",)
     success_message = "Creado con éxito."
     form_class = MedidaAnexaForm
 
@@ -66,7 +66,7 @@ class MedidaAnexaCreateView(PermissionRequiredMixin,
 
 class MedidaAnexaDetailView(PermissionRequiredMixin, DetailView):
     model = MedidaAnexa
-    permission_required = ("view_medidaanexa",)
+    permission_required = ("especialidades.view_medidaanexa",)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -77,7 +77,7 @@ class MedidaAnexaDetailView(PermissionRequiredMixin, DetailView):
 
 class MedidaAnexaUpdateView(PermissionRequiredMixin, UpdateView):
     model = MedidaAnexa
-    permission_required = "change_medidaanexa"
+    permission_required = "especialidades.change_medidaanexa"
     success_message = "Actualizado con éxito."
     form_class = MedidaAnexaForm
 

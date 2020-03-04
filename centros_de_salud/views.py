@@ -16,7 +16,7 @@ from .forms import CentroDeSaludForm
 @method_decorator(cache_page(60 * 5), name='dispatch')
 class CentroDeSaludListView(PermissionRequiredMixin, ListView):
     model = CentroDeSalud
-    permission_required = ("view_centrodesalud",)
+    permission_required = ("centros_de_salud.view_centrodesalud",)
     paginate_by = 10  # pagination
 
     def get_queryset(self):
@@ -53,7 +53,7 @@ class CentroDeSaludCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
     model = CentroDeSalud
-    permission_required = ("add_centrodesalud",)
+    permission_required = ("centros_de_salud.add_centrodesalud",)
     form_class = CentroDeSaludForm
     success_message = "Creado con éxito."
 
@@ -71,7 +71,7 @@ class CentroDeSaludCreateView(PermissionRequiredMixin,
 
 class CentroDeSaludUpdateView(PermissionRequiredMixin, UpdateView):
     model = CentroDeSalud
-    permission_required = "change_centrodesalud"
+    permission_required = "centros_de_salud.change_centrodesalud"
     form_class = CentroDeSaludForm
     success_message = "Actualizado con éxito."
 
@@ -90,7 +90,7 @@ class CentroDeSaludUpdateView(PermissionRequiredMixin, UpdateView):
 
 class CentroDeSaludDetailView(PermissionRequiredMixin, DetailView):
     model = CentroDeSalud
-    permission_required = ("view_centrodesalud",)
+    permission_required = ("centros_de_salud.view_centrodesalud",)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

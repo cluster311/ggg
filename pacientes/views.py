@@ -31,7 +31,7 @@ class ConsultaListView(PermissionRequiredMixin, ListView):
     """
 
     model = Consulta
-    permission_required = ("can_view_tablero",)
+    permission_required = ("pacientes.view_consulta",)
     template_name = "pacientes/consulta_listview.html"
 
     def get_context_data(self, **kwargs):
@@ -50,7 +50,7 @@ class ConsultaDetailView(PermissionRequiredMixin, DetailView):
     """
 
     model = Consulta
-    permission_required = ("view_consulta",)
+    permission_required = ("pacientes.view_consulta",)
     template_name = "pacientes/consulta_detailview.html"
 
     def get_context_data(self, **kwargs):
@@ -167,7 +167,7 @@ class EvolucionUpdateView(ConsultaMixin,
                           UpdateView):
     """Evolución /Consulta de paciente"""
     model = Consulta
-    permission_required = ("add_consulta",)
+    permission_required = ("pacientes.add_consulta",)
     template_name = "pacientes/evolucion.html"
     form_class = EvolucionForm
     success_message = "Datos guardados con éxito."

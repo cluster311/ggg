@@ -12,7 +12,7 @@ class FacturaPendEnvioView(PermissionRequiredMixin, ListView):
     """
     template_name = 'recupero/facturacion-pendiente-de-envio.html'
     model = Factura
-    permission_required = ("change_factura",)
+    permission_required = ("recupero.change_factura",)
     paginate_by = 10  # pagination
 
     def get_queryset(self):        
@@ -42,7 +42,7 @@ class FacturaPendCobroView(
     """
     template_name = 'recupero/facturacion-pendiente-de-cobro.html'
     model = Factura
-    permission_required = ("change_factura",)
+    permission_required = ("recupero.change_factura",)
     paginate_by = 10  # pagination
 
     def get_queryset(self):        

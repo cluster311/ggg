@@ -20,7 +20,7 @@ class ServicioListView(PermissionRequiredMixin, ListView):
     Lista de Servicios
     """
     model = Servicio
-    permission_required = ("view_servicio",)
+    permission_required = ("centros_de_salud.view_servicio",)
     paginate_by = 10
 
     def get_queryset(self):
@@ -53,7 +53,7 @@ class ServicioCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
     model = Servicio
-    permission_required = ("view_servicio",)
+    permission_required = ("centros_de_salud.view_servicio",)
     success_message = "Creado con éxito."
     form_class = ServicioForm
 
@@ -76,7 +76,7 @@ class ServicioCreateView(PermissionRequiredMixin,
 
 class ServicioDetailView(PermissionRequiredMixin, DetailView):
     model = Servicio
-    permission_required = ("view_servicio",)
+    permission_required = ("centros_de_salud.view_servicio",)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -87,7 +87,7 @@ class ServicioDetailView(PermissionRequiredMixin, DetailView):
 
 class ServicioUpdateView(PermissionRequiredMixin, UpdateView):
     model = Servicio
-    permission_required = "change_servicio"
+    permission_required = "centros_de_salud.change_servicio"
     success_message = "Actualizado con éxito."
     form_class = ServicioForm
 
