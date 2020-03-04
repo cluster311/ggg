@@ -1,0 +1,9 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+<h2>Datos de salud</h2>
+<p>Home para el analista de datos ... en construccion</p>
+{% if not request.user.is_authenticated %}
+<a class="btn btn-link btn-primary" href="{% url 'account_login' %}"> Acceso </a>
+{% endif %}
+{% endblock %}

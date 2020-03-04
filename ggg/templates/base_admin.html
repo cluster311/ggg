@@ -35,29 +35,30 @@
     crossorigin="anonymous"></script>
 
   <!-- Colores para ciudadanos, no administradores de muni-->
-  {% if user__es_ciudadno and not user__es_administrativo and not user__es_profesional %}
+  {% if user__es_super %}
   <style>
-    #sidebar {
-      background: #81b28e;
-    }
-    #sidebar .sidebar-header,
-    #sidebar ul li.active > a,
-    a[aria-expanded="true"],
-    #sidebar ul ul a{
-      background: #73a55e;
-    }
+    #sidebar {background: #2b3f30;}
+    #sidebar .sidebar-header, #sidebar ul li.active > a, a[aria-expanded="true"], #sidebar ul ul a {background: #223619;}
+  </style>
+  {% elif user__es_administrativo %}
+  <style>
+    #sidebar {background: #81b28e;}
+    #sidebar .sidebar-header, #sidebar ul li.active > a, a[aria-expanded="true"], #sidebar ul ul a {background: #73a55e;}
   </style>
   {% elif user__es_profesional %}
     <style>
-      #sidebar {
-        background: #f92121;
-      }
-      #sidebar .sidebar-header,
-      #sidebar ul li.active > a,
-      a[aria-expanded="true"],
-      #sidebar ul ul a{
-        background: #fa0303;
-      }
+      #sidebar {background: #f92121;}
+      #sidebar .sidebar-header, #sidebar ul li.active > a, a[aria-expanded="true"], #sidebar ul ul a {background: #fa0303;}
+    </style>
+  {% elif user__es_recupero %}
+  <style>
+    #sidebar {background: #49609e;}
+    #sidebar .sidebar-header, #sidebar ul li.active > a, a[aria-expanded="true"], #sidebar ul ul a {background: #583f85;}
+  </style>
+  {% elif user__es_ciudadano %}
+    <style>
+      #sidebar {background: #7f8351;}
+      #sidebar .sidebar-header, #sidebar ul li.active > a, a[aria-expanded="true"], #sidebar ul ul a {background: #3f381a;}
     </style>
   {% endif %}
 

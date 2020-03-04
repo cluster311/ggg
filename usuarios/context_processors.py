@@ -18,8 +18,12 @@ def cpp_usuarios(request):
         centro_de_salud_elegido = user.centros_de_salud_permitidos.filter(elegido=True)
         context["user__centro_de_salud_elegido"] = centro_de_salud_elegido.first()
         
-    context["user__es_ciudadno"] = user.groups.filter(name=settings.GRUPO_CIUDADANO).exists()
+    context["user__es_ciudadano"] = user.groups.filter(name=settings.GRUPO_CIUDADANO).exists()
     context["user__es_administrativo"] = user.is_superuser or user.groups.filter(name=settings.GRUPO_ADMIN).exists()
     context["user__es_profesional"] = user.groups.filter(name=settings.GRUPO_PROFESIONAL).exists()
+    context["user__es_data"] = user.groups.filter(name=settings.GRUPO_DATOS).exists()
+    context["user__es_super"] = user.groups.filter(name=settings.GRUPO_SUPER_ADMIN).exists()
+    context["user__es_recupero"] = user.groups.filter(name=settings.GRUPO_RECUPERO).exists()
+
     
     return context

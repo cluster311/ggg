@@ -4,15 +4,17 @@ from django.test import Client
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from profesionales.models import Profesional
+from core.base_permission import start_roles_and_permissions
 from .views import ProfesionalHome
 
 
 class FullUsersMixin:
     def create_users_and_groups(self):
         #create permissions group
-        self.group_city, created = Group.objects.get_or_create(name=settings.GRUPO_CIUDADANO)
-        self.group_admin, created = Group.objects.get_or_create(name=settings.GRUPO_ADMIN)
-        self.group_prof, created = Group.objects.get_or_create(name=settings.GRUPO_PROFESIONAL)
+        start_roles_and_permissions()
+        self.group_city= Group.objects.get(name=settings.GRUPO_CIUDADANO)
+        self.group_admin = Group.objects.get(name=settings.GRUPO_ADMIN)
+        self.group_prof = Group.objects.get(name=settings.GRUPO_PROFESIONAL)
         
         self.user_anon = AnonymousUser()
         self.user_city = User.objects.create_user(username="city", email="city@test.com", password="city")
@@ -24,8 +26,8 @@ class FullUsersMixin:
         prof.user = self.user_prof
         self.user_prof.groups.add(self.group_prof)
 
-class ProfesionalesTests(TestCase, FullUsersMixin):
 
+class ProfesionalesTests(TestCase, FullUsersMixin):
 
     def setUp(self):
         self.c = Client()
