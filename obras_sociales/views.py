@@ -38,7 +38,7 @@ class ObraSocialListView(PermissionRequiredMixin, ListView):
         context['title'] = 'Lista de Obras sociales'
         context['title_url'] = 'obras-sociales.lista'
         context['use_search_bar'] = True
-        if self.request.user.has_perm('obras-sociales.add_obrasocial'):
+        if self.request.user.has_perm('obras_sociales.add_obrasocial'):
             context['use_add_btn'] = True
             context['add_url'] = 'obras-sociales.create'
         return context
@@ -66,7 +66,7 @@ class ObraSocialCreateView(PermissionRequiredMixin,
 
 class ObraSocialUpdateView(PermissionRequiredMixin, UpdateView):
     model = ObraSocial
-    permission_required = "obras_sociales.change_obrasocia"
+    permission_required = "obras_sociales.change_obrasocial"
     fields =  '__all__'
     success_message = "Actualizado con éxito."
 
