@@ -60,7 +60,6 @@ class ProfesionalHome(TemplateView, GroupRequiredMixin):
         return context
 
 
-@method_decorator(cache_page(60 * 5), name='dispatch')
 class ProfesionalListView(PermissionRequiredMixin, ListView):
     model = Profesional
     permission_required = ("profesionales.view_profesional",)

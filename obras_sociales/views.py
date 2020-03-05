@@ -14,7 +14,6 @@ from django.conf import settings
 from .models import ObraSocial
 
 
-@method_decorator(cache_page(60 * 5), name='dispatch')
 class ObraSocialListView(PermissionRequiredMixin, ListView):
     model = ObraSocial
     permission_required = ("obras_sociales.view_obrasocial",)

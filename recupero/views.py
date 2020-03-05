@@ -2,7 +2,6 @@ from django.views.generic.list import ListView
 from django.db.models import Count, Q
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
 from .models import Factura, TipoDocumentoAnexo, TipoPrestacion
 
 

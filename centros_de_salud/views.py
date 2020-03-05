@@ -6,14 +6,12 @@ from django.db.models import Q
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
 from django.conf import settings
 from django.urls import reverse
 from .models import CentroDeSalud
 from .forms import CentroDeSaludForm
 
 
-@method_decorator(cache_page(60 * 5), name='dispatch')
 class CentroDeSaludListView(PermissionRequiredMixin, ListView):
     model = CentroDeSalud
     permission_required = ("centros_de_salud.view_centrodesalud",)

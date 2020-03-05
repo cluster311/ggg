@@ -8,7 +8,6 @@ from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMi
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
