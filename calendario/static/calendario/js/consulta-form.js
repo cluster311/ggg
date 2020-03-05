@@ -1,10 +1,10 @@
 $( document ).ready(function() {
 // id_servicio or select2-id_servicio-container
 
-  // $('body').on('change', '#id_servicio', function () {
-  //   let servicio_id = $(this).val();
-  //   reload_profesionales(servicio_id)
-  // });
+  $('body').on('change', '#id_servicio', function () {
+    let servicio_id = $(this).val();
+    reload_profesionales(servicio_id)
+  });
 
   // $('body').on('change', '#select2-id_servicio-container', function () {
   //   let servicio_id = $(this).val();
