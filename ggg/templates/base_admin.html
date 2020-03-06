@@ -47,8 +47,8 @@
   </style>
   {% elif user__es_profesional %}
     <style>
-      #sidebar {background: #f92121;}
-      #sidebar .sidebar-header, #sidebar ul li.active > a, a[aria-expanded="true"], #sidebar ul ul a {background: #fa0303;}
+      #sidebar {background: #552222;}
+      #sidebar .sidebar-header, #sidebar ul li.active > a, a[aria-expanded="true"], #sidebar ul ul a {background: #300f0f;}
     </style>
   {% elif user__es_recupero %}
   <style>
@@ -88,7 +88,7 @@
 
               <li>
                 <a target='_blank' href="{% url 'account_logout' %}" 
-                    class="article">Salir</a>
+                    class="article">Salir [{{ user.username }}]</a>
               </li>
             
           </ul>

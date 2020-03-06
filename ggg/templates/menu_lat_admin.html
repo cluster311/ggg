@@ -1,5 +1,5 @@
 
-{% if user__es_administrativo or user__es_profesional %}
+{% if user__es_administrativo or user__es_profesional or user__es_super %}
 {# centros de salud autorizados para este usuario #}
 Centro de salud activo
 <select class="custom-select custom-select-sm" 
@@ -139,7 +139,7 @@ Centro de salud activo
     </li>
     {% endif %}
 
-    {% if perms.calendario.add_turno or perms.calendario.can_schedule_turno or perms.profesionales.add_consulta or perms.calendario.can_view_misturnos %}
+    {% if perms.calendario.add_turno or perms.calendario.can_schedule_turno or perms.pacientes.add_consulta or perms.pacientes.view_consulta or perms.calendario.can_view_misturnos %}
     <li>
         <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
         <a href="#menu_turnos" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Turnos</a>

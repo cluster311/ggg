@@ -14,13 +14,13 @@ def start_roles_and_permissions():
     """ asignar los permisos iniciales a los roles en el sistema """
     perm_schedule_turno = Permission.objects.get(codename='can_schedule_turno', content_type__app_label='calendario')
     perm_viewmy_turno = Permission.objects.get(codename='can_view_misturnos', content_type__app_label='calendario')
-    # Definir perm_cancelmy_turno = Permission.objects.get(codename='can_cancel_turno', content_type__app_label='calendario')
+    perm_cancel_turno = Permission.objects.get(codename='can_cancel_turno', content_type__app_label='calendario')
     # Definir perm_gestionar_turno = Permission.objects.get(codename='can_gestionar_turnos', content_type__app_label='calendario')
     perm_add_turno = Permission.objects.get(codename='add_turno', content_type__app_label='calendario')
     perm_view_turno = Permission.objects.get(codename='view_turno', content_type__app_label='calendario')
     perm_change_turno = Permission.objects.get(codename='change_turno', content_type__app_label='calendario')
 
-    group_admin.permissions.add(perm_add_turno, perm_change_turno, perm_schedule_turno, perm_view_turno)
+    group_admin.permissions.add(perm_add_turno, perm_change_turno, perm_schedule_turno, perm_view_turno, perm_cancel_turno)
     group_city.permissions.add(perm_viewmy_turno)
 
     perm_add_consulta = Permission.objects.get(codename='add_consulta', content_type__app_label='pacientes')
@@ -33,6 +33,7 @@ def start_roles_and_permissions():
     perm_chg_prof = Permission.objects.get(codename='change_profesional', content_type__app_label='profesionales')
     perm_tablero_prof = Permission.objects.get(codename='can_view_tablero', content_type__app_label='profesionales')
     
+    group_admin.permissions.add(perm_view_prof)  # lo necesita para filtrar la lista de profesionales al crear los turnos. TODO limitarlo de alguna forma
     group_data.permissions.add(perm_tablero_prof)
     group_super.permissions.add(perm_view_prof, perm_chg_prof, perm_add_prof)
     
