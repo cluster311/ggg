@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from profesionales.models import Profesional
+from centros_de_salud.models import CentroDeSalud, Especialidad, Servicio, ProfesionalesEnServicio
+from usuarios.models import UsuarioEnCentroDeSalud
 
 
 def start_roles_and_permissions():
@@ -93,6 +95,52 @@ def start_roles_and_permissions():
     perm_chg_uecds = Permission.objects.get(codename='change_usuarioencentrodesalud', content_type__app_label='usuarios')
     
     group_super.permissions.add(perm_view_uecds, perm_add_uecds, perm_chg_uecds)
+
+
+def create_test_data():
+    """ Crear centros de salud con diferentes 
+        especialidades y profesionales asignados cada una.
+        Sumar ademas usuarios con permisos en esos centros
+        """
+
+    for x in range(1, 4):
+        # crear centros de salud y especialidades
+        cs, created = CentroDeSalud.objects.get_or_create(nombre=f"Centro de Salud {x}")
+        es, created = Especialidad.objects.get_or_create(nombre=f"Especialidad {x}")
+        # crear un servicio en ese centro de salud para esa especialidad
+        se, created = Servicio.objects.get_or_create(centro=cs, especialidad=es)
+        for y in 'ABCDE':
+            pr, created = Profesional.objects.get_or_create(nombres=f"Profesional {x}{y}",
+                                                            numero_documento=f"900000{x}{y}")
+            ps, created = ProfesionalesEnServicio.objects.get_or_create(servicio=se, profesional=pr)
+
+            # crear un usuario para cada uno de los profesionales
+            group_prof = Group.objects.get(name=settings.GRUPO_PROFESIONAL)
+            us = User.objects.filter(username=f"prof{x}{y}")
+            if us.count() == 0:
+                user_prof = User.objects.create_user(username=f"prof{x}{y}",
+                                                    email=f"prof{x}{y}@test.com",
+                                                    password=f"prof{x}{y}")
+                pr.user = user_prof
+                pr.save()
+            else:
+                user_prof = us[0]
+            user_prof.groups.add(group_prof)
+    
+        # agregar un usuario administrativo con permisos para este centro de salud
+        group_admin = Group.objects.get(name=settings.GRUPO_ADMIN)
+        user_name = f"administrativo{x}"
+        us = User.objects.filter(username=user_name)
+        if us.count() == 0:
+            user_admin = User.objects.create_user(username=user_name,
+                                                  email=f"admin{x}@test.com", 
+                                                  password=user_name)
+        else:
+            user_admin = us[0]
+        user_admin.groups.add(group_admin)
+        UsuarioEnCentroDeSalud.objects.get_or_create(usuario=user_admin,
+                                                     centro_de_salud=cs)
+
 
 def create_test_users():
     group_city = Group.objects.get(name=settings.GRUPO_CIUDADANO)
