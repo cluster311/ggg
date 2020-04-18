@@ -98,6 +98,7 @@ def create_test_users():
     group_city = Group.objects.get(name=settings.GRUPO_CIUDADANO)
     group_admin = Group.objects.get(name=settings.GRUPO_ADMIN)
     group_prof = Group.objects.get(name=settings.GRUPO_PROFESIONAL)
+    group_recupero = Group.objects.get(name=settings.GRUPO_RECUPERO)
     
     user_anon = AnonymousUser()
 
@@ -125,6 +126,13 @@ def create_test_users():
     
     user_prof.groups.add(group_prof)
 
+    us = User.objects.filter(username="recupero")
+    if us.count() == 0:
+        user_recupero = User.objects.create_user(username="recupero", email="recupero@test.com", password="recupero")
+    else:
+        user_recupero = us[0]
+    user_recupero.groups.add(group_recupero)
+
     ret = {
         'group_city': group_city,
         'group_admin': group_admin,
@@ -132,7 +140,8 @@ def create_test_users():
         'user_anon': user_anon,
         'user_city': user_city,
         'user_admin': user_admin,
-        'user_prof': user_prof
+        'user_prof': user_prof,
+        'user_recupero': user_recupero
     }
 
     return ret
