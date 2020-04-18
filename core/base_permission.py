@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from profesionales.models import Profesional
 from centros_de_salud.models import CentroDeSalud, Especialidad, Servicio, ProfesionalesEnServicio
 from usuarios.models import UsuarioEnCentroDeSalud
@@ -139,3 +139,58 @@ def create_test_data():
         user_admin.groups.add(group_admin)
         UsuarioEnCentroDeSalud.objects.get_or_create(usuario=user_admin,
                                                      centro_de_salud=cs)
+
+
+def create_test_users():
+    group_city = Group.objects.get(name=settings.GRUPO_CIUDADANO)
+    group_admin = Group.objects.get(name=settings.GRUPO_ADMIN)
+    group_prof = Group.objects.get(name=settings.GRUPO_PROFESIONAL)
+    group_recupero = Group.objects.get(name=settings.GRUPO_RECUPERO)
+    
+    user_anon = AnonymousUser()
+
+    us = User.objects.filter(username="city")
+    if us.count() == 0:
+        user_city = User.objects.create_user(username="city", email="city@test.com", password="city")
+    else:
+        user_city = us[0]
+    user_city.groups.add(group_city)
+
+    us = User.objects.filter(username="administrativo")
+    if us.count() == 0:
+        user_admin = User.objects.create_user(username="administrativo", email="admin@test.com", password="administrativo")
+    else:
+        user_admin = us[0]
+    user_admin.groups.add(group_admin)
+
+    us = User.objects.filter(username="prof")
+    if us.count() == 0:
+        prof = Profesional.objects.create(nombres="prof name", numero_documento="10101090")
+        user_prof = User.objects.create_user(username="prof", email="prof@test.com", password="prof")
+        prof.user = user_prof
+        prof.save()
+    else:
+        user_prof = us[0]
+    
+    user_prof.groups.add(group_prof)
+
+    us = User.objects.filter(username="recupero")
+    if us.count() == 0:
+        user_recupero = User.objects.create_user(username="recupero", email="recupero@test.com", password="recupero")
+    else:
+        user_recupero = us[0]
+    user_recupero.groups.add(group_recupero)
+
+    ret = {
+        'group_city': group_city,
+        'group_admin': group_admin,
+        'group_prof': group_prof,
+        'group_recupero': group_recupero,
+        'user_anon': user_anon,
+        'user_city': user_city,
+        'user_admin': user_admin,
+        'user_prof': user_prof,
+        'user_recupero': user_recupero
+    }
+
+    return ret
