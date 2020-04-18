@@ -4,31 +4,19 @@
 {% block content %}
 <a role="button" class="btn btn-warning btn-sm active" 
     href="{% url 'recupero.facturas' %}">Volver a la lista</a>
-{% if perms.recupero.change_tipoprestacion %}
+{% if perms.recupero.change_factura %}
 <a role="button" 
     class="btn btn-warning btn-sm active" 
     href="{% url 'recupero.factura.edit' pk=object.id %}">Editar</a>
 {% endif %}
 
-<h2>Código: {{ object.codigo }}</h2>
-<p>{{ object.nombre }}: <b>$ {{ object.arancel }}</b></p>
-<p>{{ object.descripcion }}</p>
-<p>{{ object.observaciones }}</p>
-<p>Tipo: {{ object.get_tipo_display }}</p>
-<p>Documentos requeridos</p>
-<ul>
-    {% for doc in object.documentos_requeridos.all %}
-    <li>{{ doc.nombre }}</li>
-    {% empty %}
-    <li>Sin documentos requeridos</li>
-    {% endfor %}
-</ul>
-<p>Documentos sugeridos</p>
-<ul>
-    {% for doc in object.documentos_sugeridos.all %}
-    <li>{{ doc.nombre }}</li>
-    {% empty %}
-    <li>Sin documentos sugeridos</li>
-    {% endfor %}
-</ul>
+<h2>Factura: {{ object.id }}</h2>
+<p>Creada: <b>$ {{ object.created|date:"Y/m/d H:i" }}</b></p>
+<p>Obra social: <b>{{ object.obra_social|default_if_none:"Sin definir" }}</b></p>
+<p>Centro de Salud: <b>{{ object.consulta.centro_de_salud }}</b></p>
+<p>Estado: {{ object.get_estado_display }}</p>
+<p>Profesional: <b>{{ object.consulta.profesional }}</b></p>
+<p>Especialidad: <b>{{ object.consulta.especialidad }}</b></p>
+<p>CIE 10 principal: <b>{{ object.consulta.codigo_cie_principal }}</b></p>
+
 {% endblock %}

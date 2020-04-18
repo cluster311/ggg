@@ -1,7 +1,7 @@
 {% extends "base_admin.html" %}
 
 {% block content %}
-<h2>Facturación de recupero pendiente de cobro</h2>
+<h2>Facturación de recupero</h2>
 
 {% include 'admin_search_bar.html' %}
 {% include 'admin_paginate.html' %}
@@ -10,6 +10,7 @@
     <thead>
     <tr>
         <th scope="col">Factura</th>
+        <th scope="col">Estado</th>
         <th scope="col">Fecha</th>
         <th scope="col">Obra social</th>
         <th scope="col">Centro de salud</th>
@@ -23,6 +24,7 @@
     {% for cs in object_list %}
 <tr>
     <th scope="row">{{ cs.id }}</th>
+    <td scope="row">{{ cs.get_estado_display }}</td>
     <th scope="row">{{ cs.created|date:"Y/m/d H:i" }}</th>
     <td scope="row">{{ cs.obra_social|default_if_none:"Sin definir" }}</td>
     <td scope="row">{{ cs.consulta.centro_de_salud }}</td>
@@ -31,10 +33,10 @@
     <td scope="row">{{ cs.consulta.codigo_cie_principal }}</td>
     <td scope="row">
         <a role="button" class="btn btn-warning btn-sm active" 
-            href="{% url 'recupero.tipos-documento-anexo.detail' pk=cs.id %}">Detalles</a>
+            href="{% url 'recupero.factura.detail' pk=cs.id %}">Detalles</a>
         {% if perms.recupero.change_factura %}
         <a role="button" class="btn btn-warning btn-sm active" 
-            href="{% url 'recupero.tipos-documento-anexo.edit' pk=cs.id %}">Editar</a>
+            href="{% url 'recupero.factura.edit' pk=cs.id %}">Editar</a>
         {% endif %}
     </td>
 </tr>

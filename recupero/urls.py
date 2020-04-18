@@ -1,9 +1,9 @@
 from django.conf.urls import url, include
 from django.urls import path
-from .views import (
-    FacturaPendEnvioView,
-    FacturaPendCobroView
-)
+from .views import (FacturaListView,
+                    FacturaDetailView,
+                    FacturaUpdateView)
+
 from .views_tipo_prestacion import (TipoPrestacionListView,
                                     TipoPrestacionCreateView,
                                     TipoPrestacionDetailView,
@@ -20,17 +20,16 @@ urlpatterns = [
         FacturaListView.as_view(),
         name="recupero.facturas",
     ),
-    url(
-        r"^facturacion-pendiente-de-envio.html$",
-        FacturaPendEnvioView.as_view(),
-        name="recupero.factura.lista-pendientes-envio",
+    path(
+        r"detalle-factura/<int:pk>",
+        FacturaDetailView.as_view(),
+        name="recupero.factura.detail",
     ),
-    url(
-        r"^facturacion-pendiente-de-cobro.html$",
-        FacturaPendCobroView.as_view(),
-        name="recupero.factura.lista-pendientes-cobro",
+    path(
+        r"editar-factura/<int:pk>",
+        FacturaUpdateView.as_view(),
+        name="recupero.factura.edit",
     ),
-    
     path(
         r"tipo-de-prestacion.html",
         TipoPrestacionListView.as_view(),
