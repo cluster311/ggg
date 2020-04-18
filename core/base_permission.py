@@ -1,5 +1,6 @@
 from django.conf import settings
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import User, Group, Permission, AnonymousUser
+from profesionales.models import Profesional
 
 
 def start_roles_and_permissions():
@@ -92,3 +93,46 @@ def start_roles_and_permissions():
     perm_chg_uecds = Permission.objects.get(codename='change_usuarioencentrodesalud', content_type__app_label='usuarios')
     
     group_super.permissions.add(perm_view_uecds, perm_add_uecds, perm_chg_uecds)
+
+def create_test_users():
+    group_city = Group.objects.get(name=settings.GRUPO_CIUDADANO)
+    group_admin = Group.objects.get(name=settings.GRUPO_ADMIN)
+    group_prof = Group.objects.get(name=settings.GRUPO_PROFESIONAL)
+    
+    user_anon = AnonymousUser()
+
+    us = User.objects.filter(username="city")
+    if us.count() == 0:
+        user_city = User.objects.create_user(username="city", email="city@test.com", password="city")
+    else:
+        user_city = us[0]
+    user_city.groups.add(group_city)
+
+    us = User.objects.filter(username="administrativo")
+    if us.count() == 0:
+        user_admin = User.objects.create_user(username="administrativo", email="admin@test.com", password="administrativo")
+    else:
+        user_admin = us[0]
+    user_admin.groups.add(group_admin)
+
+    us = User.objects.filter(username="admin")
+    if us.count() == 0:
+        prof = Profesional.objects.create(nombres="prof name", numero_documento="10101090")
+        user_prof = User.objects.create_user(username="prof", email="prof@test.com", password="prof")
+        prof.user = user_prof
+    else:
+        user_prof = us[0]
+    
+    user_prof.groups.add(group_prof)
+
+    ret = {
+        'group_city': group_city,
+        'group_admin': group_admin,
+        'group_prof': group_prof,
+        'user_anon': user_anon,
+        'user_city': user_city,
+        'user_admin': user_admin,
+        'user_prof': user_prof
+    }
+
+    return ret

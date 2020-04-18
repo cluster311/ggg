@@ -3,8 +3,7 @@ from django.test import TestCase, RequestFactory
 from django.test import Client
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from profesionales.models import Profesional
-from core.base_permission import start_roles_and_permissions
+from core.base_permission import start_roles_and_permissions, create_test_users
 from .views import ProfesionalHome
 
 
@@ -12,20 +11,16 @@ class FullUsersMixin:
     def create_users_and_groups(self):
         #create permissions group
         start_roles_and_permissions()
-        self.group_city= Group.objects.get(name=settings.GRUPO_CIUDADANO)
-        self.group_admin = Group.objects.get(name=settings.GRUPO_ADMIN)
-        self.group_prof = Group.objects.get(name=settings.GRUPO_PROFESIONAL)
-        
-        self.user_anon = AnonymousUser()
-        self.user_city = User.objects.create_user(username="city", email="city@test.com", password="city")
-        self.user_city.groups.add(self.group_city)
-        self.user_admin = User.objects.create_user(username="admin", email="admin@test.com", password="admin")
-        self.user_admin.groups.add(self.group_admin)
-        prof = Profesional.objects.create(nombres="prof name", numero_documento="10101090")
-        self.user_prof = User.objects.create_user(username="prof", email="prof@test.com", password="prof")
-        prof.user = self.user_prof
-        self.user_prof.groups.add(self.group_prof)
+        ret = create_test_users()
 
+        self.group_city = ret['group_city']
+        self.group_admin = ret['group_admin']
+        self.group_prof = ret['group_prof']
+        
+        self.user_anon = ret['user_anon']
+        self.user_city = ret['user_city']
+        self.user_admin = ret['user_admin']
+        self.user_prof = ret['user_prof']
 
 class ProfesionalesTests(TestCase, FullUsersMixin):
 
