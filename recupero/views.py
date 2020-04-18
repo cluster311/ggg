@@ -5,6 +5,7 @@ from django.db.models import Count, Q
 from django.urls import reverse
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.decorators import method_decorator
+from django.contrib.messages.views import SuccessMessageMixin
 from .models import Factura, TipoDocumentoAnexo, TipoPrestacion
 
 
@@ -35,9 +36,35 @@ class FacturaListView(PermissionRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['title'] = 'Facturas de recupero'
+        context['title_url'] = 'recupero.facturas'
         context['search_txt'] = self.request.GET.get('search', '')
+        context['use_search_bar'] = True
+        if self.request.user.has_perm('recupero.add_factura'):
+            context['use_add_btn'] = True
+            context['add_url'] = 'recupero.factura.create'
         return context
 
+
+class FacturaCreateView(PermissionRequiredMixin,
+                               CreateView,
+                               SuccessMessageMixin):
+    model = Factura
+    permission_required = ("recupero.add_factura",)
+    fields = ['estado', 'obra_social']
+    success_message = "Creado con éxito."
+    template_name = "recupero/factura_create_form.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Facturas de rcupero'
+        context['title_url'] = 'recupero.facturas'
+        return context
+
+    def get_success_url(self):
+        return reverse(
+            "recupero.facturas"
+        )
 
 class FacturaDetailView(PermissionRequiredMixin, DetailView):
     model = Factura

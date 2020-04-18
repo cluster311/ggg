@@ -44,7 +44,7 @@ class TipoDocumentoAnexoCreateView(PermissionRequiredMixin,
                                    CreateView,
                                    SuccessMessageMixin):
     model = TipoDocumentoAnexo
-    permission_required = ("recupero.view_tipodocumentoanexo",)
+    permission_required = ("recupero.add_tipodocumentoanexo",)
     fields = ['nombre']
     success_message = "Creado con éxito."
 

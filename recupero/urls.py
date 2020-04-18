@@ -2,7 +2,8 @@ from django.conf.urls import url, include
 from django.urls import path
 from .views import (FacturaListView,
                     FacturaDetailView,
-                    FacturaUpdateView)
+                    FacturaUpdateView,
+                    FacturaCreateView)
 
 from .views_tipo_prestacion import (TipoPrestacionListView,
                                     TipoPrestacionCreateView,
@@ -29,6 +30,11 @@ urlpatterns = [
         r"editar-factura/<int:pk>",
         FacturaUpdateView.as_view(),
         name="recupero.factura.edit",
+    ),
+    path(
+        r"crear-factura",
+        FacturaCreateView.as_view(),
+        name="recupero.factura.create",
     ),
     path(
         r"tipo-de-prestacion.html",

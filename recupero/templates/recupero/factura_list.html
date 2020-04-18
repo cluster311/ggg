@@ -1,10 +1,6 @@
 {% extends "base_admin.html" %}
 
 {% block content %}
-<h2>Facturación de recupero</h2>
-
-{% include 'admin_search_bar.html' %}
-{% include 'admin_paginate.html' %}
 
 <table class="table">
     <thead>
@@ -45,6 +41,8 @@
         {% endfor %}
     </tbody>
 </table>
+
+{% include 'admin_paginate.html' %}
 
 {% endblock %}
 
