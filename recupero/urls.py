@@ -16,6 +16,11 @@ from .views_tipo_documento_anexo import (TipoDocumentoAnexoListView,
 
 urlpatterns = [
     url(
+        r"^facturacion$",
+        FacturaListView.as_view(),
+        name="recupero.facturas",
+    ),
+    url(
         r"^facturacion-pendiente-de-envio.html$",
         FacturaPendEnvioView.as_view(),
         name="recupero.factura.lista-pendientes-envio",

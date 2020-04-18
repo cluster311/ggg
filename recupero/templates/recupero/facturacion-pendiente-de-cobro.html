@@ -16,6 +16,7 @@
         <th scope="col">Profesional</th>
         <th scope="col">Especialidad</th>
         <th scope="col">CIE10 principal</th>
+        <th scope="col">Acciones</th>
     </tr>
     </thead>
     <tbody>
@@ -28,6 +29,14 @@
     <td scope="row">{{ cs.consulta.profesional }}</td>
     <td scope="row">{{ cs.consulta.especialidad }}</td>
     <td scope="row">{{ cs.consulta.codigo_cie_principal }}</td>
+    <td scope="row">
+        <a role="button" class="btn btn-warning btn-sm active" 
+            href="{% url 'recupero.tipos-documento-anexo.detail' pk=cs.id %}">Detalles</a>
+        {% if perms.recupero.change_factura %}
+        <a role="button" class="btn btn-warning btn-sm active" 
+            href="{% url 'recupero.tipos-documento-anexo.edit' pk=cs.id %}">Editar</a>
+        {% endif %}
+    </td>
 </tr>
         {% empty %}
         <td>Sin datos</td><td></td><td></td>

@@ -74,6 +74,7 @@ def start_roles_and_permissions():
     group_super.permissions.add(perm_view_ma, perm_chg_ma, perm_view_maesp, perm_chg_maesp,
                                 perm_add_ma, perm_add_maesp)
 
+    perm_add_fact = Permission.objects.get(codename='add_factura', content_type__app_label='recupero')
     perm_view_fact = Permission.objects.get(codename='view_factura', content_type__app_label='recupero')
     perm_chg_fact = Permission.objects.get(codename='change_factura', content_type__app_label='recupero')
     perm_add_tda = Permission.objects.get(codename='add_tipodocumentoanexo', content_type__app_label='recupero')
@@ -85,7 +86,7 @@ def start_roles_and_permissions():
 
     group_recupero.permissions.add(perm_view_fact, perm_chg_fact, perm_view_tda,
                                     perm_chg_tda, perm_view_tp, perm_chg_tp,
-                                    perm_add_tda, perm_add_tp)
+                                    perm_add_tda, perm_add_tp, perm_add_fact)
     
     perm_view_uecds = Permission.objects.get(codename='view_usuarioencentrodesalud', content_type__app_label='usuarios')
     perm_add_uecds = Permission.objects.get(codename='add_usuarioencentrodesalud', content_type__app_label='usuarios')

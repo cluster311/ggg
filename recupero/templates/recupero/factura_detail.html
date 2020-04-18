@@ -1,0 +1,34 @@
+{% extends "base_admin.html" %}
+{% load static %}
+
+{% block content %}
+<a role="button" class="btn btn-warning btn-sm active" 
+    href="{% url 'recupero.facturas' %}">Volver a la lista</a>
+{% if perms.recupero.change_tipoprestacion %}
+<a role="button" 
+    class="btn btn-warning btn-sm active" 
+    href="{% url 'recupero.factura.edit' pk=object.id %}">Editar</a>
+{% endif %}
+
+<h2>Código: {{ object.codigo }}</h2>
+<p>{{ object.nombre }}: <b>$ {{ object.arancel }}</b></p>
+<p>{{ object.descripcion }}</p>
+<p>{{ object.observaciones }}</p>
+<p>Tipo: {{ object.get_tipo_display }}</p>
+<p>Documentos requeridos</p>
+<ul>
+    {% for doc in object.documentos_requeridos.all %}
+    <li>{{ doc.nombre }}</li>
+    {% empty %}
+    <li>Sin documentos requeridos</li>
+    {% endfor %}
+</ul>
+<p>Documentos sugeridos</p>
+<ul>
+    {% for doc in object.documentos_sugeridos.all %}
+    <li>{{ doc.nombre }}</li>
+    {% empty %}
+    <li>Sin documentos sugeridos</li>
+    {% endfor %}
+</ul>
+{% endblock %}
