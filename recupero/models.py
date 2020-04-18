@@ -186,3 +186,9 @@ class Factura(TimeStampedModel):
                      data=data)
         self.estado = new_status
         self.save()
+    
+    def as_anexo2_json(self):
+        """ recuperar los datos de esta factura en el formato que 
+            la librería Anexo2 (en Pypi) requiere """
+        
+        return {}
