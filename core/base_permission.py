@@ -121,6 +121,7 @@ def create_test_users():
         prof = Profesional.objects.create(nombres="prof name", numero_documento="10101090")
         user_prof = User.objects.create_user(username="prof", email="prof@test.com", password="prof")
         prof.user = user_prof
+        prof.save()
     else:
         user_prof = us[0]
     
