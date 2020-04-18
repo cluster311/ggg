@@ -116,7 +116,7 @@ def create_test_users():
         user_admin = us[0]
     user_admin.groups.add(group_admin)
 
-    us = User.objects.filter(username="admin")
+    us = User.objects.filter(username="prof")
     if us.count() == 0:
         prof = Profesional.objects.create(nombres="prof name", numero_documento="10101090")
         user_prof = User.objects.create_user(username="prof", email="prof@test.com", password="prof")
