@@ -122,6 +122,7 @@ def create_test_data():
                                                     email=f"prof{x}{y}@test.com",
                                                     password=f"prof{x}{y}")
                 pr.user = user_prof
+                pr.save()
             else:
                 user_prof = us[0]
             user_prof.groups.add(group_prof)
