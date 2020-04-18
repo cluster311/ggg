@@ -137,6 +137,7 @@ def create_test_users():
         'group_city': group_city,
         'group_admin': group_admin,
         'group_prof': group_prof,
+        'group_recupero': group_recupero,
         'user_anon': user_anon,
         'user_city': user_city,
         'user_admin': user_admin,

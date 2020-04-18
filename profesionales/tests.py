@@ -16,11 +16,13 @@ class FullUsersMixin:
         self.group_city = ret['group_city']
         self.group_admin = ret['group_admin']
         self.group_prof = ret['group_prof']
+        self.group_recupero = ret['group_recupero']
         
         self.user_anon = ret['user_anon']
         self.user_city = ret['user_city']
         self.user_admin = ret['user_admin']
         self.user_prof = ret['user_prof']
+        self.user_recupero = ret['user_recupero']
 
 class ProfesionalesTests(TestCase, FullUsersMixin):
 
