@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission
+from profesionales.models import Profesional
+from centros_de_salud.models import CentroDeSalud, Especialidad, Servicio, ProfesionalesEnServicio
 
 
 def start_roles_and_permissions():
@@ -92,3 +94,14 @@ def start_roles_and_permissions():
     perm_chg_uecds = Permission.objects.get(codename='change_usuarioencentrodesalud', content_type__app_label='usuarios')
     
     group_super.permissions.add(perm_view_uecds, perm_add_uecds, perm_chg_uecds)
+
+
+def create_test_data():
+    # crear 3 centros de salud con diferentes especialidades y profesionales asignados cada una
+    for x in range(1, 4):
+        cs, created = CentroDeSalud.objects.get_or_create(nombre=f"Centro de Salud {x}")
+        es, created = Especialidad.objects.get_or_create(nombre=f"Especialidad {x}")
+        # crear un servicio en ese centro de salud para esa especialidad
+        se, created = Servicio.objects.get_or_create(centro=cs, especialidad=es)
+        pr, created = Profesional.objects.get_or_create(nombres=f"Profesional {x}", numero_documento="900000{x}")
+        ps, created = ProfesionalesEnServicio.objects.get_or_create(servicio=se, profesional=pr)
