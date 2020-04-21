@@ -12,6 +12,8 @@ function cargarData(data){
     $("#paciente-doc").html(data.extendedProps.patient.numero_documento);
   }
   const ASIGNADO = "{{turno_states.ASIGNADO}}";
+  const CANCELADO_PACIENTE = "{{turno_states.CANCELADO_PACIENTE}}";
+  const CANCELADO_ESTABLECIMIENTO = "{{turno_states.CANCELADO_ESTABLECIMIENTO}}";
   $("#title").html(data.title);
   $("#start").html(formatDatetime(data.start));
   $("#state").html(states[data.extendedProps.status].replace(/\_/g, ' '));
@@ -19,9 +21,17 @@ function cargarData(data){
     /*Solo se podra confirmar el turno cuando este ASIGNADO
       y el paciente llegue */
     $("#btnConfirmar").prop('disabled','');
+    $("#btnConfirmar").attr('class','btn btn-primary');
+    $("#btnCancelar").prop('disabled','');
+    $("#btnCancelar").attr('class','btn btn-danger');
   }
   else{
     $("#btnConfirmar").prop('disabled','disabled');
+    $("#btnConfirmar").attr('class','btn btn-dark');
+    if (data.extendedProps.status == CANCELADO_ESTABLECIMIENTO){
+        $("#btnCancelar").prop('disabled','disabled');
+        $("#btnCancelar").attr('class','btn btn-dark');
+    }
   }
   $("#idTurno").val(data.id);
 }
@@ -104,7 +114,7 @@ function crearSobreturno(){
       <input hidden id="idTurno">
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" onclick="crearSobreturno()">Crear Sobreturno</button>
-        <button type="button" class="btn btn-danger" onclick="cancelarTurno()">Cancelar Turno</button>
+        <button type="button" class="btn btn-danger"  id='btnCancelar' onclick="cancelarTurno()">Cancelar Turno</button>
         <button type="button" class="btn btn-primary" id='btnConfirmar'
           onclick="confirmarTurno()">Confirmar</button>
       </div>
