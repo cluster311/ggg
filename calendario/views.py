@@ -20,6 +20,9 @@ from obras_sociales.models import ObraSocial
 @permission_required('calendario.view_turno')
 @require_http_methods(["GET"])
 def index(request):
+    '''
+        grupo acceso disponible: grupo_administrativo
+    '''
     context = {
         'modal_title': 'Agregar turno',
         'modal_close': 'Cancelar',
@@ -133,6 +136,9 @@ def copy_appointments(request):
 @permission_required('calendario.view_turno')
 @require_http_methods(["GET"])
 def feed(request, servicio=None):
+    '''
+    grupo acceso disponible: grupo_administrativo
+    '''
     turnos = get_appointments_list(servicio, user=request.user, **request.GET)
     turnos = [{
         'id': t.id,
