@@ -1,3 +1,5 @@
+import json
+
 from django.test import TestCase, RequestFactory
 from django.test import Client
 from django.core.exceptions import PermissionDenied
@@ -69,6 +71,22 @@ class CalendarioTests(TestCase, FullUsersMixin):
 
         self.client.login(username=self.user_prof, password=self.user_prof)
         response = self.client.get('/turnos/')
+        self.assertEqual(response.status_code, 302)
+
+    def test_loggeado_add_appointment(self):
+        #self.client.login(username=self.user_admin, password=self.user_admin)
+        #data = {"test": "test", 'bulk': False, 'id': '', 'servicio': '10000', 'profesional': '10000'}
+        #response = self.client.post('/turnos/appointments/', json.dumps(data), content_type="application/json")
+        #print(response)
+        #self.assertEqual(response.status_code, 404)
+
+        self.client.login(username=self.user_city, password=self.user_city)
+        response = self.client.post('/turnos/appointments/')
+        print(response)
+        self.assertEqual(response.status_code, 302)
+
+        self.client.login(username=self.user_prof, password=self.user_prof)
+        response = self.client.post('/turnos/appointments/')
         self.assertEqual(response.status_code, 302)
 
 

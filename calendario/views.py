@@ -50,7 +50,7 @@ def index(request):
 @require_http_methods(["POST"])
 def add_appointment(request):
     '''
-            grupo acceso disponible: grupo_administrativo
+         grupo acceso disponible: grupo_administrativo
     '''
     form_data = json.loads(request.body)
     if form_data['bulk']:
