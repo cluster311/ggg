@@ -87,7 +87,12 @@ def add_appointment(request):
     return JsonResponse(response_data)
 
 
+@permission_required('calendario.add_turno')
+@require_http_methods(["GET"])
 def copy_appointments(request):
+    '''
+        grupo acceso disponible: grupo_administrativo
+    '''
     if 'start' in request.GET:
         c_start = parse_datetime(request.GET['start'])
     else:
@@ -133,7 +138,6 @@ def copy_appointments(request):
         'success': True,
         'appointments': response_appointments}
     )
-
 
 
 @permission_required('calendario.view_turno')
@@ -186,6 +190,9 @@ def get_appointments_list(servicio, user, **kwargs):
 @permission_required('calendario.can_schedule_turno')
 @require_http_methods(["GET"])
 def agendar(request):
+    '''
+        grupo acceso disponible: grupo_administrativo
+    '''
     context = {
         'especialidades': Especialidad.objects.all(),
         'sys_logo': settings.SYS_LOGO

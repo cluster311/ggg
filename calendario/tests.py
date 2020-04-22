@@ -47,6 +47,15 @@ class CalendarioTests(TestCase, FullUsersMixin):
         response = self.client.get('/turnos/')
         self.assertRedirects(response, '/accounts/login/?next=/turnos/')
 
+        response = self.client.get('/turnos/appointments/')
+        self.assertRedirects(response, '/accounts/login/?next=/turnos/appointments/')
+
+        response = self.client.get('/turnos/appointments/copy/')
+        self.assertRedirects(response, '/accounts/login/?next=/turnos/appointments/copy/')
+
+        response = self.client.get('/turnos/agendar/')
+        self.assertRedirects(response, '/accounts/login/?next=/turnos/agendar/')
+
     def test_loggeado_feed(self):
         self.client.login(username=self.user_admin, password=self.user_admin)
         response = self.client.get('/turnos/feed')
@@ -74,19 +83,40 @@ class CalendarioTests(TestCase, FullUsersMixin):
         self.assertEqual(response.status_code, 302)
 
     def test_loggeado_add_appointment(self):
+        #faltaria crear objectos para poder hacerel post porque entra y rompe
         #self.client.login(username=self.user_admin, password=self.user_admin)
         #data = {"test": "test", 'bulk': False, 'id': '', 'servicio': '10000', 'profesional': '10000'}
         #response = self.client.post('/turnos/appointments/', json.dumps(data), content_type="application/json")
-        #print(response)
         #self.assertEqual(response.status_code, 404)
 
         self.client.login(username=self.user_city, password=self.user_city)
         response = self.client.post('/turnos/appointments/')
-        print(response)
         self.assertEqual(response.status_code, 302)
 
         self.client.login(username=self.user_prof, password=self.user_prof)
         response = self.client.post('/turnos/appointments/')
         self.assertEqual(response.status_code, 302)
 
+    def test_loggeado_add_appointment_copy(self):
+        # falta agregar el de admin pero tener en cuenta los parametros, que tienen
+        self.client.login(username=self.user_city, password=self.user_city)
+        response = self.client.post('/turnos/appointments/copy/')
+        self.assertEqual(response.status_code, 302)
+
+        self.client.login(username=self.user_prof, password=self.user_prof)
+        response = self.client.post('/turnos/appointments/copy/')
+        self.assertEqual(response.status_code, 302)
+
+    def test_loggeado_agendar(self):
+        self.client.login(username=self.user_admin, password=self.user_admin)
+        response = self.client.get('/turnos/agendar/')
+        self.assertEqual(response.status_code, 200)
+
+        self.client.login(username=self.user_city, password=self.user_city)
+        response = self.client.post('/turnos/agendar/')
+        self.assertEqual(response.status_code, 302)
+
+        self.client.login(username=self.user_prof, password=self.user_prof)
+        response = self.client.post('/turnos/agendar/')
+        self.assertEqual(response.status_code, 302)
 
