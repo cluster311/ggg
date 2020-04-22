@@ -49,6 +49,9 @@ def index(request):
 @permission_required('calendario.add_turno')
 @require_http_methods(["POST"])
 def add_appointment(request):
+    '''
+            grupo acceso disponible: grupo_administrativo
+    '''
     form_data = json.loads(request.body)
     if form_data['bulk']:
         form = BulkTurnoForm(form_data)

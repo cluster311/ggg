@@ -45,10 +45,7 @@ class CalendarioTests(TestCase, FullUsersMixin):
         response = self.client.get('/turnos/')
         self.assertRedirects(response, '/accounts/login/?next=/turnos/')
 
-        #response = self.client.get('/turnos/feed_availables')
-        #self.assertRedirects(response, '/accounts/login/?next=/turnos/feed')
-
-    def test_logged(self):
+    def test_loggeado_feed(self):
         self.client.login(username=self.user_admin, password=self.user_admin)
         response = self.client.get('/turnos/feed')
         self.assertEqual(response.status_code, 200)
@@ -57,5 +54,21 @@ class CalendarioTests(TestCase, FullUsersMixin):
         response = self.client.get('/turnos/feed')
         self.assertEqual(response.status_code, 302)
 
+        self.client.login(username=self.user_prof, password=self.user_prof)
+        response = self.client.get('/turnos/feed')
+        self.assertEqual(response.status_code, 302)
+
+    def test_loggeado_index(self):
+        self.client.login(username=self.user_admin, password=self.user_admin)
+        response = self.client.get('/turnos/')
+        self.assertEqual(response.status_code, 200)
+
+        self.client.login(username=self.user_city, password=self.user_city)
+        response = self.client.get('/turnos/')
+        self.assertEqual(response.status_code, 302)
+
+        self.client.login(username=self.user_prof, password=self.user_prof)
+        response = self.client.get('/turnos/')
+        self.assertEqual(response.status_code, 302)
 
 
