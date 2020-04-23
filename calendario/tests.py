@@ -83,7 +83,7 @@ class CalendarioTests(TestCase, FullUsersMixin):
         self.assertEqual(response.status_code, 302)
 
     def test_loggeado_add_appointment(self):
-        #faltaria crear objectos para poder hacerel post porque entra y rompe
+        #faltaria crear objectos para poder hacer el post porque entra y rompe para ADMIN
         #self.client.login(username=self.user_admin, password=self.user_admin)
         #data = {"test": "test", 'bulk': False, 'id': '', 'servicio': '10000', 'profesional': '10000'}
         #response = self.client.post('/turnos/appointments/', json.dumps(data), content_type="application/json")
@@ -98,7 +98,7 @@ class CalendarioTests(TestCase, FullUsersMixin):
         self.assertEqual(response.status_code, 302)
 
     def test_loggeado_add_appointment_copy(self):
-        # falta agregar el de admin pero tener en cuenta los parametros, que tienen
+        # falta agregar el de admin pero tener en cuenta los parametros de GET que tiene
         self.client.login(username=self.user_city, password=self.user_city)
         response = self.client.post('/turnos/appointments/copy/')
         self.assertEqual(response.status_code, 302)
