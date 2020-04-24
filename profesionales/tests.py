@@ -65,25 +65,24 @@ class ProfesionalHomeTest(TestCase, FullUsersMixin):
 
     def test_environment_set_in_context(self):
         request = self.factory.get('/')
-        view = ProfesionalHome()
-        
-        request.user = self.user_anon
+
+        request.user = self.user_city
         try:
-            view.setup(request)
-            assert 'Anon access to profesional'
+            ProfesionalHome.as_view()(request)
         except PermissionDenied:
-            pass
-        
-        request.user = self.user_admin
+            self.assertTrue('ciudadano no tiene permisos')
+
+        request.user = self.user_prof
         try:
-            view.setup(request)
-            assert 'ADMIN access to profesional'
+            ProfesionalHome.as_view()(request)
+            self.assertTrue('profesional tiene permisos')
         except PermissionDenied:
             pass
 
+        view = ProfesionalHome()
         request.user = self.user_prof
         view.setup(request)
         context = view.get_context_data()
         self.assertIn('hoy', context)
         self.assertIn('estados', context)
-    
+
