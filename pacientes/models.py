@@ -125,6 +125,34 @@ class Paciente(Persona):
             'apellidos': self.apellidos,
             'numero_documento': self.numero_documento,
         }
+    
+    def as_anexo2_json(self):
+        """ devuelve el JSON compatible con la librería Anexo2 https://github.com/cluster311/Anexo2
+            Ejemplo:
+                {'apellido_y_nombres': 'Juan Perez',
+                    'tipo_dni': 'DNI',  # | LE | LC
+                    'dni': '34100900',
+                    'tipo_beneficiario': 'titular',  # | no titular | adherente
+                    'parentesco': 'conyuge',  # hijo | otro
+                    'sexo': 'M',  # | F
+                    'edad': 88}
+        """
+        sexo = None
+        if self.sexo == 'masculino':
+            sexo = 'M'
+        elif self.sexo == 'femenino':
+            sexo = 'F'
+        
+        # TODO definir como obtener el tipo de beneficiario y su parentesco
+        ret = {'apellido_y_nombres': f'{self.apellidos}, {self.nombres}',
+                'tipo_dni': self.tipo_documento,
+                'dni': self.numero_documento,
+                'tipo_beneficiario': 'titular',  # | no titular | adherente
+                'parentesco': 'otro',  # conyuge | hijo | otro
+                'sexo': sexo,  # M | F
+                'edad': self.edad}
+
+        return ret
 
     def agregar_dato_de_contacto(self, tipo, valor):
         type_ = ContentType.objects.get_for_model(self)
@@ -334,8 +362,10 @@ class Consulta(TimeStampedModel):
 
 
 class Receta(TimeStampedModel):
+    """ Cada una de las recetas que un medico le da al paciente en consulta """
+
     consulta = models.ForeignKey(Consulta, on_delete=models.CASCADE, related_name='recetas')
-    #TODO conectarse a algún vademecum online o crear una librería
+    # TODO conectarse a algún vademecum online o crear una librería
     # https://servicios.pami.org.ar/vademecum/views/consultaPublica/listado.zul
     medicamento = models.CharField(max_length=290)
     posologia = models.TextField(null=True, blank=True)
@@ -346,9 +376,45 @@ class Receta(TimeStampedModel):
 
 
 class Derivacion(TimeStampedModel):
+    """ Cada una de las derivaciones que un medico le da al paciente en consulta """
     consulta = models.ForeignKey(Consulta, on_delete=models.CASCADE, related_name='derivaciones')
     especialidad = models.ForeignKey("centros_de_salud.Especialidad",on_delete=models.SET_NULL, null=True)
     observaciones = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.especialidad.nombre
+
+
+class Empresa(models.Model):
+    """ empresas en las que los pacientes trabajan """
+    nombre = models.CharField(max_length=150)
+    direccion = models.CharField(max_length=200, null=True, blank=True)
+    cuit = models.CharField(max_length=30, null=True, blank=True)
+
+    def __str__(self):
+        return self.nombre
+
+class EmpresaPaciente(models.Model):
+    """ Empresa donde trabaja un paciente un paciente """
+
+    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
+    ultimo_recibo_de_sueldo = models.DateTimeField(null=True, blank=True)
+  
+    def as_anexo2_json(self):
+        """ devuelve el JSON compatible con la librería Anexo2 https://github.com/cluster311/Anexo2
+            Ejemplo:
+                {'nombre': 'Telescopios Hubble',
+                   'direccion': 'Av Astronómica s/n',
+                   'ultimo_recibo_de_sueldo': {'mes': 7, 'anio': 2019},
+                   'cuit': '31-91203043-8'}
+        """
+        recibo_mes = None if self.ultimo_recibo_de_sueldo is None else self.ultimo_recibo_de_sueldo.month
+        recibo_ano = None if self.ultimo_recibo_de_sueldo is None else self.ultimo_recibo_de_sueldo.year
+
+        ret = {'nombre': self.empresa.nombre,
+               'direccion': self.empresa.direccion,
+               'ultimo_recibo_de_sueldo': {'mes': recibo_mes, 'anio': recibo_ano},
+               'cuit': self.empresa.cuit}
+        
+        return ret

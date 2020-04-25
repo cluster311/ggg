@@ -188,7 +188,34 @@ class Factura(TimeStampedModel):
         self.save()
     
     def as_anexo2_json(self):
-        """ recuperar los datos de esta factura en el formato que 
-            la librería Anexo2 (en Pypi) requiere """
+        """ recuperar los datos de esta factura en el formato que
+            la librería Anexo2 (en Pypi) requiere
+            Requisitos acá: https://github.com/cluster311/Anexo2
+            """
+        hospital = self.consulta.centro_de_salud.as_anexo2_json()
+        beneficiario = self.consulta.paciente.as_anexo2_json()
+        atencion = {'tipo': 'consulta',  # | practica | internacion
+                    'especialidad': 'Va un texto al parecer largo, quizas sea del nomenclador',
+                    'codigos_N_HPGD': ['AA01', 'AA02', 'AA06', 'AA07'],  # no se de donde son estos códigos
+                    'fecha': {'dia': 3, 'mes': 9, 'anio': 2019},
+                    'diagnostico_ingreso_cie10': {'principal': 'W020', 'otros': ['w021', 'A189']}}
         
-        return {}
+        # TODO, detectar esto que todavía no esta relevado
+        obra_social_paciente = None
+        obra_social = obra_social_paciente.as_anexo2_json()
+
+        # TODO, detectar esto que todavía no esta relevado
+        empresa_paciente = None
+        empresa = empresa_paciente.as_anexo2_json()
+
+        data = {'dia': 3,
+                'mes': 9,
+                'anio': 2019,
+                'hospital': hospital,
+                'beneficiario': beneficiario,
+                'atencion': atencion,
+                'obra_social': obra_social,
+                'empresa': empresa
+                }
+
+        return data

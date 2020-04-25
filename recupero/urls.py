@@ -80,7 +80,7 @@ urlpatterns = [
         name="recupero.tipos-documento-anexo.edit",
     ),
     path(
-        r"anexo-II/<int:pk>",
+        r"anexo-II-por-consulta/<int:consulta_id>",
         Anexo2View.as_view(),
         name="recupero.anexo2",
     ),
