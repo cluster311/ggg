@@ -44,7 +44,7 @@ class TipoPrestacionCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
     model = TipoPrestacion
-    permission_required = ("recupero.view_tipoprestacion",)
+    permission_required = ("recupero.add_tipoprestacion",)
     fields = ['nombre', 'codigo', 'descripcion', 'observaciones',
               'tipo', 'documentos_requeridos', 'documentos_sugeridos']
     success_message = "Creado con éxito."

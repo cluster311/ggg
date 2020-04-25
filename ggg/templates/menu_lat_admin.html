@@ -207,12 +207,9 @@ Centro de salud activo
         <ul class="collapse list-unstyled" id="menu_recupero">
         {% if perms.recupero.view_factura %}
         <li>
-            <a href="{% url 'recupero.factura.lista-pendientes-envio' %}">Facturación pendiente de envío</a>
+            <a href="{% url 'recupero.facturas' %}">Facturación</a>
         </li>
             
-        <li>
-            <a href="{% url 'recupero.factura.lista-pendientes-cobro' %}">Facturación pendiente de cobro</a>
-        </li>
         {% endif %}
         
         {% if perms.recupero.view_tipodocumentoanexo %}

@@ -1,9 +1,10 @@
 from django.conf.urls import url, include
 from django.urls import path
-from .views import (
-    FacturaPendEnvioView,
-    FacturaPendCobroView
-)
+from .views import (FacturaListView,
+                    FacturaDetailView,
+                    FacturaUpdateView,
+                    FacturaCreateView)
+
 from .views_tipo_prestacion import (TipoPrestacionListView,
                                     TipoPrestacionCreateView,
                                     TipoPrestacionDetailView,
@@ -16,16 +17,25 @@ from .views_tipo_documento_anexo import (TipoDocumentoAnexoListView,
 
 urlpatterns = [
     url(
-        r"^facturacion-pendiente-de-envio.html$",
-        FacturaPendEnvioView.as_view(),
-        name="recupero.factura.lista-pendientes-envio",
+        r"^facturacion$",
+        FacturaListView.as_view(),
+        name="recupero.facturas",
     ),
-    url(
-        r"^facturacion-pendiente-de-cobro.html$",
-        FacturaPendCobroView.as_view(),
-        name="recupero.factura.lista-pendientes-cobro",
+    path(
+        r"detalle-factura/<int:pk>",
+        FacturaDetailView.as_view(),
+        name="recupero.factura.detail",
     ),
-    
+    path(
+        r"editar-factura/<int:pk>",
+        FacturaUpdateView.as_view(),
+        name="recupero.factura.edit",
+    ),
+    path(
+        r"crear-factura",
+        FacturaCreateView.as_view(),
+        name="recupero.factura.create",
+    ),
     path(
         r"tipo-de-prestacion.html",
         TipoPrestacionListView.as_view(),
