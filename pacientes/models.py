@@ -117,6 +117,8 @@ class Paciente(Persona):
 
     @property
     def edad(self):
+        if self.fecha_nacimiento is None:
+            return None
         return (now().date() - self.fecha_nacimiento).days / 365
 
     def as_json(self):
@@ -144,13 +146,14 @@ class Paciente(Persona):
             sexo = 'F'
         
         # TODO definir como obtener el tipo de beneficiario y su parentesco
+        edad = 0 if self.edad is None else self.edad
         ret = {'apellido_y_nombres': f'{self.apellidos}, {self.nombres}',
                 'tipo_dni': self.tipo_documento,
                 'dni': self.numero_documento,
                 'tipo_beneficiario': 'titular',  # | no titular | adherente
                 'parentesco': 'otro',  # conyuge | hijo | otro
                 'sexo': sexo,  # M | F
-                'edad': self.edad}
+                'edad': edad}
 
         return ret
 
@@ -371,13 +374,14 @@ class Consulta(TimeStampedModel):
                     'diagnostico_ingreso_cie10': {'principal': 'W020', 'otros': ['w021', 'A189']}}
         """
         # TODO detectar tipo de atencion
-        tipo_atencion = 'consulta',  # | practica | internacion
+        tipo_atencion = 'consulta'  # | practica | internacion
         cie_secundarios = [c10.code for c10 in self.codigos_cie_secundarios.all()]
+        cie_code = 'DESC' if self.codigo_cie_principal is None else self.codigo_cie_principal.code
         ret = {'tipo': tipo_atencion,
                'especialidad': 'Va un texto al parecer largo, quizas sea del nomenclador',
                'codigos_N_HPGD': ['AA01', 'AA02', 'AA06', 'AA07'],  
                'fecha': {'dia': self.fecha.day, 'mes': self.fecha.month, 'anio': self.fecha.year},
-               'diagnostico_ingreso_cie10': {'principal': self.codigo_cie_principal.code, 
+               'diagnostico_ingreso_cie10': {'principal': cie_code, 
                                              'otros': cie_secundarios}
                 }
         

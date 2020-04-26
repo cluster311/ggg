@@ -195,6 +195,8 @@ class Factura(TimeStampedModel):
             Requisitos acá: https://github.com/cluster311/Anexo2
             """
         hospital = self.consulta.centro_de_salud.as_anexo2_json()
+        if hospital['codigo_hpgd'] is None:
+            hospital['codigo_hpgd'] = 'DESC'  # TODO, no permitido
         beneficiario = self.consulta.paciente.as_anexo2_json()
         atencion = self.consulta.as_anexo2_json()
         
