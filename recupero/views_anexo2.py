@@ -2,39 +2,28 @@ from django.http import HttpResponse
 from django.views import View
 from django.template import Context, Template
 
-from pacientes.models import Consulta
+from recupero.models import Factura
 from anexo2.docs import Anexo2
 
 
 class Anexo2View(View):
     """ Devuelve el HTML con el Anexo II listo para imprimir
-        Recibe el parametro consulta_id. """
+        Recibe el parametro factura_id. """
     
     permission_required = ("recupero.view_factura", )
 
-    def get_context_data(self, **kwargs):
-        consulta_id = self.kwargs['consulta_id']
-        consulta = Consulta.objects.get(pk=consulta_id)
-        context = super().get_context_data(**kwargs)
-
-        return context
-
-
     def get(self, request, *args, **kwargs):
+        factura_id = self.kwargs['factura_id']
+        factura = Factura.objects.get(pk=factura_id)
         
-        
+        data = factura.as_anexo2_json()
         anx = Anexo2(data=data)
-        save_to = 'path.html'
-        res = anx.get_html(save_path=save_to)
+        res = anx.get_html()
         if res is None:
-            print('ERRORES al procesar pedido')
-            for field, error in a2.errors.items():
-                print(f' - {field}: {error}')
-        else:
-            print(f'Procesado correctamente y grabado en {save_to}')
+            res = '<h1>ERRORES al procesar pedido</h1>'
+            res += '<ul>'
+            for field, error in anx.errors.items():
+                res += f'<li>{field}: {error}</li>'
+            res += '</ul>'
 
-        template = Template("My name is {{ my_name }}.")
-        context = Context({"my_name": "Adrian"})
-        template.render(context)
-
-        return HttpResponse('Hello, World!')
+        return HttpResponse(res)

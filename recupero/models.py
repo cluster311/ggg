@@ -168,7 +168,9 @@ class Factura(TimeStampedModel):
         null=True,
         blank=True
     )
-    
+
+    fecha = models.DateTimeField(default=timezone.now)
+
     def __str__(self):
         return f'Factura {self.id}'
     
@@ -194,23 +196,28 @@ class Factura(TimeStampedModel):
             """
         hospital = self.consulta.centro_de_salud.as_anexo2_json()
         beneficiario = self.consulta.paciente.as_anexo2_json()
-        atencion = {'tipo': 'consulta',  # | practica | internacion
-                    'especialidad': 'Va un texto al parecer largo, quizas sea del nomenclador',
-                    'codigos_N_HPGD': ['AA01', 'AA02', 'AA06', 'AA07'],  # no se de donde son estos códigos
-                    'fecha': {'dia': 3, 'mes': 9, 'anio': 2019},
-                    'diagnostico_ingreso_cie10': {'principal': 'W020', 'otros': ['w021', 'A189']}}
+        atencion = self.consulta.as_anexo2_json()
         
         # TODO, detectar esto que todavía no esta relevado
-        obra_social_paciente = None
-        obra_social = obra_social_paciente.as_anexo2_json()
+        # obra_social_paciente = None
+        # obra_social = obra_social_paciente.as_anexo2_json()
+        obra_social = {'codigo_rnos': '800501',
+                    'nombre': 'OBRA SOCIAL ACEROS PARANA',
+                    'nro_carnet_obra_social': '9134818283929101',
+                    'fecha_de_emision': {'dia': 11, 'mes': 9, 'anio': 2009},
+                    'fecha_de_vencimiento': {'dia': 11, 'mes': 9, 'anio': 2029}}
 
         # TODO, detectar esto que todavía no esta relevado
-        empresa_paciente = None
-        empresa = empresa_paciente.as_anexo2_json()
+        # empresa_paciente = None
+        # empresa = empresa_paciente.as_anexo2_json()
+        empresa = {'nombre': 'Telescopios Hubble',
+                   'direccion': 'Av Astronómica s/n',
+                   'ultimo_recibo_de_sueldo': {'mes': 7, 'anio': 2019},
+                   'cuit': '31-91203043-8'}
 
-        data = {'dia': 3,
-                'mes': 9,
-                'anio': 2019,
+        data = {'dia': self.fecha.day,
+                'mes': self.fecha.month,
+                'anio': self.fecha.year,
                 'hospital': hospital,
                 'beneficiario': beneficiario,
                 'atencion': atencion,
