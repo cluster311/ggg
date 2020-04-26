@@ -21,4 +21,4 @@ cie>=0.208
 fastkml>=0.11
 django_tinymce>=2.8.0
 oss-ar>=0.131
-anexo2>=0.101
+anexo2>=0.105
