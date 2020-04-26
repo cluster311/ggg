@@ -21,13 +21,11 @@ class FacturaListView(PermissionRequiredMixin, ListView):
     def get_queryset(self):        
         if 'search' in self.request.GET:
             q = self.request.GET['search']
-            # TODO sumar nombres de OSS, profesionales, CIE secundarios, etc
             objects = Factura.objects.filter(
                 Q(consulta__especialidad__nombre__icontains=q) |
                 Q(consulta__codigo_cie_principal__code__icontains=q)
                 )
         else:
-            #TODO detectar el estado de la factura y listar solo las que esten pendientes
             objects = Factura.objects.all()
         
         # mostrar prinmero los ultimos modificados

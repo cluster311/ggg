@@ -41,7 +41,6 @@ def choice_homepage(request):
     es_super = user.groups.filter(name=settings.GRUPO_SUPER_ADMIN)
     es_recupero = user.groups.filter(name=settings.GRUPO_RECUPERO)
 
-    # todo usuario pertenece al grupo ciudano
     if es_super:
         return redirect('super.home')
     elif es_profesional:

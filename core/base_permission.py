@@ -1,5 +1,8 @@
 from django.conf import settings
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import User, Group, Permission, AnonymousUser
+from profesionales.models import Profesional
+from centros_de_salud.models import CentroDeSalud, Especialidad, Servicio, ProfesionalesEnServicio
+from usuarios.models import UsuarioEnCentroDeSalud
 
 
 def start_roles_and_permissions():
@@ -33,7 +36,9 @@ def start_roles_and_permissions():
     perm_chg_prof = Permission.objects.get(codename='change_profesional', content_type__app_label='profesionales')
     perm_tablero_prof = Permission.objects.get(codename='can_view_tablero', content_type__app_label='profesionales')
     
-    group_admin.permissions.add(perm_view_prof)  # lo necesita para filtrar la lista de profesionales al crear los turnos. TODO limitarlo de alguna forma
+    # ISSUE limitarlo de alguna forma
+    # https://github.com/cluster311/ggg/issues/182
+    group_admin.permissions.add(perm_view_prof)  # lo necesita para filtrar la lista de profesionales al crear los turnos. 
     group_data.permissions.add(perm_tablero_prof)
     group_super.permissions.add(perm_view_prof, perm_chg_prof, perm_add_prof)
     
@@ -93,3 +98,103 @@ def start_roles_and_permissions():
     perm_chg_uecds = Permission.objects.get(codename='change_usuarioencentrodesalud', content_type__app_label='usuarios')
     
     group_super.permissions.add(perm_view_uecds, perm_add_uecds, perm_chg_uecds)
+
+
+def create_test_data():
+    """ Crear centros de salud con diferentes 
+        especialidades y profesionales asignados cada una.
+        Sumar ademas usuarios con permisos en esos centros
+        """
+
+    for x in range(1, 4):
+        # crear centros de salud y especialidades
+        cs, created = CentroDeSalud.objects.get_or_create(nombre=f"Centro de Salud {x}")
+        es, created = Especialidad.objects.get_or_create(nombre=f"Especialidad {x}")
+        # crear un servicio en ese centro de salud para esa especialidad
+        se, created = Servicio.objects.get_or_create(centro=cs, especialidad=es)
+        for y in 'ABCDE':
+            pr, created = Profesional.objects.get_or_create(nombres=f"Profesional {x}{y}",
+                                                            numero_documento=f"900000{x}{y}")
+            ps, created = ProfesionalesEnServicio.objects.get_or_create(servicio=se, profesional=pr)
+
+            # crear un usuario para cada uno de los profesionales
+            group_prof = Group.objects.get(name=settings.GRUPO_PROFESIONAL)
+            us = User.objects.filter(username=f"prof{x}{y}")
+            if us.count() == 0:
+                user_prof = User.objects.create_user(username=f"prof{x}{y}",
+                                                    email=f"prof{x}{y}@test.com",
+                                                    password=f"prof{x}{y}")
+                pr.user = user_prof
+                pr.save()
+            else:
+                user_prof = us[0]
+            user_prof.groups.add(group_prof)
+    
+        # agregar un usuario administrativo con permisos para este centro de salud
+        group_admin = Group.objects.get(name=settings.GRUPO_ADMIN)
+        user_name = f"administrativo{x}"
+        us = User.objects.filter(username=user_name)
+        if us.count() == 0:
+            user_admin = User.objects.create_user(username=user_name,
+                                                  email=f"admin{x}@test.com", 
+                                                  password=user_name)
+        else:
+            user_admin = us[0]
+        user_admin.groups.add(group_admin)
+        UsuarioEnCentroDeSalud.objects.get_or_create(usuario=user_admin,
+                                                     centro_de_salud=cs)
+
+
+def create_test_users():
+    group_city = Group.objects.get(name=settings.GRUPO_CIUDADANO)
+    group_admin = Group.objects.get(name=settings.GRUPO_ADMIN)
+    group_prof = Group.objects.get(name=settings.GRUPO_PROFESIONAL)
+    group_recupero = Group.objects.get(name=settings.GRUPO_RECUPERO)
+    
+    user_anon = AnonymousUser()
+
+    us = User.objects.filter(username="city")
+    if us.count() == 0:
+        user_city = User.objects.create_user(username="city", email="city@test.com", password="city")
+    else:
+        user_city = us[0]
+    user_city.groups.add(group_city)
+
+    us = User.objects.filter(username="administrativo")
+    if us.count() == 0:
+        user_admin = User.objects.create_user(username="administrativo", email="admin@test.com", password="administrativo")
+    else:
+        user_admin = us[0]
+    user_admin.groups.add(group_admin)
+
+    us = User.objects.filter(username="prof")
+    if us.count() == 0:
+        prof = Profesional.objects.create(nombres="prof name", numero_documento="10101090")
+        user_prof = User.objects.create_user(username="prof", email="prof@test.com", password="prof")
+        prof.user = user_prof
+        prof.save()
+    else:
+        user_prof = us[0]
+    
+    user_prof.groups.add(group_prof)
+
+    us = User.objects.filter(username="recupero")
+    if us.count() == 0:
+        user_recupero = User.objects.create_user(username="recupero", email="recupero@test.com", password="recupero")
+    else:
+        user_recupero = us[0]
+    user_recupero.groups.add(group_recupero)
+
+    ret = {
+        'group_city': group_city,
+        'group_admin': group_admin,
+        'group_prof': group_prof,
+        'group_recupero': group_recupero,
+        'user_anon': user_anon,
+        'user_city': user_city,
+        'user_admin': user_admin,
+        'user_prof': user_prof,
+        'user_recupero': user_recupero
+    }
+
+    return ret
