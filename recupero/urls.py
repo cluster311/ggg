@@ -15,6 +15,8 @@ from .views_tipo_documento_anexo import (TipoDocumentoAnexoListView,
                                          TipoDocumentoAnexoDetailView,
                                          TipoDocumentoAnexoUpdateView)
 
+from .views_anexo2 import Anexo2View
+
 urlpatterns = [
     url(
         r"^facturacion$",
@@ -76,6 +78,11 @@ urlpatterns = [
         r"editar-tipo-de-documentacion/<int:pk>",
         TipoDocumentoAnexoUpdateView.as_view(),
         name="recupero.tipos-documento-anexo.edit",
+    ),
+    path(
+        r"anexo-II/<int:factura_id>",
+        Anexo2View.as_view(),
+        name="recupero.anexo2",
     ),
     
 ]

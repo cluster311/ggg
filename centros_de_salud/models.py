@@ -48,6 +48,15 @@ class CentroDeSalud(models.Model):
             'descripcion': self.descripcion,
             'direccion': str(self.direccion),
         }
+    
+    def as_anexo2_json(self):
+        """ devuelve el JSON compatible con la librería Anexo2 https://github.com/cluster311/Anexo2
+            Ejemplo:
+                hospital = {'nombre': 'HOSPITAL SAN ROQUE',
+                            'codigo_hpgd': '4321323'}
+        """
+        ret = {'nombre': self.nombre, 'codigo_hpgd': self.codigo_hpgd}
+        return ret
 
     class Meta:
         verbose_name = 'Centro de Salud'
