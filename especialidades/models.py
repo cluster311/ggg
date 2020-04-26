@@ -1,6 +1,4 @@
 from django.db import models
-# TODO mover la clase centros_de_salud.Especialidad aquí
-
 
 class MedidaAnexa(models.Model):
     """ Cada vez que se hace alguna consulta médica vinculada

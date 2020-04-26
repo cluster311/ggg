@@ -36,7 +36,9 @@ def start_roles_and_permissions():
     perm_chg_prof = Permission.objects.get(codename='change_profesional', content_type__app_label='profesionales')
     perm_tablero_prof = Permission.objects.get(codename='can_view_tablero', content_type__app_label='profesionales')
     
-    group_admin.permissions.add(perm_view_prof)  # lo necesita para filtrar la lista de profesionales al crear los turnos. TODO limitarlo de alguna forma
+    # ISSUE limitarlo de alguna forma
+    # https://github.com/cluster311/ggg/issues/182
+    group_admin.permissions.add(perm_view_prof)  # lo necesita para filtrar la lista de profesionales al crear los turnos. 
     group_data.permissions.add(perm_tablero_prof)
     group_super.permissions.add(perm_view_prof, perm_chg_prof, perm_add_prof)
     

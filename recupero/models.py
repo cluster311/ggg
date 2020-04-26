@@ -115,7 +115,8 @@ class DocumentoAnexo(TimeStampedModel):
     prestacion = models.ForeignKey(Prestacion, on_delete=models.CASCADE, related_name='documentos')
     tipo = models.ForeignKey(TipoDocumentoAnexo, on_delete=models.CASCADE)
 
-    # TODO definir un destino seguro y privado!
+    # ISSUE definir un destino seguro y privado!
+    # https://github.com/cluster311/ggg/issues/184
     documento_adjunto = models.FileField(upload_to='documentos_anexos')
 
     def __str__(self):
@@ -171,11 +172,6 @@ class Factura(TimeStampedModel):
     
     def __str__(self):
         return f'Factura {self.id}'
-    
-    def define_oss(self):
-        # ver si el paciente tiene OSS o le corresponde algun progeama de salud
-        #TODO self.obra_social = X
-        return
     
     def change_status(self, new_status):
         data = {'old_status': self.estado, 'new_status': new_status}

@@ -91,9 +91,6 @@ class ConsultaMixin:
                 ).exclude(pk=instance.pk).order_by('-created')
             context['consultas_previas'] = consultas_previas
         
-        # ver las medidas anexas que deben tomarse
-        # asegurarse de no duplicar si ya se crearon antes
-        # TODO ver si esto podría hacerse al momento de crear la consulta en la aceptación de turno
         consulta = self.object
         medidas_a_tomar = MedidasAnexasEspecialidad.objects.filter(
             especialidad=consulta.especialidad
@@ -139,7 +136,8 @@ class ConsultaMixin:
             ps.instance = self.object
             ps.save()
         
-        # TODO usar MedidaAnexaEnConsultaForm
+        # ISSUE usar MedidaAnexaEnConsultaForm
+        # https://github.com/cluster311/ggg/issues/120
         data = context["data"]
         for field, value in data.items():
             if field.startswith('medida_'):

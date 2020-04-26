@@ -237,9 +237,10 @@ class Paciente(Persona):
                 os.obra_social_updated = now()
                 os.save()
         if not found:
-            # TODO: estamos detectando un cambio de OSS.
+            # ISSUE: estamos detectando un cambio de OSS.
             # para tableros de control y estadísticas este dato puede
             # ser valioso de grabar
+            # https://github.com/cluster311/ggg/issues/183
             new_oss = ObraSocialPaciente.objects.create(
                 data_source=settings.SOURCE_OSS_SISA,
                 paciente=self,
@@ -335,8 +336,8 @@ class Consulta(TimeStampedModel):
 
 class Receta(TimeStampedModel):
     consulta = models.ForeignKey(Consulta, on_delete=models.CASCADE, related_name='recetas')
-    #TODO conectarse a algún vademecum online o crear una librería
-    # https://servicios.pami.org.ar/vademecum/views/consultaPublica/listado.zul
+    # ISSUE conectarse a algún vademecum online o crear una librería
+    # https://github.com/cluster311/ggg/issues/179
     medicamento = models.CharField(max_length=290)
     posologia = models.TextField(null=True, blank=True)
     observaciones = models.TextField(null=True, blank=True)
