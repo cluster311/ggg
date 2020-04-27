@@ -165,7 +165,7 @@ def get_appointments_list(servicio, user, **kwargs):
         kw['fin__lte'] = parse_datetime(end)
     if servicio is not None:
         kw['servicio__pk'] = servicio
-        kw['estado__in'] = [0, 4]
+        kw['estado__in'] = [Turno.DISPONIBLE, Turno.CANCELADO_PACIENTE, Turno.CANCELADO_ESTABLECIMIENTO]
         return Turno.objects.filter(**kw)
     else:
         csp = user.centros_de_salud_permitidos.all()
