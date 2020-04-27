@@ -207,7 +207,9 @@ def confirm_turn(request, pk):
 @permission_required('calendario.change_turno')
 @require_http_methods(["PUT"])
 def edit_turn(request, pk):
-    # TODO asegurarse que el usuario esta activo en el centro de salud donde se hace el cambio
+    # ISSUE asegurarse que el usuario esta activo en el centro de salud donde se hace el cambio
+    # https://github.com/cluster311/ggg/issues/181
+
     instance = get_object_or_404(Turno, id=pk)
     form_data = json.loads(request.body)
     form = TurnoForm(form_data, instance=instance)

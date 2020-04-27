@@ -115,7 +115,8 @@ class DocumentoAnexo(TimeStampedModel):
     prestacion = models.ForeignKey(Prestacion, on_delete=models.CASCADE, related_name='documentos')
     tipo = models.ForeignKey(TipoDocumentoAnexo, on_delete=models.CASCADE)
 
-    # TODO definir un destino seguro y privado!
+    # ISSUE definir un destino seguro y privado!
+    # https://github.com/cluster311/ggg/issues/184
     documento_adjunto = models.FileField(upload_to='documentos_anexos')
 
     def __str__(self):
@@ -168,14 +169,11 @@ class Factura(TimeStampedModel):
         null=True,
         blank=True
     )
-    
+
+    fecha = models.DateTimeField(default=timezone.now)
+
     def __str__(self):
         return f'Factura {self.id}'
-    
-    def define_oss(self):
-        # ver si el paciente tiene OSS o le corresponde algun progeama de salud
-        #TODO self.obra_social = X
-        return
     
     def change_status(self, new_status):
         data = {'old_status': self.estado, 'new_status': new_status}
@@ -186,3 +184,43 @@ class Factura(TimeStampedModel):
                      data=data)
         self.estado = new_status
         self.save()
+    
+    def as_anexo2_json(self):
+        """ recuperar los datos de esta factura en el formato que
+            la librería Anexo2 (en Pypi) requiere
+            Requisitos acá: https://github.com/cluster311/Anexo2
+            """
+        hospital = self.consulta.centro_de_salud.as_anexo2_json()
+        if hospital['codigo_hpgd'] is None:
+            hospital['codigo_hpgd'] = 'DESC'  # TODO, no permitido
+        beneficiario = self.consulta.paciente.as_anexo2_json()
+        atencion = self.consulta.as_anexo2_json()
+        
+        # TODO, detectar esto que todavía no esta relevado
+        # obra_social_paciente = None
+        # obra_social = obra_social_paciente.as_anexo2_json()
+        obra_social = {'codigo_rnos': '800501',
+                    'nombre': 'OBRA SOCIAL ACEROS PARANA',
+                    'nro_carnet_obra_social': '9134818283929101',
+                    'fecha_de_emision': {'dia': 11, 'mes': 9, 'anio': 2009},
+                    'fecha_de_vencimiento': {'dia': 11, 'mes': 9, 'anio': 2029}}
+
+        # TODO, detectar esto que todavía no esta relevado
+        # empresa_paciente = None
+        # empresa = empresa_paciente.as_anexo2_json()
+        empresa = {'nombre': 'Telescopios Hubble',
+                   'direccion': 'Av Astronómica s/n',
+                   'ultimo_recibo_de_sueldo': {'mes': 7, 'anio': 2019},
+                   'cuit': '31-91203043-8'}
+
+        data = {'dia': self.fecha.day,
+                'mes': self.fecha.month,
+                'anio': self.fecha.year,
+                'hospital': hospital,
+                'beneficiario': beneficiario,
+                'atencion': atencion,
+                'obra_social': obra_social,
+                'empresa': empresa
+                }
+
+        return data

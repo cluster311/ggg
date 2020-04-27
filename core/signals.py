@@ -38,7 +38,8 @@ def sig_app_log(sender, code, severity=1, description=None, data=None, **kwargs)
 
 @receiver(post_save, sender=User, dispatch_uid="assign_user_first_group")
 def assign_user_first_group(sender, instance, created, **kwargs):
-    # todo usuario nuevo es por defecto ciudadano
+    # ISSUE usuario nuevo es por defecto ciudadano
+    # https://github.com/cluster311/ggg/issues/180
     if created:
         group, created = Group.objects.get_or_create(name=settings.GRUPO_CIUDADANO)
         user = instance

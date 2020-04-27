@@ -96,7 +96,7 @@ class Turno(models.Model):
         if self.estado in [self.CANCELADO_PACIENTE, self.CANCELADO_ESTABLECIMIENTO]:
             logger.info('Grabando Turno en estado cacelado')
             if hasattr(self, 'consulta'):
-                # TODO ¿debería eliminar la consulta?
+                # ¿debería eliminar la consulta?
                 logger.info(f'Eliminando consulta {self.consulta.id} por cancelación de turno')
                 self.consulta.delete()
             else:
