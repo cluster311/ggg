@@ -17,7 +17,7 @@ from pacientes.models import Paciente
 from obras_sociales.models import ObraSocial
 
 
-@permission_required('calendario.view_turno')
+@permission_required('calendario.view_turno', raise_exception=True)
 @require_http_methods(["GET"])
 def index(request):
     '''
@@ -46,7 +46,7 @@ def index(request):
     return render(request, 'calendario.html', context)
 
 
-@permission_required('calendario.add_turno')
+@permission_required('calendario.add_turno', raise_exception=True)
 @require_http_methods(["POST"])
 def add_appointment(request):
     '''
@@ -87,7 +87,7 @@ def add_appointment(request):
     return JsonResponse(response_data)
 
 
-@permission_required('calendario.add_turno')
+@permission_required('calendario.add_turno', raise_exception=True)
 @require_http_methods(["GET"])
 def copy_appointments(request):
     '''
@@ -140,7 +140,7 @@ def copy_appointments(request):
     )
 
 
-@permission_required('calendario.view_turno')
+@permission_required('calendario.view_turno', raise_exception=True)
 @require_http_methods(["GET"])
 def feed(request, servicio=None):
     '''
@@ -187,7 +187,7 @@ def get_appointments_list(servicio, user, **kwargs):
         return Turno.objects.filter(servicio__centro__in=centros_de_salud_permitidos, **kw)
 
 
-@permission_required('calendario.can_schedule_turno')
+@permission_required('calendario.can_schedule_turno', raise_exception=True)
 @require_http_methods(["GET"])
 def agendar(request):
     '''
@@ -220,7 +220,7 @@ def confirm_turn(request, pk):
         )
 
 
-@permission_required('calendario.change_turno')
+@permission_required('calendario.change_turno', raise_exception=True)
 @require_http_methods(["PUT"])
 def edit_turn(request, pk):
     # TODO asegurarse que el usuario esta activo en el centro de salud donde se hace el cambio
@@ -240,7 +240,7 @@ def edit_turn(request, pk):
         )
 
 
-@permission_required('calendario.can_view_misturnos')
+@permission_required('calendario.can_view_misturnos', raise_exception=True)
 @require_http_methods(["GET"])
 def mis_turnos(request):
     today = datetime.now().replace(hour=0,minute=0,second=0)
@@ -255,7 +255,7 @@ def mis_turnos(request):
     return render(request, 'mis-turnos.html', context)
 
 
-@permission_required('calendario.can_cancel_turno')
+@permission_required('calendario.can_cancel_turno', raise_exception=True)
 @require_http_methods(["PUT"])
 def cancelar_turno(request, pk):
     instance = get_object_or_404(Turno, id=pk)
@@ -274,7 +274,7 @@ def cancelar_turno(request, pk):
         )
 
 
-@permission_required('calendario.can_gestionar_turnos')
+@permission_required('calendario.can_gestionar_turnos', raise_exception=True)
 @require_http_methods(["GET"])
 def gestion_turnos(request):
     context = {
@@ -284,7 +284,7 @@ def gestion_turnos(request):
     return render(request, 'calendario-gestionar.html', context)
 
 
-@permission_required('calendario.can_gestionar_turnos')
+@permission_required('calendario.can_gestionar_turnos', raise_exception=True)
 @require_http_methods(["PUT"])
 def gestion_turno(request, pk):
     instance = get_object_or_404(Turno, id=pk)
@@ -304,7 +304,7 @@ def gestion_turno(request, pk):
             'errors': result}
         )
 
-@permission_required('calendario.can_gestionar_turnos')
+@permission_required('calendario.can_gestionar_turnos', raise_exception=True)
 @require_http_methods(["POST"])
 def crear_sobreturno(request, pk):
     instance = get_object_or_404(Turno, id=pk)
