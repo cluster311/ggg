@@ -19,3 +19,7 @@
     height: auto;
     min-height: 41px;
 }
+
+.espacio-margin{
+    margin-top: 2px;
+}
