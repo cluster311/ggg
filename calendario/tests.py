@@ -1,11 +1,12 @@
 import json
 
+
 from django.test import TestCase, RequestFactory
 from django.test import Client
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 
-from calendario.views import feed
+from calendario.views import feed, index, add_appointment, copy_appointments, agendar
 from core.base_permission import start_roles_and_permissions, create_test_users
 
 
@@ -46,87 +47,118 @@ class CalendarioTests(TestCase, FullUsersMixin):
     def test_redireccion_no_logeado(self):
         request = self.factory.get('/turnos/feed')
         request.user = self.user_anon
-        try:
+        with self.assertRaises(PermissionDenied):
             feed(request)
-        except PermissionDenied:
-            pass
 
-        #response = self.client.get('/turnos/feed')
-        #self.assertRedirects(response, '/accounts/login/?next=/turnos/feed')
+        request = self.factory.get('/turnos/')
+        request.user = self.user_anon
+        with self.assertRaises(PermissionDenied):
+            index(request)
 
-        #response = self.client.get('/turnos/')
-        #self.assertRedirects(response, '/accounts/login/?next=/turnos/')
+        request = self.factory.get('/turnos/appointments/')
+        request.user = self.user_anon
+        with self.assertRaises(PermissionDenied):
+            add_appointment(request)
 
-        #response = self.client.get('/turnos/appointments/')
-        #self.assertRedirects(response, '/accounts/login/?next=/turnos/appointments/')
+        request = self.factory.get('/turnos/appointments/copy/')
+        request.user = self.user_anon
+        with self.assertRaises(PermissionDenied):
+            copy_appointments(request)
 
-        #response = self.client.get('/turnos/appointments/copy/')
-        #self.assertRedirects(response, '/accounts/login/?next=/turnos/appointments/copy/')
+        request = self.factory.get('/turnos/agendar/')
+        request.user = self.user_anon
+        with self.assertRaises(PermissionDenied):
+            agendar(request)
 
-        #response = self.client.get('/turnos/agendar/')
-        #self.assertRedirects(response, '/accounts/login/?next=/turnos/agendar/')
-'''
     def test_loggeado_feed(self):
-        self.client.login(username=self.user_admin, password=self.user_admin)
-        response = self.client.get('/turnos/feed')
+        request = self.factory.get('/turnos/feed')
+        request.user = self.user_admin
+        response = feed(request)
         self.assertEqual(response.status_code, 200)
 
-        self.client.login(username=self.user_city, password=self.user_city)
-        response = self.client.get('/turnos/feed')
-        self.assertEqual(response.status_code, 403)
+        request.user = self.user_city
+        with self.assertRaises(PermissionDenied):
+            feed(request)
 
-        self.client.login(username=self.user_prof, password=self.user_prof)
-        response = self.client.get('/turnos/feed')
-        self.assertEqual(response.status_code, 403)
+        request.user = self.user_prof
+        with self.assertRaises(PermissionDenied):
+            feed(request)
+
+        request.user = self.user_recupero
+        with self.assertRaises(PermissionDenied):
+            feed(request)
 
     def test_loggeado_index(self):
-        self.client.login(username=self.user_admin, password=self.user_admin)
-        response = self.client.get('/turnos/')
+        request = self.factory.get('/turnos/')
+        request.user = self.user_admin
+        response = index(request)
         self.assertEqual(response.status_code, 200)
 
-        self.client.login(username=self.user_city, password=self.user_city)
-        response = self.client.get('/turnos/')
-        self.assertEqual(response.status_code, 403)
+        request.user = self.user_city
+        with self.assertRaises(PermissionDenied):
+            index(request)
 
-        self.client.login(username=self.user_prof, password=self.user_prof)
-        response = self.client.get('/turnos/')
-        self.assertEqual(response.status_code, 403)
+        request.user = self.user_prof
+        with self.assertRaises(PermissionDenied):
+            index(request)
+
+        request.user = self.user_recupero
+        with self.assertRaises(PermissionDenied):
+            index(request)
 
     def test_loggeado_add_appointment(self):
-        #faltaria crear objectos para poder hacer el post porque entra y rompe para ADMIN
-        #self.client.login(username=self.user_admin, password=self.user_admin)
-        #data = {"test": "test", 'bulk': False, 'id': '', 'servicio': '10000', 'profesional': '10000'}
-        #response = self.client.post('/turnos/appointments/', json.dumps(data), content_type="application/json")
-        #self.assertEqual(response.status_code, 404)
+        #responde 405 porque faltan enviar formulario y datos que recibe en formato json
+        request = self.factory.post('/turnos/appointments/')
+        #request.user = self.user_admin
+        #response = add_appointment(request)
+        #self.assertEqual(response.status_code, 405)
 
-        self.client.login(username=self.user_city, password=self.user_city)
-        response = self.client.post('/turnos/appointments/')
-        self.assertEqual(response.status_code, 403)
+        request.user = self.user_city
+        with self.assertRaises(PermissionDenied):
+            add_appointment(request)
 
-        self.client.login(username=self.user_prof, password=self.user_prof)
-        response = self.client.post('/turnos/appointments/')
-        self.assertEqual(response.status_code, 403)
+        request.user = self.user_prof
+        with self.assertRaises(PermissionDenied):
+            add_appointment(request)
+
+        request.user = self.user_recupero
+        with self.assertRaises(PermissionDenied):
+            add_appointment(request)
 
     def test_loggeado_add_appointment_copy(self):
-        # falta agregar el de admin pero tener en cuenta los parametros de GET que tiene
-        self.client.login(username=self.user_city, password=self.user_city)
-        response = self.client.post('/turnos/appointments/copy/')
-        self.assertEqual(response.status_code, 403)
+        # falta agregar parametros de fecha pero copiaria turnos
+        request = self.factory.get('/turnos/appointments/copy/')
+        #request.user = self.user_admin
+        #response = copy_appointments(request)
+        #self.assertEqual(response.status_code, 405)
 
-        self.client.login(username=self.user_prof, password=self.user_prof)
-        response = self.client.post('/turnos/appointments/copy/')
-        self.assertEqual(response.status_code, 403)
+        request.user = self.user_city
+        with self.assertRaises(PermissionDenied):
+            copy_appointments(request)
+
+        request.user = self.user_prof
+        with self.assertRaises(PermissionDenied):
+            copy_appointments(request)
+
+        request.user = self.user_recupero
+        with self.assertRaises(PermissionDenied):
+            copy_appointments(request)
 
     def test_loggeado_agendar(self):
-        self.client.login(username=self.user_admin, password=self.user_admin)
-        response = self.client.get('/turnos/agendar/')
-        self.assertEqual(response.status_code, 200)
+        request = self.factory.post('/turnos/agendar/')
+        #request.user = self.user_admin
+        #response = add_appointment(request)
+        #self.assertEqual(response.status_code, 200)
 
-        self.client.login(username=self.user_city, password=self.user_city)
-        response = self.client.post('/turnos/agendar/')
-        self.assertEqual(response.status_code, 403)
+        request.user = self.user_city
+        with self.assertRaises(PermissionDenied):
+            agendar(request)
 
-        self.client.login(username=self.user_prof, password=self.user_prof)
-        response = self.client.post('/turnos/agendar/')
-        self.assertEqual(response.status_code, 403)
-'''
+        request.user = self.user_prof
+        with self.assertRaises(PermissionDenied):
+            agendar(request)
+
+        request.user = self.user_recupero
+        with self.assertRaises(PermissionDenied):
+            agendar(request)
+
