@@ -43,6 +43,7 @@ class CalendarioTests(TestCase, FullUsersMixin):
         self.group_city.delete()
         self.group_admin.delete()
         self.group_prof.delete()
+        self.user_anon.delete()
 
     def test_redireccion_no_logeado(self):
         request = self.factory.get('/turnos/feed')
@@ -161,4 +162,3 @@ class CalendarioTests(TestCase, FullUsersMixin):
         request.user = self.user_recupero
         with self.assertRaises(PermissionDenied):
             agendar(request)
-
