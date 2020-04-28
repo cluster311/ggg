@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.test import Client, TestCase
+from django.core.exceptions import PermissionDenied
 from core.base_permission import start_roles_and_permissions, create_test_data
 from centros_de_salud.models import CentroDeSalud
 from calendario.forms import TurnoForm
@@ -24,8 +25,8 @@ class AdministrativosTest(TestCase, FullUserMixin):
     def test_login_administrativo(self):
 
         # Request sin loguearse
-        response = self.client.get('/turnos/')
-        self.assertRedirects(response, '/accounts/login/?next=/turnos/') 
+        with self.assertRaises(PermissionDenied):
+            response = self.client.get('/turnos/')
 
         # Login con user administrativo1
         self.client.login(username=self.user_admin_1, password=self.user_admin_1)
