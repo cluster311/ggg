@@ -16,7 +16,7 @@ urlpatterns = [
         name="usuarios.en-centro-de-salud",
     ),
     url(
-        r"^crear-en-centro-de-salud.html",
+        r"^crear-en-centro-de-salud.html$",
         UsuarioEnCentroDeSaludCreateView.as_view(),
         name="usuarios.en-centro-de-salud.create",
     ),

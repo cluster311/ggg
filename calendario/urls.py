@@ -13,9 +13,9 @@ urlpatterns = [
     url(r'^agendar/$', agendar, name='calendario.agendar'),
     url(r'^confirm_turn/(?P<pk>\d+)/$', confirm_turn, name='calendario.confirm'),
     url(r'^edit_turn/(?P<pk>\d+)/$', edit_turn, name='calendario.edit_turn'),
-    url(r'^mis_turnos$', mis_turnos, name='calendario.mis_turnos'),
+    url(r'^mis_turnos/$', mis_turnos, name='calendario.mis_turnos'),
     url(r'^cancelar_turn/(?P<pk>\d+)/$',cancelar_turno, name='calendario.cancelar_turn'),
-    url(r'^gestionar_turnos',gestion_turnos, name='calendario.gestion_turnos'),
+    url(r'^gestionar_turnos/$',gestion_turnos, name='calendario.gestion_turnos'),
     url(r'^gestionar_turno/(?P<pk>\d+)/$', gestion_turno, name='calendario.gestion_turno'),
     url(r'^crear_sobreturno/(?P<pk>\d+)/$', crear_sobreturno, name='calendario.crear_sobreturno'),
 ]
