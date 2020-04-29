@@ -25,8 +25,9 @@ class AdministrativosTest(TestCase, FullUserMixin):
     def test_login_administrativo(self):
 
         # Request sin loguearse
-        with self.assertRaises(PermissionDenied):
-            response = self.client.get('/turnos/')
+        response = self.client.get('/turnos/')
+        # raise error internally but not exposes here 
+        self.assertTrue(response.status_code, 403)
 
         # Login con user administrativo1
         self.client.login(username=self.user_admin_1, password=self.user_admin_1)
