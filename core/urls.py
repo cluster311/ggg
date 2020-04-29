@@ -12,12 +12,12 @@ from core.views import (CIE10Autocomplete,
 
 urlpatterns = [
     path(
-        r"servicio-autocomplete",
+        r"servicio-autocomplete/",
         ServicioAutocomplete.as_view(),
         name="servicio-autocomplete",
     ),
     path(
-        r"carpeta-familiar-autocomplete",
+        r"carpeta-familiar-autocomplete/",
         CarpetaFamiliarAutocomplete.as_view(),
         name="carpeta-familiar-autocomplete",
     ),

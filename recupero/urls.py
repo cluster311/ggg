@@ -18,8 +18,8 @@ from .views_tipo_documento_anexo import (TipoDocumentoAnexoListView,
 from .views_anexo2 import Anexo2View
 
 urlpatterns = [
-    url(
-        r"^facturacion$",
+    path(
+        r"facturacion/",
         FacturaListView.as_view(),
         name="recupero.facturas",
     ),
@@ -34,7 +34,7 @@ urlpatterns = [
         name="recupero.factura.edit",
     ),
     path(
-        r"crear-factura",
+        r"crear-factura/",
         FacturaCreateView.as_view(),
         name="recupero.factura.create",
     ),
@@ -59,8 +59,8 @@ urlpatterns = [
         name="recupero.tipos-prestacion.edit",
     ),
 
-    url(
-        r"^tipo-de-documentacion-anexa.html$",
+    path(
+        r"tipo-de-documentacion-anexa.html",
         TipoDocumentoAnexoListView.as_view(),
         name="recupero.tipos-doc-anexo",
     ),
@@ -86,4 +86,3 @@ urlpatterns = [
     ),
     
 ]
-

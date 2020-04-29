@@ -17,7 +17,7 @@ urlpatterns = [
     ),
     
     path(
-        r"<int:dni>/historia",
+        r"<int:dni>/historia/",
         ConsultaListView.as_view(),
         name="pacientes.consulta.lista",
     ),
@@ -27,7 +27,7 @@ urlpatterns = [
         name="pacientes.consulta.detalle",
     ),
     path(
-        r"crear-carpeta-familiar",
+        r"crear-carpeta-familiar/",
         CarpetaFamiliarCreateView.as_view(),
         name="pacientes.carpeta-familiar.crear",
     ),

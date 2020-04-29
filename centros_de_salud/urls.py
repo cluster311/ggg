@@ -45,7 +45,7 @@ urlpatterns = [
         name="centros_de_salud.servicios",
     ),
     url(
-        r"^crear-servicio.html",
+        r"^crear-servicio.html$",
         ServicioCreateView.as_view(),
         name="centros_de_salud.servicios.create",
     ),
@@ -67,7 +67,7 @@ urlpatterns = [
         name="centros_de_salud.especialidades",
     ),
     url(
-        r"^crear-especialidad.html",
+        r"^crear-especialidad.html$",
         EspecialidadCreateView.as_view(),
         name="centros_de_salud.especialidades.create",
     ),
@@ -89,7 +89,7 @@ urlpatterns = [
         name="centros_de_salud.profesionales-en-servicio",
     ),
     url(
-        r"^crear-profesional-en-servicio.html",
+        r"^crear-profesional-en-servicio.html$",
         ProfesionalesEnServicioCreateView.as_view(),
         name="centros_de_salud.profesionales-en-servicio.create",
     ),

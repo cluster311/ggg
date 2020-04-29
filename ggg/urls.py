@@ -26,7 +26,7 @@ urlpatterns = [
     url(r'^hsuper/$', SuperAdminHome.as_view(), name='super.home'),
     url(r'^hrecupero/$', RecuperoHome.as_view(), name='recupero.home'),
     url(r'^hdata/$', DataHome.as_view(), name='data.home'),
-    url(r'^home$', choice_homepage, name='home'),
+    url(r'^home/$', choice_homepage, name='home'),
 ] 
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
