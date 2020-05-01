@@ -26,8 +26,8 @@
         <td>Sin datos</td><td></td><td></td>
         {% endfor %}
     </tbody>
-    <p>{{ search }}</p>
 </table>
+
 {% include 'admin_paginate.html' with search_text=search_txt %}
 
 {% endblock %}
