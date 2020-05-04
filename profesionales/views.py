@@ -57,6 +57,8 @@ class ProfesionalHome(TemplateView, GroupRequiredMixin):
             else:
                 # este usuario no tiene un profesional conectado
                 raise PermissionDenied
+        else:
+            raise PermissionDenied
         return context
 
 
