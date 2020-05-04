@@ -77,6 +77,10 @@ class ProfesionalHomeTest(TestCase, FullUsersMixin):
         response = ProfesionalHome.as_view()(request)
         self.assertEqual(response.status_code, 200)
 
+        request.user = self.user_admin
+        with self.assertRaises(PermissionDenied):
+            ProfesionalHome.as_view()(request)
+
         view = ProfesionalHome()
         request.user = self.user_prof
         view.setup(request)
