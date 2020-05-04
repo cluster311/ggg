@@ -166,7 +166,6 @@ class EvolucionUpdateView(ConsultaMixin,
     def get_success_url(self):
         return reverse(
             "profesionales.home",
-            kwargs=({"dni": self.object.paciente.numero_documento}),
         )
 
 
