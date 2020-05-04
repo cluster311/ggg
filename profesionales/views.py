@@ -5,7 +5,7 @@ from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django.db.models import Count, Q
 from django.core.exceptions import PermissionDenied
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
@@ -65,6 +65,7 @@ class ProfesionalHome(TemplateView, GroupRequiredMixin):
 class ProfesionalListView(PermissionRequiredMixin, ListView):
     model = Profesional
     permission_required = ("profesionales.view_profesional",)
+    raise_exception = True
     paginate_by = 10  # pagination
 
     def get_queryset(self):        

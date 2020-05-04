@@ -4,7 +4,7 @@ from django.test import Client
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from core.base_permission import start_roles_and_permissions, create_test_users
-from .views import ProfesionalHome
+from .views import ProfesionalHome, ProfesionalListView
 
 
 class FullUsersMixin:
@@ -88,3 +88,28 @@ class ProfesionalHomeTest(TestCase, FullUsersMixin):
         self.assertIn('hoy', context)
         self.assertIn('estados', context)
 
+
+class ProfesionalListViewTest(TestCase, FullUsersMixin):
+    def setUp(self):
+        # Every test needs access to the request factory.
+        self.factory = RequestFactory()
+
+        self.create_users_and_groups()
+
+    def test_login(self):
+        request = self.factory.get('/profesionales/lista.html')
+        request.user = self.user_city
+        with self.assertRaises(PermissionDenied):
+            ProfesionalListView.as_view()(request)
+
+        request.user = self.user_anon
+        with self.assertRaises(PermissionDenied):
+            ProfesionalListView.as_view()(request)
+
+        request.user = self.user_prof
+        with self.assertRaises(PermissionDenied):
+            ProfesionalListView.as_view()(request)
+
+        request.user = self.user_admin
+        response = ProfesionalListView.as_view()(request)
+        self.assertEqual(response.status_code, 200)
