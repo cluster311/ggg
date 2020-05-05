@@ -4,6 +4,7 @@ from django.test import Client
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from core.base_permission import start_roles_and_permissions, create_test_users
+from .models import Profesional
 from .views import ProfesionalHome, ProfesionalListView, ProfesionalCreateView, ProfesionalUpdateView, \
     ProfesionalDetailView
 
@@ -177,6 +178,7 @@ class ProfesionalDetailViewTest(TestCase, FullUsersMixin):
 
     def test_login(self):
         request = self.factory.get('/profesionales/detalle-profesional.html/1/')
+
         request.user = self.user_city
         with self.assertRaises(PermissionDenied):
             ProfesionalDetailView.as_view()(request)
@@ -190,5 +192,7 @@ class ProfesionalDetailViewTest(TestCase, FullUsersMixin):
             ProfesionalDetailView.as_view()(request)
 
         request.user = self.user_admin
-        response = ProfesionalDetailView.as_view()(request, pk=1)
+        profesional = Profesional.objects.get(user=self.user_prof)
+        response = ProfesionalDetailView.as_view()(request, pk=profesional.pk)
         self.assertEqual(response.status_code, 200)
+
