@@ -99,6 +99,7 @@ class ProfesionalCreateView(PermissionRequiredMixin,
                                SuccessMessageMixin):
     model = Profesional
     permission_required = ("profesionales.view_profesional",)
+    raise_exception = True
     fields =  '__all__'
     success_message = "Creado con éxito."
 
