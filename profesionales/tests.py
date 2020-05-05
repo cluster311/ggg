@@ -4,7 +4,7 @@ from django.test import Client
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from core.base_permission import start_roles_and_permissions, create_test_users
-from .views import ProfesionalHome, ProfesionalListView, ProfesionalCreateView
+from .views import ProfesionalHome, ProfesionalListView, ProfesionalCreateView, ProfesionalUpdateView
 
 
 class FullUsersMixin:
@@ -137,5 +137,31 @@ class ProfesionalCreateViewTest(TestCase, FullUsersMixin):
             ProfesionalCreateView.as_view()(request)
 
         request.user = self.user_admin
-        response = ProfesionalCreateView.as_view()(request)
-        self.assertEqual(response.status_code, 200)
+        with self.assertRaises(PermissionDenied):
+            ProfesionalCreateView.as_view()(request)
+
+
+class ProfesionalUpdateViewTest(TestCase, FullUsersMixin):
+    def setUp(self):
+        # Every test needs access to the request factory.
+        self.factory = RequestFactory()
+
+        self.create_users_and_groups()
+
+    def test_login(self):
+        request = self.factory.get('/profesionales/editar-profesional.html/')
+        request.user = self.user_city
+        with self.assertRaises(PermissionDenied):
+            ProfesionalUpdateView.as_view()(request)
+
+        request.user = self.user_anon
+        with self.assertRaises(PermissionDenied):
+            ProfesionalUpdateView.as_view()(request)
+
+        request.user = self.user_prof
+        with self.assertRaises(PermissionDenied):
+            ProfesionalUpdateView.as_view()(request)
+
+        request.user = self.user_admin
+        with self.assertRaises(PermissionDenied):
+            ProfesionalCreateView.as_view()(request)
