@@ -90,13 +90,18 @@
         }
     }
 
-    function initCalendar(calendarEl, servicio){
-      if (servicio == null) servicio = 0;
+
+    // Inicializar Select2 de Especialidad y Servicios
+    $("#select2Especialidad").select2();
+    $('#select2Servicios').select2();
+
+    // Render inicial del calendario
+    document.addEventListener('DOMContentLoaded', function() {
+      const calendarEl = document.getElementById('calendar');
+
       calendar = new FullCalendar.Calendar(calendarEl, {
         plugins: [ 'dayGrid', 'timeGrid' ],
-        eventSources: [{
-            url: '{% url "calendario.feed-availables" servicio=0 %}'.replace(0,servicio),
-        }],
+        eventSources: [],
         eventRender: calendarEventRender,
         eventClick: function(info) {
           let fkn_month = info.event.start.getMonth() + 1;
@@ -126,30 +131,54 @@
       });
 
       calendar.render();
-    }
-  
-    $("#select2Especialidad").select2();
+    })
 
+    /**
+     * 
+     */
+    function replaceEvents(servicio) {
+      if (servicio === null) {
+        return false
+      };
+
+      // Elimina todas las fuentes de eventos del calendario
+      calendar.removeAllEventSources();
+      console.log('SERVICIO', servicio)
+      // Creamos la nueva fuente con la url del servicio que necesitamos solicitar
+      let newEventSource = {
+          id: 'source',
+          url: '{% url "calendario.feed-availables" servicio=0 %}'.replace(0, servicio),
+        }
+      
+      // Agregamos nueva fuente de eventos
+      calendar.addEventSource(newEventSource);
+    }
+
+    // Cuando cambie el valor del select Especialidad
     $("#select2Especialidad").change(function(){
-      $("#select2Servicios").val('').change();
-      $('#select2Servicios').select2("destroy");
+      $('#select2Servicios').val(null).change(); // Limpiar select Servicios
+
+      // Obtener nuevos valores de Servicios ofrecidos por Especialidades
       $('#select2Servicios').select2({
         ajax: {
           url: "{% url 'centros_de_salud.servicio-by-especialidad' pk=0 %}".replace(0,$("#select2Especialidad").val()),
           dataType: 'json'
         }
       });
-      $("#select2Servicios").change();
     });
-    $('#select2Servicios').select2();
+
+    // Esto permite que select2Servicios cargue valores
+    // iniciales sin tener que re-seleccionar una Especialidad
     $("#select2Especialidad").change();
 
+
+    // Cuando cambie el valor del select de Servicios
     $("#select2Servicios").change(function(){
+      // Tomamos el valor del servicio y lo pasamos a la función
       let servicio_id = $("#select2Servicios").val();
-      const calendarEl = document.getElementById('calendar');
-      initCalendar(calendarEl, servicio_id);
+
+      replaceEvents(servicio_id);
     });
-    $("#select2Servicios").change();
 
   </script>
 
