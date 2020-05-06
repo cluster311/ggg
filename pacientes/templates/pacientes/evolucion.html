@@ -35,21 +35,9 @@
           <small>Separados por comas</small></p>
 
         <h4>Medidas anexas</h4>
-          {% for medida in medidas_en_consulta %}
-            <p> {{ medida.medida_en_consulta.medida.nombre }} 
-              <input 
-                type="number" 
-                value="{{ medida.medida_en_consulta.valor|unlocalize }}" 
-                step="10.00" required="true" 
-                name="medida_{{ medida.medida_en_consulta.id}}">
-              
-<small> {{ medida.medida_en_consulta.medida.observaciones_para_el_que_mide }} {{ medida.medida_en_especialidad.observaciones_para_el_que_mide }}</small>
-            </p>
-            
-          {% empty %}
-            <p>No hay medidas anexas para esta especialdiad</p>
-          {% endfor %}
-
+          <div class="{{ p }}-form">
+            {{ medidas_frm|crispy }}
+          </div>
       </div>
       <div class="col-6 col-md-6">
         <div>

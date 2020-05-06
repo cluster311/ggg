@@ -14,7 +14,7 @@ from django.template import RequestContext
 from django.conf import settings
 from .models import Consulta, CarpetaFamiliar
 from especialidades.models import MedidasAnexasEspecialidad, MedidaAnexaEnConsulta
-from especialidades.forms import MedidaAnexaEnConsultaForm
+from especialidades.forms import MedidaAnexaEnConsultaForm, MedidaAnexaEnConsultaFormset
 from calendario.models import Turno
 from .forms import (EvolucionForm, ConsultaForm,
                    RecetaFormset, DerivacionFormset, 
@@ -95,20 +95,13 @@ class ConsultaMixin:
         medidas_a_tomar = MedidasAnexasEspecialidad.objects.filter(
             especialidad=consulta.especialidad
         )
-        medidas_en_consulta = []
         for medida in medidas_a_tomar:
-            medida_en_consulta, created = MedidaAnexaEnConsulta.objects.get_or_create(
+            MedidaAnexaEnConsulta.objects.get_or_create(
                 consulta=consulta,
                 medida=medida.medida
                 )
-            
-            frm = MedidaAnexaEnConsultaForm(instance=medida_en_consulta, obligatorio=medida.obligatorio)
-            medidas_en_consulta.append({'medida_en_consulta': medida_en_consulta,
-                                        'frm': frm,
-                                        'medida_en_especialidad': medida})
-        
-        context['medidas_en_consulta'] = medidas_en_consulta
-
+        context["recetas_frm"] = RecetaFormset(data, prefix='Recetas', instance=instance)
+        context["medidas_frm"] = MedidaAnexaEnConsultaFormset(data, prefix='Medidas', instance=instance)
         return context
 
     def form_valid(self, form):
@@ -117,6 +110,7 @@ class ConsultaMixin:
         rs = context["recetas_frm"]
         ds = context["derivaciones_frm"]
         ps = context["prestaciones_frm"]
+        ms = context["medidas_frm"]
 
         self.object = form.save()
         logger.info(f'Pasando el turno {self.object.turno} a "atendido"')
@@ -138,21 +132,9 @@ class ConsultaMixin:
         
         # ISSUE usar MedidaAnexaEnConsultaForm
         # https://github.com/cluster311/ggg/issues/120
-        data = context["data"]
-        for field, value in data.items():
-            if field.startswith('medida_'):
-                medida_en_consulta_id = field.split('_')[1]
-                medida_en_consulta = MedidaAnexaEnConsulta.objects.get(pk=medida_en_consulta_id)
-
-                try:
-                    a = float(value)
-                except:
-                    error = 'Valor inválido para {medida_en_consulta.medida_en_consulta.nombre}'
-                    logger.error(error)
-                    # form.add_error(None, error)
-                else:
-                    medida_en_consulta.valor = value
-                    medida_en_consulta.save()
+        if ms.is_valid():
+            ms.instance = self.object
+            ms.save()
 
         return super().form_valid(form)
 
@@ -184,7 +166,6 @@ class EvolucionUpdateView(ConsultaMixin,
     def get_success_url(self):
         return reverse(
             "profesionales.home",
-            kwargs=({"dni": self.object.paciente.numero_documento}),
         )
 
 
