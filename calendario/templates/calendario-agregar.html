@@ -134,16 +134,19 @@
     })
 
     /**
-     * 
+     * Esta función recibe el id del servicio como argumento,
+     * borra los que se muestran en el calendario, 
+     * busca los eventos del nuevo servicio solicitado y los agrega al calendario.
      */
     function replaceEvents(servicio) {
+      // Workaround para el render inicial
       if (servicio === null) {
         return false
       };
 
       // Elimina todas las fuentes de eventos del calendario
       calendar.removeAllEventSources();
-      console.log('SERVICIO', servicio)
+
       // Creamos la nueva fuente con la url del servicio que necesitamos solicitar
       let newEventSource = {
           id: 'source',
@@ -156,7 +159,9 @@
 
     // Cuando cambie el valor del select Especialidad
     $("#select2Especialidad").change(function(){
-      $('#select2Servicios').val(null).change(); // Limpiar select Servicios
+
+      // Limpiar select Servicios
+      $('#select2Servicios').val(null);
 
       // Obtener nuevos valores de Servicios ofrecidos por Especialidades
       $('#select2Servicios').select2({
@@ -171,10 +176,10 @@
     // iniciales sin tener que re-seleccionar una Especialidad
     $("#select2Especialidad").change();
 
-
     // Cuando cambie el valor del select de Servicios
     $("#select2Servicios").change(function(){
-      // Tomamos el valor del servicio y lo pasamos a la función
+
+      // Toma el valor del servicio y lo pasa a la función
       let servicio_id = $("#select2Servicios").val();
 
       replaceEvents(servicio_id);
