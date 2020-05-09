@@ -110,13 +110,13 @@ class ServicioUpdateView(PermissionRequiredMixin, UpdateView):
 
 @permission_required('calendario.can_schedule_turno')
 @require_http_methods(["GET"])
-def servicios_by_especialidad(request, pk):
-    instance = get_object_or_404(Especialidad, id=pk)
-    servicios = Servicio.objects.filter(especialidad=instance)
+def servicios_by_centro_salud(request, pk):
+    instance = get_object_or_404(CentroDeSalud, id=pk)
+    servicios = Servicio.objects.filter(centro=instance)
     data = {'results': [] }
     for servicio in servicios:
         data['results'].append({
             'id': servicio.pk,
-            'text': servicio.centro.nombre
+            'text': str(servicio.especialidad)
         })
     return JsonResponse(data)

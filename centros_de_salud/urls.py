@@ -6,7 +6,7 @@ from .views_servicios import (ServicioListView,
                               ServicioCreateView,
                               ServicioDetailView,
                               ServicioUpdateView,
-                              servicios_by_especialidad)
+                              servicios_by_centro_salud)
 
 from .views_especialidad import (EspecialidadListView,
                                  EspecialidadCreateView,
@@ -105,8 +105,8 @@ urlpatterns = [
     ),
 
     path(
-        r"servicio-by-especialidad/<int:pk>",
-        servicios_by_especialidad,
-        name="centros_de_salud.servicio-by-especialidad",
+        r"servicios-by-centro-salud/<int:pk>",
+        servicios_by_centro_salud,
+        name="centros_de_salud.servicios-by-centro-salud",
     ),
 ]

@@ -91,10 +91,6 @@
     }
 
 
-    // Inicializar Select2 de Especialidad y Servicios
-    $("#select2Especialidad").select2();
-    $('#select2Servicios').select2();
-
     // Render inicial del calendario
     document.addEventListener('DOMContentLoaded', function() {
       const calendarEl = document.getElementById('calendar');
@@ -157,30 +153,30 @@
       calendar.addEventSource(newEventSource);
     }
 
-    // Cuando cambie el valor del select Especialidad
-    $("#select2Especialidad").change(function(){
+    // Cuando cambie el centro de salud activo blanquear especialidad seleccionada
+    $("#usuario_elegir_centro").change(function() {
+      $('#select2Especialidad').empty();
+    })
 
-      // Limpiar select Servicios
-      $('#select2Servicios').val(null);
-
-      // Obtener nuevos valores de Servicios ofrecidos por Especialidades
-      $('#select2Servicios').select2({
+ // Inicializar Select2 de Especialidad y Servicios
+    $('#select2Especialidad').select2({
         ajax: {
-          url: "{% url 'centros_de_salud.servicio-by-especialidad' pk=0 %}".replace(0,$("#select2Especialidad").val()),
+          url: function(centro_elegido) {
+            return "{% url 'centros_de_salud.servicios-by-centro-salud' pk=0 %}".replace(0, $("#usuario_elegir_centro").val());
+          },
           dataType: 'json'
         }
       });
-    });
+    
+    // Cuando cambie el valor del select de Especialidad
+    $("#select2Especialidad").change(function () {
 
-    // Esto permite que select2Servicios cargue valores
-    // iniciales sin tener que re-seleccionar una Especialidad
-    $("#select2Especialidad").change();
-
-    // Cuando cambie el valor del select de Servicios
-    $("#select2Servicios").change(function(){
-
-      // Toma el valor del servicio y lo pasa a la función
-      let servicio_id = $("#select2Servicios").val();
+      /* 
+        El select contiene 2 propiedades:
+        - id del servicio
+        - Texto de la especialidad
+      */
+      let servicio_id = $('#select2Especialidad').val();
 
       replaceEvents(servicio_id);
     });
@@ -262,15 +258,7 @@
       <div class="col-md-5">
           <p>Especialidad</p>
           <select id="select2Especialidad" style="width:100%">
-          {% for especialidad  in especialidades %}
-            <option value="{{especialidad.pk}}">{{especialidad}}</option>
-          {% endfor %}
           </select>
-      </div>
-      <div class="col-md-5">
-        <p>Servicio</p>
-        <select id="select2Servicios" style="width:100%">
-        </select>
       </div>
     </div>
     <br>

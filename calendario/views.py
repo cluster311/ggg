@@ -194,7 +194,6 @@ def agendar(request):
         grupo acceso disponible: grupo_administrativo
     '''
     context = {
-        'especialidades': Especialidad.objects.all(),
         'sys_logo': settings.SYS_LOGO
     }
     return render(request, 'calendario-agregar.html', context)
