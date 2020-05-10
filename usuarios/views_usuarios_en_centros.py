@@ -22,8 +22,8 @@ class UsuarioEnCentroDeSaludListView(PermissionRequiredMixin, ListView):
         if 'search' in self.request.GET:
             q = self.request.GET['search']
             objects = UsuarioEnCentroDeSalud.objects.filter(
-                Q(centro__nombre__icontains=q) |
-                Q(especialidad__nombre__icontains=q)
+                Q(centro_de_salud__nombre__icontains=q) |
+                Q(usuario__username__icontains=q)
             )
         else:
             objects = UsuarioEnCentroDeSalud.objects.all()
