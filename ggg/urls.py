@@ -7,6 +7,7 @@ from .views import (LandingPage, choice_homepage,
                    CiudadanoHome, RecuperoHome, SuperAdminHome, DataHome )
 
 
+
 urlpatterns = [
     # url(r'^jet/', include('jet.urls', 'jet')),
     path('admin/', admin.site.urls),
@@ -28,5 +29,7 @@ urlpatterns = [
     url(r'^hdata/$', DataHome.as_view(), name='data.home'),
     url(r'^home/$', choice_homepage, name='home'),
 ] 
+
+handler403 = 'core.views.handler403'
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

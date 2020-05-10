@@ -1,5 +1,7 @@
 from dal import autocomplete
 from cie10_django.models import CIE10
+from django.shortcuts import render, render_to_response, redirect
+
 from pacientes.models import Paciente, CarpetaFamiliar
 from profesionales.models import Profesional
 from centros_de_salud.models import (CentroDeSalud, ProfesionalesEnServicio,
@@ -163,3 +165,14 @@ class ServicioAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(especialidad__nombre__icontains=self.q)
 
         return qs
+
+
+def handler403(request, exception):
+    if not request.user.is_anonymous:
+        response = render_to_response("errors/403.html")
+        response.status_code = 403
+        return response
+    else:
+        return redirect('../../accounts/login/?next='+request.get_full_path(),)
+
+

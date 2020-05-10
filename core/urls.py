@@ -10,6 +10,7 @@ from core.views import (CIE10Autocomplete,
                         )
 
 
+
 urlpatterns = [
     path(
         r"servicio-autocomplete/",
@@ -51,5 +52,5 @@ urlpatterns = [
         TipoPrestacionAutocomplete.as_view(),
         name="tipo_prestacion-autocomplete",
     ),
-    
+
 ]
