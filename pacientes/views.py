@@ -12,7 +12,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
 from django.conf import settings
-from .models import Consulta, CarpetaFamiliar
+from .models import Consulta, CarpetaFamiliar, Receta, Derivacion
 from especialidades.models import MedidasAnexasEspecialidad, MedidaAnexaEnConsulta
 from especialidades.forms import MedidaAnexaEnConsultaForm, MedidaAnexaEnConsultaFormset
 from calendario.models import Turno
@@ -86,10 +86,16 @@ class ConsultaMixin:
             context['consultas_previas'] = None
         else:
             # evitar la consulta automática que se creo en relacion al turno
+            consultas_previas_completas = []
             consultas_previas = Consulta.objects.filter(
                 paciente=instance.paciente
                 ).exclude(pk=instance.pk).order_by('-created')
-            context['consultas_previas'] = consultas_previas
+            for cp in consultas_previas:
+                mac = MedidaAnexaEnConsulta.objects.filter(consulta=cp)
+                rec = Receta.objects.filter(consulta=cp)
+                der = Derivacion.objects.filter(consulta=cp)
+                consultas_previas_completas.append((cp, mac, rec, der))
+            context['consultas_previas'] = consultas_previas_completas
         
         consulta = self.object
         medidas_a_tomar = MedidasAnexasEspecialidad.objects.filter(
