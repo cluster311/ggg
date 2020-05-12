@@ -88,15 +88,14 @@
                             </h5>
                         </div>
                       </div>
-                            <div id="collapse-recetas-{{ cp.id }}" class="panel-collapse collapse">
-                                <div class="panel-body container card-body-child">
-                                      {% for r in recetas %}
-                                        <h6>{{r.medicamento}} - {{r.posologia}} </h6>
-                                        <h6>{{r.observaciones}}</h6>
-                                        <hr class="solid">
-                                      {% endfor %}
-                                </div>
-                            </div>
+                      <div id="collapse-recetas-{{ cp.id }}" class="panel-collapse collapse">
+                        <div class="panel-body container card-body-child">
+                              {% for r in recetas %}
+                                <h6>{{r.medicamento}} - {{r.posologia}} </h6>
+                                <h6>{{r.observaciones}}</h6>
+                                <hr class="solid">
+                              {% endfor %}
+                        </div>
                       </div>
                       <div class="card-header-child ">
                         <div class="panel-heading">
@@ -109,20 +108,22 @@
                             </h5>
                         </div>
                       </div>
-                            <div id="collapse-derivacion-{{ cp.id }}" class="panel-collapse collapse">
-                                <div class="panel-body container card-body-child">
-                                      {% for d in derivaciones %}
-                                        <h6>{{d.especialidad}}</h6>
-                                        <h6>{{d.observaciones}}</h6>
-                                        <hr class="solid">
-                                      {% endfor %}
-                                </div>
-                            </div>
+                      <div id="collapse-derivacion-{{ cp.id }}" class="panel-collapse collapse">
+                        <div class="panel-body container card-body-child">
+                          {% for d in derivaciones %}
+                            <h6>{{d.especialidad}}</h6>
+                            <h6>{{d.observaciones}}</h6>
+                            <hr class="solid">
+                          {% endfor %}
+                        </div>
                       </div>
+
+                  </div>
                 </div>
               </div>
             {% endfor %}
             </div>
+
         </div>
         <h4>Extras</h4>
         <div class="accordion" id="accordion">
