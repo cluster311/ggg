@@ -134,9 +134,10 @@
      * borra los que se muestran en el calendario, 
      * busca los eventos del nuevo servicio solicitado y los agrega al calendario.
      */
-    function replaceEvents(servicio) {
+    function replaceEvents(servicio_id) {
       // Workaround para el render inicial
-      if (servicio === null) {
+      if (servicio_id === null) {
+        calendar.removeAllEventSources();
         return false
       };
 
@@ -146,31 +147,41 @@
       // Creamos la nueva fuente con la url del servicio que necesitamos solicitar
       let newEventSource = {
           id: 'source',
-          url: '{% url "calendario.feed-availables" servicio=0 %}'.replace(0, servicio),
+          url: '{% url "calendario.feed-availables" servicio=0 %}'.replace(0, servicio_id),
         }
       
       // Agregamos nueva fuente de eventos
       calendar.addEventSource(newEventSource);
     }
 
+    // Esta función es un wrapper para que no se muestren 
+    // otras especialidades cuando se cambie el centro de salud 
+    function initSelectEspecialidad() {
+      $('#select2Especialidad').select2({
+          placeholder: "Seleccione una especialidad",
+          ajax: {
+            url: function(centro_elegido) {
+              return "{% url 'centros_de_salud.servicios-by-centro-salud' pk=0 %}".replace(0, $("#usuario_elegir_centro").val());
+            },
+            dataType: 'json'
+          },
+        });
+    }
+
+    // Inicializar Select2 de Especialidades
+    initSelectEspecialidad();
+
     // Cuando cambie el centro de salud activo blanquear especialidad seleccionada
+    // y llamar re inicializar el select de especialidades con el nuevo centro de salud
     $("#usuario_elegir_centro").change(function() {
-      $('#select2Especialidad').empty();
+      $('#select2Especialidad').val('').change();
+
+      initSelectEspecialidad();
+      replaceEvents(null);
     })
 
- // Inicializar Select2 de Especialidad y Servicios
-    $('#select2Especialidad').select2({
-        ajax: {
-          url: function(centro_elegido) {
-            return "{% url 'centros_de_salud.servicios-by-centro-salud' pk=0 %}".replace(0, $("#usuario_elegir_centro").val());
-          },
-          dataType: 'json'
-        }
-      });
-    
     // Cuando cambie el valor del select de Especialidad
     $("#select2Especialidad").change(function () {
-
       /* 
         El select contiene 2 propiedades:
         - id del servicio
