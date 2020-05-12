@@ -43,7 +43,7 @@
         <div>
           <h4>Consultas previas</h4>
           <div class="accordion" id="accordion_evo" style='overflow-y: scroll; height: 400px;'>
-              {% for cp, medidas, recetas, derivaciones in consultas_previas %}
+              {% for cp, medidas, recetas, derivaciones, prestaciones in consultas_previas %}
               <div class="card">
                 <div class="card-header" id="heading-{{ cp.id }}">
                   <h2 class="mb-0">
@@ -117,7 +117,27 @@
                           {% endfor %}
                         </div>
                       </div>
-
+                      <div class="card-header-child ">
+                        <div class="panel-heading">
+                            <h5 class="panel-title card-panel-child">
+                               {% if prestaciones %}
+                                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion-prestacion-{{ cp.id }}" href="#collapse-prestacion-{{ cp.id }}">Prestaciones</a>
+                               {% else %}
+                                    <a data-toggle="collapse" data-parent="#accordion-prestacion-{{ cp.id }}" href="#collapse-prestacion-{{ cp.id }}">No se registran Prestaciones</a>
+                               {% endif %}
+                            </h5>
+                        </div>
+                      </div>
+                      <div id="collapse-prestacion-{{ cp.id }}" class="panel-collapse collapse">
+                        <div class="panel-body container card-body-child">
+                          {% for p in prestaciones %}
+                            <h6><b>Tipo:</b>{{p.tipo}}</h6>
+                            <h6><b>Cantidad:</b>{{ p.cantidad }}</h6>
+                            <h6>{{p.observaciones}}</h6>
+                            <hr class="solid">
+                          {% endfor %}
+                        </div>
+                      </div>
                   </div>
                 </div>
               </div>
