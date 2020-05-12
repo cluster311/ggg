@@ -1,0 +1,30 @@
+.card-header-child {
+    padding-top: 5px;
+    padding-left: 10px;
+
+    border: 1px solid black;
+    background-color: rgba(236, 90, 90, 0.51);
+}
+
+.card-panel-child > a[aria-expanded="true"]{
+    background-color: transparent;
+    font-weight: bold;
+    text-shadow: rgb(0, 0, 0) 1px 0px 0px, rgb(0, 0, 0) 0.540302px 0.841471px 0px, rgb(0, 0, 0) -0.416147px 0.909297px 0px, rgb(0, 0, 0) -0.989992px 0.14112px 0px, rgb(0, 0, 0) -0.653644px -0.756802px 0px, rgb(0, 0, 0) 0.283662px -0.958924px 0px, rgb(0, 0, 0) 0.96017px -0.279415px 0px;
+
+}
+
+.cont-consulta-previa{
+    margin: 5px;
+
+}
+
+.card-body-child{
+    padding-top: 5px;
+    padding-left: 15px;
+    background-color: #f8f9fa;
+    border: 1px solid black;
+}
+
+.accordion-toggle{
+    display: block;
+}
