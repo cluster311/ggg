@@ -90,13 +90,14 @@
         }
     }
 
-    function initCalendar(calendarEl, servicio){
-      if (servicio == null) servicio = 0;
+
+    // Render inicial del calendario
+    document.addEventListener('DOMContentLoaded', function() {
+      const calendarEl = document.getElementById('calendar');
+
       calendar = new FullCalendar.Calendar(calendarEl, {
         plugins: [ 'dayGrid', 'timeGrid' ],
-        eventSources: [{
-            url: '{% url "calendario.feed-availables" servicio=0 %}'.replace(0,servicio),
-        }],
+        eventSources: [],
         eventRender: calendarEventRender,
         eventClick: function(info) {
           let fkn_month = info.event.start.getMonth() + 1;
@@ -126,30 +127,70 @@
       });
 
       calendar.render();
-    }
-  
-    $("#select2Especialidad").select2();
+    })
 
-    $("#select2Especialidad").change(function(){
-      $("#select2Servicios").val('').change();
-      $('#select2Servicios').select2("destroy");
-      $('#select2Servicios').select2({
-        ajax: {
-          url: "{% url 'centros_de_salud.servicio-by-especialidad' pk=0 %}".replace(0,$("#select2Especialidad").val()),
-          dataType: 'json'
+    /**
+     * Esta función recibe el id del servicio como argumento,
+     * borra los que se muestran en el calendario, 
+     * busca los eventos del nuevo servicio solicitado y los agrega al calendario.
+     */
+    function replaceEvents(servicio_id) {
+      // Workaround para el render inicial
+      if (servicio_id === null) {
+        calendar.removeAllEventSources();
+        return false
+      };
+
+      // Elimina todas las fuentes de eventos del calendario
+      calendar.removeAllEventSources();
+
+      // Creamos la nueva fuente con la url del servicio que necesitamos solicitar
+      let newEventSource = {
+          id: 'source',
+          url: '{% url "calendario.feed-availables" servicio=0 %}'.replace(0, servicio_id),
         }
-      });
-      $("#select2Servicios").change();
-    });
-    $('#select2Servicios').select2();
-    $("#select2Especialidad").change();
+      
+      // Agregamos nueva fuente de eventos
+      calendar.addEventSource(newEventSource);
+    }
 
-    $("#select2Servicios").change(function(){
-      let servicio_id = $("#select2Servicios").val();
-      const calendarEl = document.getElementById('calendar');
-      initCalendar(calendarEl, servicio_id);
+    // Esta función es un wrapper para que no se muestren 
+    // otras especialidades cuando se cambie el centro de salud 
+    function initSelectEspecialidad() {
+      $('#select2Especialidad').select2({
+          placeholder: "Seleccione una especialidad",
+          ajax: {
+            url: function(centro_elegido) {
+              return "{% url 'centros_de_salud.servicios-by-centro-salud' pk=0 %}".replace(0, $("#usuario_elegir_centro").val());
+            },
+            dataType: 'json'
+          },
+        });
+    }
+
+    // Inicializar Select2 de Especialidades
+    initSelectEspecialidad();
+
+    // Cuando cambie el centro de salud activo blanquear especialidad seleccionada
+    // y llamar re inicializar el select de especialidades con el nuevo centro de salud
+    $("#usuario_elegir_centro").change(function() {
+      $('#select2Especialidad').val('').change();
+
+      initSelectEspecialidad();
+      replaceEvents(null);
+    })
+
+    // Cuando cambie el valor del select de Especialidad
+    $("#select2Especialidad").change(function () {
+      /* 
+        El select contiene 2 propiedades:
+        - id del servicio
+        - Texto de la especialidad
+      */
+      let servicio_id = $('#select2Especialidad').val();
+
+      replaceEvents(servicio_id);
     });
-    $("#select2Servicios").change();
 
   </script>
 
@@ -228,15 +269,7 @@
       <div class="col-md-5">
           <p>Especialidad</p>
           <select id="select2Especialidad" style="width:100%">
-          {% for especialidad  in especialidades %}
-            <option value="{{especialidad.pk}}">{{especialidad}}</option>
-          {% endfor %}
           </select>
-      </div>
-      <div class="col-md-5">
-        <p>Servicio</p>
-        <select id="select2Servicios" style="width:100%">
-        </select>
       </div>
     </div>
     <br>
