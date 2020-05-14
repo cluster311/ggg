@@ -12,6 +12,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='turno',
-            options={'permissions': [('can_schedule_turno', 'Puede agendar un turno'), ('can_view_misturnos', 'Puede ver Mis Turnos'), ('can_cancel_turno', 'Puede cancelar sus turnos'), ('can_gestionar_turnos', 'Puede gestionar turnos')]},
+            options={'permissions': [('can_schedule_turno', 'Puede agendar un turno'), ('can_view_misturnos', 'Puede ver Mis Turnos'), ('can_cancel_turno', 'Puede cancelar sus turnos')]},
         ),
     ]
