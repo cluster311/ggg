@@ -20,7 +20,6 @@ def start_roles_and_permissions():
     perm_schedule_turno = Permission.objects.get(codename='can_schedule_turno', content_type__app_label='calendario')
     perm_viewmy_turno = Permission.objects.get(codename='can_view_misturnos', content_type__app_label='calendario')
     perm_cancel_turno = Permission.objects.get(codename='can_cancel_turno', content_type__app_label='calendario')
-    # Definir perm_gestionar_turno = Permission.objects.get(codename='can_gestionar_turnos', content_type__app_label='calendario')
     perm_add_turno = Permission.objects.get(codename='add_turno', content_type__app_label='calendario')
     perm_view_turno = Permission.objects.get(codename='view_turno', content_type__app_label='calendario')
     perm_change_turno = Permission.objects.get(codename='change_turno', content_type__app_label='calendario')

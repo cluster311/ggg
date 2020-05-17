@@ -63,10 +63,6 @@ class Turno(models.Model):
                 "can_cancel_turno",
                 "Puede cancelar sus turnos"
             ),
-            (
-                "can_gestionar_turnos",
-                "Puede gestionar turnos"
-            ),
             
         ]
 

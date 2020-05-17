@@ -211,7 +211,14 @@
       })
         .then(response => {
           if (!response.data.success) {
-            $("#dni-error").css('display','block');
+            // En caso de error abrir modal de creación de paciente
+            $("#cargar_dni").val($("#dni").val());
+            $("#cargar_dni").prop("disabled","disabled");
+            $("#cargar_turn_pk").val(pk);
+            $('#crearPacienteModal').modal('show');
+            $('#agendarModal').modal('hide');
+            $("#dni-error").css('display','none');
+            $("#dni").val("");
           } else {
             $("#dni-error").css('display','none');
             $("#dni").val("");
@@ -224,6 +231,47 @@
         .catch(error => {
           console.error(error)
         });
+    }
+
+    function cargarPaciente(){
+      if ($("#cargar_apellidos").val() == ""){
+        $("#cargar_apellidos-error").css("display","block");
+        return
+      }
+      if ($("#cargar_nombres").val() == ""){
+        $("#cargar_nombres-error").css("display","block");
+        return
+      }
+      let formData = {
+        'paciente':$("#cargar_dni").val(),
+        'apellidos':$("#cargar_apellidos").val(),
+        'nombres':$("#cargar_nombres").val(),
+        'oss':$("#cargar_oss").val(),
+      }
+      if($("#cargar_numero-afiliado").val().trim() != ""){
+        formData['numero-afiliado'] = $("#cargar_numero-afiliado").val().trim();
+      }
+      
+      let pk = $("#cargar_turn_pk").val()
+      axios({
+        method: 'PUT',
+        url: "{% url 'calendario.confirm' pk=0 %}".replace(0,pk),
+        headers: {'Content-Type': 'application/json'},
+        data: formData
+      })
+        .then(response => {
+          if (!response.data.success) {
+            console.error(response.data);
+          } else {
+            $(".cargar-inputs").val("");
+            $(".cargar-errores").css('display','none');
+            calendar.refetchEvents();
+            $('#crearPacienteModal').modal('hide');
+          }
+        })
+        .catch(error => {
+          console.error(error)
+      });
     }
 
     function imprimirTurno(){
@@ -297,9 +345,9 @@
         <p id="modal-body-text"></p>
         <div class="form-group">
           <label for="dni" class="col-form-label">DNI Paciente:</label>
-          <input class="form-control" id="dni"></input>
+          <input class="form-control" id="dni">
           <span class="help-block" id="dni-error" style="display: none;">
-            Tu historia clínica no ha sido inicializada, luego de que recibas la próxima atención esto estará resuelto
+          El DNI es incorrecto. Por favor ingréselo nuevamente.
           </span>
         </div>
         <input id="turn_pk" hidden/>
@@ -344,6 +392,70 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
         <button type="button" class="btn btn-primary" onclick="imprimirTurno()">Imprimir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="crearPacienteModal" tabindex="1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document" style="max-width:40%">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Cargar Datos</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-body-text">El paciente no estaba registrado en el sistema, ingresa los siguientes datos para el alta del mismo y agendar el turno.</p>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="dni" class="col-form-label">DNI Paciente:</label>
+              <input class="form-control cargar-inputs" id="cargar_dni"></input>
+              <span class="help-block cargar-errores" id="cargar_dni-error" style="display: none;">El dni es incorrecto</span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="dni" class="col-form-label">Numero de afiliado:</label>
+              <input class="form-control cargar-inputs" id="cargar_numero-afiliado"></input>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="dni" class="col-form-label">Nombres:</label>
+              <input class="form-control cargar-inputs" id="cargar_nombres"></input>
+              <span class="help-block cargar-errores" id="cargar_nombres-error" style="display: none;">El nombre no puede estar vacio</span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="dni" class="col-form-label">Apellidos:</label>
+              <input class="form-control cargar-inputs" id="cargar_apellidos"></input>
+              <span class="help-block cargar-errores" id="cargar_apellidos-error" style="display: none;">El apellido no puede estar vacio</span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="dni" >Obra Social:</label>
+              <select class="form-control" id="cargar_oss">
+                {% for os in obras_sociales %}
+                <option value="{{os.pk}}">{{os.nombre}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+        <input id="cargar_turn_pk" class="cargar-inputs" hidden/>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" onclick="cargarPaciente()">Cargar y agendar</button>
       </div>
     </div>
   </div>

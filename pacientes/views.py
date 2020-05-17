@@ -184,7 +184,7 @@ class CarpetaFamiliarCreateView(PermissionRequiredMixin,
     model = CarpetaFamiliar
     success_message = "Carpeta creada con éxito."
     form_class = CarpetaFamiliarForm
-    permission_required = ("calendario.can_gestionar_turnos",)
+    permission_required = ("calendario.can_schedule_turno",)
 
     # descomentar si queremos un boton con link arriba a la derecha
     # def get_context_data(self, **kwargs):
@@ -196,5 +196,5 @@ class CarpetaFamiliarCreateView(PermissionRequiredMixin,
 
     def get_success_url(self):
         return reverse(
-            "calendario.gestion_turno"
+            "calendario.agendar"
         )

@@ -209,12 +209,13 @@ def agendar(request):
         Grupo acceso disponible: grupo_administrativo
     '''
     context = {
+        'obras_sociales': ObraSocial.objects.all(),
         'sys_logo': settings.SYS_LOGO
     }
     return render(request, 'calendario-agregar.html', context)
 
 
-@permission_required('calendario.can_schedule_turno')
+@permission_required('calendario.can_schedule_turno', raise_exception=True)
 @require_http_methods(["PUT"])
 def confirm_turn(request, pk):
     '''
@@ -224,6 +225,7 @@ def confirm_turn(request, pk):
     '''
     instance = get_object_or_404(Turno, id=pk)
     form_data = json.loads(request.body)
+    logger.info(f'Gestion de turno {pk}: {form_data}')
     form_data['solicitante'] = request.user
     form = TurnoForm(form_data, instance=instance)
     save, result = form.update(form_data)
@@ -300,37 +302,6 @@ def cancelar_turno(request, pk):
     form_data = {'state': Turno.CANCELADO_PACIENTE}
     form = TurnoForm(form_data, instance=instance)
     save, result = form.change_state(form_data)
-    if save:
-        return JsonResponse({
-            'success': save,
-            'turno': instance.as_json()}
-        )
-    else:
-        return JsonResponse({
-            'success': save,
-            'errors': result}
-        )
-
-
-@permission_required('calendario.can_gestionar_turnos', raise_exception=True)
-@require_http_methods(["GET"])
-def gestion_turnos(request):
-    context = {
-        'servicios': Servicio.objects.all(),
-        'obras_sociales': ObraSocial.objects.all()
-    }
-    return render(request, 'calendario-gestionar.html', context)
-
-
-@permission_required('calendario.can_gestionar_turnos', raise_exception=True)
-@require_http_methods(["PUT"])
-def gestion_turno(request, pk):
-    instance = get_object_or_404(Turno, id=pk)
-    form_data = json.loads(request.body)
-    logger.info(f'Gestion de turno {pk}: {form_data}')
-    form_data['solicitante'] = request.user
-    form = TurnoForm(form_data, instance=instance)
-    save, result = form.update(form_data)
     if save:
         return JsonResponse({
             'success': save,
