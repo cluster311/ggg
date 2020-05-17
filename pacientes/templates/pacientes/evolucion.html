@@ -196,7 +196,7 @@ $( document ).ready(function() {
 {% for formset in formsets %}
 {% with formset.prefix|slugify as p %}
   $('.{{ p }}-form').formset({
-          prefix: '{{ formset.prefix|slugify }}',
+          prefix: '{{ formset.prefix }}',
           addText: 'Agregar otro',         
           deleteText: 'Eliminar',        
           deleteCssClass: 'btn btn-sm btn-danger',
