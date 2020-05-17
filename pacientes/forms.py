@@ -81,6 +81,7 @@ class EvolucionForm(forms.ModelForm):
         ),
     )
     indicaciones = forms.CharField(
+        required=False,
         label='Indicaciones adicionales',
         widget=forms.Textarea(attrs={'rows': 2})
     )
