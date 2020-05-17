@@ -21,7 +21,9 @@ from obras_sociales.models import ObraSocial
 @require_http_methods(["GET"])
 def index(request):
     '''
-        grupo acceso disponible: grupo_administrativo
+        Vista inicial con calendario que permite agregar turnos
+
+        Grupo acceso disponible: grupo_administrativo
     '''
     context = {
         'modal_title': 'Agregar turno',
@@ -50,7 +52,9 @@ def index(request):
 @require_http_methods(["POST"])
 def add_appointment(request):
     '''
-         grupo acceso disponible: grupo_administrativo
+        Recibe los datos del formulario para crear los turnos disponibles
+
+        Grupo acceso disponible: grupo_administrativo
     '''
     form_data = json.loads(request.body)
     if form_data['bulk']:
@@ -91,7 +95,9 @@ def add_appointment(request):
 @require_http_methods(["GET"])
 def copy_appointments(request):
     '''
-        grupo acceso disponible: grupo_administrativo
+        Copia los turnos de la semana anterior a la semana actual
+        
+        Grupo acceso disponible: grupo_administrativo
     '''
     if 'start' in request.GET:
         c_start = parse_datetime(request.GET['start'])
@@ -144,7 +150,9 @@ def copy_appointments(request):
 @require_http_methods(["GET"])
 def feed(request, servicio=None):
     '''
-    grupo acceso disponible: grupo_administrativo
+        Vista llamada al inicializar el calendario que devuelve los turnos disponibles 
+
+        Grupo acceso disponible: grupo_administrativo
     '''
     turnos = get_appointments_list(servicio, user=request.user, **request.GET)
     turnos = [{
@@ -163,6 +171,10 @@ def feed(request, servicio=None):
 
 
 def get_appointments_list(servicio, user, **kwargs):
+    '''
+        Función usada para obtener los turnos en base al 
+        servicio, usuario que lo solicita y otros argumentos
+    '''
     if 'id' in kwargs:
         pk = kwargs['id'][0] if isinstance(kwargs['id'], list) else \
              kwargs['id']
@@ -191,7 +203,10 @@ def get_appointments_list(servicio, user, **kwargs):
 @require_http_methods(["GET"])
 def agendar(request):
     '''
-        grupo acceso disponible: grupo_administrativo
+        Vista que permite agendar turnos disponibles de las 
+        Especialidades disponibles en Centros de Salud
+
+        Grupo acceso disponible: grupo_administrativo
     '''
     context = {
         'obras_sociales': ObraSocial.objects.all(),
@@ -203,6 +218,11 @@ def agendar(request):
 @permission_required('calendario.can_schedule_turno', raise_exception=True)
 @require_http_methods(["PUT"])
 def confirm_turn(request, pk):
+    '''
+        Confirma el turno de un paciente (Llamada mediante Ajax)
+
+        Grupo acceso disponible: grupo_administrativo
+    '''
     instance = get_object_or_404(Turno, id=pk)
     form_data = json.loads(request.body)
     logger.info(f'Gestion de turno {pk}: {form_data}')
@@ -224,6 +244,11 @@ def confirm_turn(request, pk):
 @permission_required('calendario.change_turno', raise_exception=True)
 @require_http_methods(["PUT"])
 def edit_turn(request, pk):
+    '''
+        Edita el estado de un turno (Llamada mediante Ajax)
+
+        Grupo acceso disponible: grupo_administrativo
+    '''
     # ISSUE asegurarse que el usuario esta activo en el centro de salud donde se hace el cambio
     # https://github.com/cluster311/ggg/issues/181
 
@@ -246,6 +271,12 @@ def edit_turn(request, pk):
 @permission_required('calendario.can_view_misturnos', raise_exception=True)
 @require_http_methods(["GET"])
 def mis_turnos(request):
+    '''
+        Muestra información sobre los turnos solicitados 
+        por el usuario con la posibilidad de cancelarlo
+
+        Grupo acceso disponible: grupo_ciudadano
+    '''
     today = datetime.now().replace(hour=0,minute=0,second=0)
     turnos = Turno.objects.filter(
         (Q(solicitante=request.user) | Q(paciente__user=request.user))
@@ -261,6 +292,12 @@ def mis_turnos(request):
 @permission_required('calendario.can_cancel_turno', raise_exception=True)
 @require_http_methods(["PUT"])
 def cancelar_turno(request, pk):
+    '''
+        Vista para cambiar el estado de un turno a 'Cancelado por el paciente'
+        (Llamada mediante Ajax)
+
+        Grupo acceso disponible: grupo_administrativo
+    '''
     instance = get_object_or_404(Turno, id=pk)
     form_data = {'state': Turno.CANCELADO_PACIENTE}
     form = TurnoForm(form_data, instance=instance)
@@ -276,10 +313,14 @@ def cancelar_turno(request, pk):
             'errors': result}
         )
 
-
 @permission_required('calendario.can_schedule_turno', raise_exception=True)
 @require_http_methods(["POST"])
 def crear_sobreturno(request, pk):
+    '''
+        Crea un nuevo turno después del último disponible.
+
+        Grupo acceso disponible: grupo_administrativo
+    '''
     instance = get_object_or_404(Turno, id=pk)
     form = TurnoForm({}, instance=instance)
     save, result = form.sobreturno()
