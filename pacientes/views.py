@@ -34,6 +34,7 @@ class ConsultaListView(PermissionRequiredMixin, ListView):
     model = Consulta
     permission_required = ("pacientes.view_consulta",)
     template_name = "pacientes/consulta_listview.html"
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -53,6 +54,7 @@ class ConsultaDetailView(PermissionRequiredMixin, DetailView):
     model = Consulta
     permission_required = ("pacientes.view_consulta",)
     template_name = "pacientes/consulta_detailview.html"
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -159,6 +161,7 @@ class EvolucionUpdateView(ConsultaMixin,
     template_name = "pacientes/evolucion.html"
     form_class = EvolucionForm
     success_message = "Datos guardados con éxito."
+    raise_exception = True
 
     def test_func(self):
         # ver si este profesional es el dueño de la consulta
