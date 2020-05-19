@@ -86,7 +86,8 @@ class PacienteTests(TestCase, FullUsersMixin):
 
         request.user = self.user_prof
         paciente = Paciente.objects.get(numero_documento=24987563)
-        response = ConsultaDetailView.as_view()(request, dni=24987563, pk=paciente.pk)
+        consulta = Consulta.objects.filter(paciente=paciente)[0]
+        response = ConsultaDetailView.as_view()(request, dni=24987563, pk=consulta.pk)
         self.assertEqual(response.status_code, 200)
 
         request.user = self.user_admin
