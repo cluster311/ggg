@@ -1,10 +1,12 @@
 from django.contrib.auth.models import User
 from django.test import Client, TestCase
 from django.core.exceptions import PermissionDenied
+from django.db.utils import IntegrityError
 from core.base_permission import start_roles_and_permissions, create_test_data
 from centros_de_salud.models import CentroDeSalud
 from calendario.forms import TurnoForm
 from centros_de_salud.models import Servicio
+from usuarios.models import UsuarioEnCentroDeSalud
 
 class FullUserMixin:
     def create_users_and_groups(self):
@@ -93,3 +95,13 @@ class AdministrativosTest(TestCase, FullUserMixin):
         valor_esperado = ['Profesional 1A ', 'Profesional 1B ', 'Profesional 1C ', 'Profesional 1D ', 'Profesional 1E ']
 
         self.assertEqual(nombres_profs, valor_esperado)
+
+    def test_permiso_administrativo_en_CS_unico(self):
+        ''' La autorización entre un usuario y el Centro de Salud
+            permitido debe existir solo una vez '''
+        
+        with self.assertRaises(IntegrityError):
+            UsuarioEnCentroDeSalud.objects.create(
+                usuario=self.user_admin_1,
+                centro_de_salud=CentroDeSalud.objects.get(nombre='Centro de Salud 1')
+            )
