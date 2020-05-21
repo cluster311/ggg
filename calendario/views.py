@@ -7,6 +7,9 @@ from django.shortcuts import get_object_or_404, render
 from django.utils.dateparse import parse_datetime
 from django.views.decorators.http import require_http_methods
 import json
+
+from calendario.decorators import centro_de_salud_habilitado_form, \
+    centro_de_salud_habilitado_pk
 from calendario.models import Turno
 from calendario.forms import BulkTurnoForm, FeedForm, TurnoForm
 import logging
@@ -50,6 +53,7 @@ def index(request):
 
 @permission_required('calendario.add_turno', raise_exception=True)
 @require_http_methods(["POST"])
+@centro_de_salud_habilitado_form
 def add_appointment(request):
     '''
         Recibe los datos del formulario para crear los turnos disponibles
@@ -217,6 +221,7 @@ def agendar(request):
 
 @permission_required('calendario.can_schedule_turno', raise_exception=True)
 @require_http_methods(["PUT"])
+@centro_de_salud_habilitado_pk
 def confirm_turn(request, pk):
     '''
         Confirma el turno de un paciente (Llamada mediante Ajax)
@@ -243,15 +248,13 @@ def confirm_turn(request, pk):
 
 @permission_required('calendario.change_turno', raise_exception=True)
 @require_http_methods(["PUT"])
+@centro_de_salud_habilitado_pk
 def edit_turn(request, pk):
     '''
         Edita el estado de un turno (Llamada mediante Ajax)
 
         Grupo acceso disponible: grupo_administrativo
     '''
-    # ISSUE asegurarse que el usuario esta activo en el centro de salud donde se hace el cambio
-    # https://github.com/cluster311/ggg/issues/181
-
     instance = get_object_or_404(Turno, id=pk)
     form_data = json.loads(request.body)
     form = TurnoForm(form_data, instance=instance)
@@ -291,6 +294,7 @@ def mis_turnos(request):
 
 @permission_required('calendario.can_cancel_turno', raise_exception=True)
 @require_http_methods(["PUT"])
+@centro_de_salud_habilitado_pk
 def cancelar_turno(request, pk):
     '''
         Vista para cambiar el estado de un turno a 'Cancelado por el paciente'
@@ -315,6 +319,7 @@ def cancelar_turno(request, pk):
 
 @permission_required('calendario.can_schedule_turno', raise_exception=True)
 @require_http_methods(["POST"])
+@centro_de_salud_habilitado_pk
 def crear_sobreturno(request, pk):
     '''
         Crea un nuevo turno después del último disponible.
