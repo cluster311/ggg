@@ -60,6 +60,9 @@
 
   <script src='https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.js'></script>
 
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+
   <script type="text/javascript">
     'use strict';
     let calendar;
@@ -146,7 +149,70 @@
           $('[id^=event-]').removeClass('noCoincideDni');
         }
       });
-    });  
+    });
+
+    /**
+     * Esta función recibe el id del servicio como argumento,
+     * borra los que se muestran en el calendario, 
+     * busca los eventos del nuevo servicio solicitado y los agrega al calendario.
+     */
+    function replaceEvents(servicio_id) {
+      // Workaround para el render inicial
+      if (servicio_id === null) {
+        calendar.removeAllEventSources();
+        return false
+      };
+
+      // Elimina todas las fuentes de eventos del calendario
+      calendar.removeAllEventSources();
+
+      // Creamos la nueva fuente con la url del servicio que necesitamos solicitar
+      let newEventSource = {
+          id: 'source',
+          url: '{% url "calendario.feed-availables" servicio=0 %}'.replace(0, servicio_id),
+        }
+      
+      // Agregamos nueva fuente de eventos
+      calendar.addEventSource(newEventSource);
+    }
+    
+    // Esta función es un wrapper para que no se muestren 
+    // otras especialidades cuando se cambie el centro de salud 
+    function initSelectEspecialidad() {
+      $('#select2Especialidad').select2({
+          placeholder: "Seleccione una especialidad",
+          ajax: {
+            url: function(centro_elegido) {
+              return "{% url 'centros_de_salud.servicios-by-centro-salud' pk=0 %}".replace(0, $("#usuario_elegir_centro").val());
+            },
+            dataType: 'json'
+          },
+        });
+    }
+
+    // Inicializar Select2 de Especialidades
+    initSelectEspecialidad();
+
+    // Cuando cambie el centro de salud activo blanquear especialidad seleccionada
+    // y llamar re inicializar el select de especialidades con el nuevo centro de salud
+    $("#usuario_elegir_centro").change(function() {
+      $('#select2Especialidad').val('').change();
+
+      initSelectEspecialidad();
+      replaceEvents(null);
+    });
+
+    // Cuando cambie el valor del select de Especialidad
+    $("#select2Especialidad").change(function () {
+      /* 
+        El select contiene 2 propiedades:
+        - id del servicio
+        - Texto de la especialidad
+      */
+      let servicio_id = $('#select2Especialidad').val();
+
+      replaceEvents(servicio_id);
+    });
   </script>
 
   <script>
@@ -423,6 +489,13 @@
     <input placeholder="Buscar por documento... " id="documentoFilter">
     {% include 'base_modal_button.html' with button_text=modal_title %}
   </div>
+  <div class="row col-md-3">
+      
+          <p>Especialidad</p>
+          <select id="select2Especialidad" style="width:100%">
+          </select>
+    </div>
+    <br>
   <div id='calendar'></div>
 {% endblock %}
 
