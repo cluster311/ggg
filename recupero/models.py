@@ -1,12 +1,11 @@
 import os
 
-from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils import timezone
 from cie10_django.models import CIE10
 from model_utils.models import TimeStampedModel
 from core.signals import app_log
-from ggg.settings import BASE_DIR
+from core.models import private_file_storage
 
 
 class TipoDocumentoAnexo(models.Model):
@@ -121,8 +120,7 @@ class DocumentoAnexo(TimeStampedModel):
     """ Cada uno de los documentos que se pueden adjuntar a una prestacion """
     prestacion = models.ForeignKey(Prestacion, on_delete=models.CASCADE, related_name='documentos')
     tipo = models.ForeignKey(TipoDocumentoAnexo, on_delete=models.CASCADE)
-    upload_storage = FileSystemStorage(location='privado', base_url=os.path.join(BASE_DIR, 'media'))
-    documento_adjunto = models.FileField(upload_to='documentos_anexos', storage=upload_storage)
+    documento_adjunto = models.FileField(upload_to='documentos_anexos', storage=private_file_storage)
 
     def __str__(self):
         return f'DOC {self.tipo.nombre} {self.id}'
