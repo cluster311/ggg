@@ -11,7 +11,7 @@ from calendario.models import Turno
 from calendario.forms import BulkTurnoForm, FeedForm, TurnoForm
 import logging
 
-from usuarios.models import EST_INACTIVO, EST_ACTIVO
+from usuarios.models import UsuarioEnCentroDeSalud
 
 logger = logging.getLogger(__name__)
 from django.contrib.auth.decorators import permission_required
@@ -196,7 +196,7 @@ def get_appointments_list(servicio, user, **kwargs):
         kw['estado__in'] = [Turno.DISPONIBLE, Turno.CANCELADO_PACIENTE, Turno.CANCELADO_ESTABLECIMIENTO]
         return Turno.objects.filter(**kw)
     else:
-        csp = user.centros_de_salud_permitidos.filter(estado=EST_ACTIVO)
+        csp = user.centros_de_salud_permitidos.filter(estado=UsuarioEnCentroDeSalud.EST_ACTIVO)
         centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
         
         return Turno.objects.filter(servicio__centro__in=centros_de_salud_permitidos, **kw)
