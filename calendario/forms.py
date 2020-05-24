@@ -13,6 +13,9 @@ from obras_sociales.models import ObraSocialPaciente, ObraSocial
 from centros_de_salud.models import ProfesionalesEnServicio, Servicio
 import math
 import logging
+
+from usuarios.models import UsuarioEnCentroDeSalud
+
 logger = logging.getLogger(__name__)
 
 
@@ -56,7 +59,7 @@ class TurnoForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({'class': classes_to_ad})
 
         if user is not None:
-            csp = user.centros_de_salud_permitidos.all()
+            csp = user.centros_de_salud_permitidos.filter(estado=UsuarioEnCentroDeSalud.EST_ACTIVO)
             centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
             qs = Servicio.objects.filter(centro__in=centros_de_salud_permitidos)
             self.fields['servicio'].queryset = qs

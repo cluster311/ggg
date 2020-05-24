@@ -19,8 +19,8 @@ class UsuarioEnCentroDeSalud(TimeStampedModel):
     EST_INACTIVO = 100
     EST_ACTIVO = 200
     estados = ((EST_INACTIVO, 'Inactivo'),
-               (EST_ACTIVO, 'Activo'))
-
+            (EST_ACTIVO, 'Activo'))
+            
     estado = models.PositiveIntegerField(choices=estados, default=EST_ACTIVO)
     elegido = models.BooleanField(default=False, help_text='Solo uno puede estar elegido en cada momento')
 

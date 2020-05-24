@@ -6,9 +6,8 @@ from usuarios.models import UsuarioEnCentroDeSalud
 def cpp_usuarios(request):
     user = request.user
     context = {}
-
     if user.is_authenticated:
-        csp = user.centros_de_salud_permitidos.all()
+        csp = user.centros_de_salud_permitidos.filter(estado=UsuarioEnCentroDeSalud.EST_ACTIVO)
         centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
         # if user.is_superuser:
         #     centros_de_salud_permitidos = CentroDeSalud.objects.all()
