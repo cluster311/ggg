@@ -1,8 +1,11 @@
+import os
+
 from django.db import models
 from django.utils import timezone
 from cie10_django.models import CIE10
 from model_utils.models import TimeStampedModel
 from core.signals import app_log
+from core.models import private_file_storage
 
 
 class TipoDocumentoAnexo(models.Model):
@@ -108,16 +111,16 @@ class Prestacion(TimeStampedModel):
 
     def __str__(self):
         return f'{self.cantidad} de {self.tipo}'
+# in your models.py, or in a separate storage.py
+
+
 
 
 class DocumentoAnexo(TimeStampedModel):
     """ Cada uno de los documentos que se pueden adjuntar a una prestacion """
     prestacion = models.ForeignKey(Prestacion, on_delete=models.CASCADE, related_name='documentos')
     tipo = models.ForeignKey(TipoDocumentoAnexo, on_delete=models.CASCADE)
-
-    # ISSUE definir un destino seguro y privado!
-    # https://github.com/cluster311/ggg/issues/184
-    documento_adjunto = models.FileField(upload_to='documentos_anexos')
+    documento_adjunto = models.FileField(upload_to='documentos_anexos', storage=private_file_storage)
 
     def __str__(self):
         return f'DOC {self.tipo.nombre} {self.id}'
