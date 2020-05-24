@@ -39,7 +39,7 @@ class TurnoForm(forms.ModelForm):
 
     servicio = forms.ModelChoiceField(
         label='Servicios',
-        queryset=Servicio.objects.filter(),
+        queryset=Servicio.objects.filter(estado=EST_ACTIVO),
         empty_label="Seleccione un valor",
         # widget=autocomplete.ModelSelect2(
         #     url="servicio-autocomplete",
