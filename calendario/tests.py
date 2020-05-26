@@ -40,11 +40,15 @@ class CalendarioTests(TestCase, FullUsersMixin):
         self.create_users_and_groups()
         self.factory = RequestFactory()
         self.cs = CentroDeSalud.objects.create(nombre=f"CdSTEST")
+        self.cs2 = CentroDeSalud.objects.create(nombre=f"CdSTEST2")
         self.es = Especialidad.objects.create(nombre=f"EspTEST")
         self.se = Servicio.objects.create(centro=self.cs, especialidad=self.es)
+        self.se2 = Servicio.objects.create(centro=self.cs2, especialidad=self.es)
         self.pr = Profesional.objects.create(nombres=f"ProfTEST", numero_documento=f"900000TEST")
         self.ps = ProfesionalesEnServicio.objects.create(servicio=self.se, profesional=self.pr)
+        self.ps2 = ProfesionalesEnServicio.objects.create(servicio=self.se2, profesional=self.pr)
         self.tr = Turno.objects.create(inicio=datetime.now(tz=timezone.utc), fin=datetime.now(tz=timezone.utc), servicio=self.se, profesional=self.pr)
+        self.tr2 = Turno.objects.create(inicio=datetime.now(tz=timezone.utc), fin=datetime.now(tz=timezone.utc), servicio=self.se2, profesional=self.pr)
         self.ucds = UsuarioEnCentroDeSalud.objects.create(usuario=self.user_admin, centro_de_salud=self.cs)
 
     def tearDown(self):
@@ -55,12 +59,16 @@ class CalendarioTests(TestCase, FullUsersMixin):
         self.group_admin.delete()
         self.group_prof.delete()
         self.tr.delete()
+        self.tr2.delete()
         self.ps.delete()
+        self.ps2.delete()
         self.ucds.delete()
         self.pr.delete()
         self.se.delete()
+        self.se2.delete()
         self.cs.delete()
         self.es.delete()
+        self.cs2.delete()
 
     def test_redireccion_no_logeado(self):
         request = self.factory.get('/turnos/feed')
@@ -190,6 +198,16 @@ class CalendarioTests(TestCase, FullUsersMixin):
         response = edit_turn(request, pk=self.tr.pk)
         self.assertEqual(response.status_code, 200)
 
+        #caso error permiso denegado
+        form_json = {"id": str(self.tr2.pk),
+                     "state": str(2)
+                     }
+        f = str(form_json).replace("\'", "\"")
+        request = self.factory.put('/turnos/edit_turn/' + str(self.tr2.pk), f)
+        request.user = self.user_admin
+        with self.assertRaises(PermissionDenied):
+            edit_turn(request, pk=self.tr2.pk)
+
     def test_cancelar_turno(self):
         form_json = {"id": str(self.tr.pk),
                 "state": str(2)
@@ -200,6 +218,17 @@ class CalendarioTests(TestCase, FullUsersMixin):
         response = cancelar_turno(request, pk=self.tr.pk)
         self.assertEqual(response.status_code, 200)
 
+        # caso error permiso denegado
+        form_json = {"id": str(self.tr2.pk),
+                     "state": str(2)
+                     }
+        f = str(form_json).replace("\'", "\"")
+        request = self.factory.put('/turnos/cancelar_turn/' + str(self.tr2.pk), f)
+        request.user = self.user_admin
+        with self.assertRaises(PermissionDenied):
+            cancelar_turno(request, pk=self.tr2.pk)
+
+
     def test_crear_sobreturno(self):
         form_json = {"id": str(self.tr.pk),
                      "state": str(2)
@@ -208,5 +237,15 @@ class CalendarioTests(TestCase, FullUsersMixin):
         request = self.factory.post('/turnos/crear_sobreturno/' + str(self.tr.pk))
         request.user = self.user_admin
         response = crear_sobreturno(request, pk=self.tr.pk)
+        self.assertEqual(response.status_code, 200)
+
+        # caso error permiso denegado
+        form_json = {"id": str(self.tr2.pk),
+                     "state": str(2)
+                     }
+        f = str(form_json).replace("\'", "\"")
+        request = self.factory.post('/turnos/crear_sobreturno/' + str(self.tr2.pk))
+        request.user = self.user_admin
+        response = crear_sobreturno(request, pk=self.tr2.pk)
         self.assertEqual(response.status_code, 200)
 
