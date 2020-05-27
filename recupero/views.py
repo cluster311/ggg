@@ -23,7 +23,10 @@ class FacturaListView(PermissionRequiredMixin, ListView):
             q = self.request.GET['search']
             objects = Factura.objects.filter(
                 Q(consulta__especialidad__nombre__icontains=q) |
-                Q(consulta__codigo_cie_principal__code__icontains=q)
+                Q(consulta__codigo_cie_principal__code__icontains=q) |
+                Q(consulta__profesional__nombres__icontains=q) |
+                Q(consulta__centro_de_salud__nombre__icontains=q) |
+                Q(obra_social__nombre__icontains=q)
                 )
         else:
             objects = Factura.objects.all()
