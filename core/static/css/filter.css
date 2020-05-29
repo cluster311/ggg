@@ -1,0 +1,17 @@
+.admin-filter-bar{
+    padding-bottom: 23px;
+    padding-left: 1px;
+}
+
+.form-right-flex{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.admin-add-bar{
+    padding-top: 23px;
+}
+
+.top-bar{
+    display: flex;
+}

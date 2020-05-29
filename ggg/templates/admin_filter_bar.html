@@ -1,0 +1,11 @@
+{% for fil,nombre,queryset in filters %}
+<div class="admin-filter-bar">
+        <label for="{{ fil }}">{{ nombre }}</label>
+        <select id="{{ fil }}" class="form-control" name="{{ fil }}">
+            <option selected>---</option>
+                {% for q in queryset %}
+                <option value="{{ q.identificador }}">{{ q.valor }}</option>
+            {% endfor %}
+        </select>
+</div>
+{% endfor %}

@@ -8,7 +8,7 @@
                 class="nav-link btn btn-light btn-lg" 
                 style="font-weight:bold">{{ title }}</a>
         </li>
-
+        <div class="top-bar">
         {% if use_search_bar %}
         <li>{% include 'admin_search_bar.html' %}</li>
         {% endif %}
@@ -16,6 +16,7 @@
         {% if use_add_btn %}
         <li>{% include 'admin_add_button.html' %}</li>
         {% endif %}
+        </div>
         <!--
         <li class="nav-item">
             <a class="nav-link" href="#">Profesionales</a>
