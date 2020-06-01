@@ -11,9 +11,11 @@ from .models import Especialidad
 
 
 class EspecialidadListView(PermissionRequiredMixin, ListView):
-    """
-    Lista de Especialidades
-    """
+    '''
+        Listado de Especialidades
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = Especialidad
     permission_required = ("centros_de_salud.view_especialidad",)
     paginate_by = 10
@@ -43,8 +45,13 @@ class EspecialidadListView(PermissionRequiredMixin, ListView):
 class EspecialidadCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
+    '''
+        Vista de creación de Especialidades
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = Especialidad
-    permission_required = ("centros_de_salud.view_especialidad",)
+    permission_required = ("centros_de_salud.add_especialidad",)
     fields = ['nombre', 'tiempo_predeterminado_turno']
     success_message = "Creado con éxito."
 
@@ -61,6 +68,11 @@ class EspecialidadCreateView(PermissionRequiredMixin,
 
 
 class EspecialidadDetailView(PermissionRequiredMixin, DetailView):
+    '''
+        Vista detallada de Especialidades
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = Especialidad
     permission_required = ("centros_de_salud.view_especialidad",)
 
@@ -72,6 +84,11 @@ class EspecialidadDetailView(PermissionRequiredMixin, DetailView):
 
 
 class EspecialidadUpdateView(PermissionRequiredMixin, UpdateView):
+    '''
+        Vista de actualización de Especialidades
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = Especialidad
     permission_required = "centros_de_salud.change_especialidad"
     fields = ['nombre', 'tiempo_predeterminado_turno']

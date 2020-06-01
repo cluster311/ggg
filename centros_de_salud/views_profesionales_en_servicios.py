@@ -11,9 +11,11 @@ from .models import ProfesionalesEnServicio
 
 
 class ProfesionalesEnServicioListView(PermissionRequiredMixin, ListView):
-    """
-    Lista de Profesionales en Servicios
-    """
+    '''
+        Listado de Servicios ofrecidos por Profesionales
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = ProfesionalesEnServicio
     permission_required = ("centros_de_salud.view_profesionalesenservicio",)
     paginate_by = 10
@@ -50,8 +52,13 @@ class ProfesionalesEnServicioListView(PermissionRequiredMixin, ListView):
 class ProfesionalesEnServicioCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
+    '''
+        Vista de creación de Servicios ofrecido por Profesionales
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = ProfesionalesEnServicio
-    permission_required = ("centros_de_salud.view_profesionalesenservicio",)
+    permission_required = ("centros_de_salud.add_profesionalesenservicio",)
     form_class = ProfesionalesEnServicioForm
     success_message = "Creado con éxito."
 
@@ -73,6 +80,11 @@ class ProfesionalesEnServicioCreateView(PermissionRequiredMixin,
 
 
 class ProfesionalesEnServicioDetailView(PermissionRequiredMixin, DetailView):
+    '''
+        Vista detallada de Servicios ofrecidos por Profesionales
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = ProfesionalesEnServicio
     permission_required = ("centros_de_salud.view_profesionalesenservicio",)
 
@@ -84,6 +96,11 @@ class ProfesionalesEnServicioDetailView(PermissionRequiredMixin, DetailView):
 
 
 class ProfesionalesEnServicioUpdateView(PermissionRequiredMixin, UpdateView):
+    '''
+        Vista de actualización de Servicios ofrecido por Profesionales
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = ProfesionalesEnServicio
     permission_required = "centros_de_salud.change_profesionalesenservicio"
     form_class = ProfesionalesEnServicioForm

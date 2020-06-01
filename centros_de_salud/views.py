@@ -13,6 +13,11 @@ from .forms import CentroDeSaludForm
 
 
 class CentroDeSaludListView(PermissionRequiredMixin, ListView):
+    '''
+        Listado de Centros de Salud
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = CentroDeSalud
     permission_required = ("centros_de_salud.view_centrodesalud",)
     paginate_by = 10  # pagination
@@ -50,6 +55,11 @@ class CentroDeSaludListView(PermissionRequiredMixin, ListView):
 class CentroDeSaludCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
+    '''
+        Vista de creación de Centros de Salud
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = CentroDeSalud
     permission_required = ("centros_de_salud.add_centrodesalud",)
     form_class = CentroDeSaludForm
@@ -68,6 +78,11 @@ class CentroDeSaludCreateView(PermissionRequiredMixin,
         )
 
 class CentroDeSaludUpdateView(PermissionRequiredMixin, UpdateView):
+    '''
+        Vista de actualización de Centros de Salud
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = CentroDeSalud
     permission_required = "centros_de_salud.change_centrodesalud"
     form_class = CentroDeSaludForm
@@ -87,6 +102,11 @@ class CentroDeSaludUpdateView(PermissionRequiredMixin, UpdateView):
 
 
 class CentroDeSaludDetailView(PermissionRequiredMixin, DetailView):
+    '''
+        Vista detallada de Centros de Salud
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = CentroDeSalud
     permission_required = ("centros_de_salud.view_centrodesalud",)
 
