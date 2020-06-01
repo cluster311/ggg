@@ -67,32 +67,37 @@ class FacturaListView(PermissionRequiredMixin, ListView):
         for c in context['estado']:
             c['valor'] = dict(Factura.estados)[c['valor']]
         filter = []
-
+        filter_txt = ''
         if len(context['obra_sociales']) > 0:
             get_obra_social = self.request.GET.get('obra-social', '',)
             if get_obra_social and not get_obra_social == '---':
+                filter_txt += '&obra-social=' + str(get_obra_social)
                 filter.append(('obra-social', 'Obra Social', context['obra_sociales'], str(get_obra_social)))
             else:
                 filter.append(('obra-social', 'Obra Social', context['obra_sociales'], None))
         if len(context['centro_de_salud']) > 0:
             get_centro_salud = self.request.GET.get('centro-salud', '', )
             if get_centro_salud and not get_centro_salud == '---':
+                filter_txt += '&centro-salud=' + str(get_centro_salud)
                 filter.append(('centro-salud', 'Centro de salud', context['centro_de_salud'], get_centro_salud))
             else:
                 filter.append(('centro-salud', 'Centro de salud', context['centro_de_salud'], None))
         if len(context['especialidad']) > 0:
             get_especialidad = self.request.GET.get('especialidad', '', )
             if get_especialidad and not get_especialidad == '---':
+                filter_txt += '&especialidad=' + str(get_especialidad)
                 filter.append(('especialidad', 'Especialidad', context['especialidad'], get_especialidad))
             else:
                 filter.append(('especialidad', 'Especialidad', context['especialidad'], None))
         if len(context['estado']) > 0:
             get_estado = self.request.GET.get('estado', '', )
             if get_estado and not get_estado == '---':
+                filter_txt += '&estado=' + str(get_estado)
                 filter.append(('estado', 'Estado', context['estado'], get_estado))
             else:
                 filter.append(('estado', 'Estado', context['estado'], None))
         context['filters'] = filter
+        context['filter_txt'] = filter_txt
         return context
 
 
