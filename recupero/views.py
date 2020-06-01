@@ -28,13 +28,24 @@ class FacturaListView(PermissionRequiredMixin, ListView):
             q = self.request.GET['obra-social']
             if not q == '---':
                 objects = objects.filter(obra_social_id=q)
+        if 'centro-salud' in self.request.GET:
+            q = self.request.GET['centro-salud']
+            if not q == '---':
+                objects = objects.filter(consulta__centro_de_salud__id=q)
+        if 'especialidad' in self.request.GET:
+            q = self.request.GET['especialidad']
+            if not q == '---':
+                objects = objects.filter(consulta__especialidad__id=q)
+        if 'estado' in self.request.GET:
+            q = self.request.GET['estado']
+            if not q == '---':
+                objects = objects.filter(estado=q)
         if 'search' in self.request.GET:
             q = self.request.GET['search']
             objects = objects.filter(
                 Q(consulta__especialidad__nombre__icontains=q) |
                 Q(consulta__codigo_cie_principal__code__icontains=q)
                 )
-
         # mostrar prinmero los ultimos modificados
         objects = objects.order_by('-modified')
         return objects
@@ -56,14 +67,31 @@ class FacturaListView(PermissionRequiredMixin, ListView):
         for c in context['estado']:
             c['valor'] = dict(Factura.estados)[c['valor']]
         filter = []
+
         if len(context['obra_sociales']) > 0:
-            filter.append(('obra-social', 'Obra Social', context['obra_sociales']))
+            get_obra_social = self.request.GET.get('obra-social', '',)
+            if get_obra_social and not get_obra_social == '---':
+                filter.append(('obra-social', 'Obra Social', context['obra_sociales'], str(get_obra_social)))
+            else:
+                filter.append(('obra-social', 'Obra Social', context['obra_sociales'], None))
         if len(context['centro_de_salud']) > 0:
-            filter.append(('centro-salud', 'Centro de salud', context['centro_de_salud']))
+            get_centro_salud = self.request.GET.get('centro-salud', '', )
+            if get_centro_salud and not get_centro_salud == '---':
+                filter.append(('centro-salud', 'Centro de salud', context['centro_de_salud'], get_centro_salud))
+            else:
+                filter.append(('centro-salud', 'Centro de salud', context['centro_de_salud'], None))
         if len(context['especialidad']) > 0:
-            filter.append(('especialidad', 'Especialidad', context['especialidad']))
+            get_especialidad = self.request.GET.get('especialidad', '', )
+            if get_especialidad and not get_especialidad == '---':
+                filter.append(('especialidad', 'Especialidad', context['especialidad'], get_especialidad))
+            else:
+                filter.append(('especialidad', 'Especialidad', context['especialidad'], None))
         if len(context['estado']) > 0:
-            filter.append(('estado', 'Estado', context['estado']))
+            get_estado = self.request.GET.get('estado', '', )
+            if get_estado and not get_estado == '---':
+                filter.append(('estado', 'Estado', context['estado'], get_estado))
+            else:
+                filter.append(('estado', 'Estado', context['estado'], None))
         context['filters'] = filter
         return context
 

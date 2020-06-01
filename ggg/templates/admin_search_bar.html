@@ -3,13 +3,9 @@
         {% if use_filter_bar %}
             <input name="search" type="text" placeholder="buscar" class="form-control mr-sm-3 " value="{{ search_txt }}">
             {% include 'admin_filter_bar.html' %}
-
-                <button type="submit" class=" btn btn-success">Buscar</button>
-
         {% else %}
             <input name="search" type="text" placeholder="buscar" class="form-control mr-sm-6 " value="{{ search_txt }}">
-            <button type="submit" class="btn btn-success">Buscar</button>
         {% endif %}
-
+            <button type="submit" class="btn btn-success">Buscar</button>
     </div>
 </form>
