@@ -11,6 +11,7 @@ class Anexo2View(View):
         Recibe el parametro factura_id. """
     
     permission_required = ("recupero.view_factura", )
+    raise_exception = True
 
     def get(self, request, *args, **kwargs):
         factura_id = self.kwargs['factura_id']

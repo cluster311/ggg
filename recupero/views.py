@@ -6,10 +6,6 @@ from django.urls import reverse
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.decorators import method_decorator
 from django.contrib.messages.views import SuccessMessageMixin
-
-from obras_sociales.models import ObraSocial
-from pacientes.models import Consulta
-from profesionales.models import Profesional
 from .models import Factura, TipoDocumentoAnexo, TipoPrestacion
 
 
@@ -21,6 +17,7 @@ class FacturaListView(PermissionRequiredMixin, ListView):
     model = Factura
     permission_required = ("recupero.view_factura",)
     paginate_by = 10  # pagination
+    raise_exception = True
 
     def get_queryset(self):
         objects = Factura.objects.all()
@@ -109,6 +106,7 @@ class FacturaCreateView(PermissionRequiredMixin,
     fields = ['estado', 'obra_social']
     success_message = "Creado con éxito."
     template_name = "recupero/factura_create_form.html"
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -124,6 +122,7 @@ class FacturaCreateView(PermissionRequiredMixin,
 class FacturaDetailView(PermissionRequiredMixin, DetailView):
     model = Factura
     permission_required = ("recupero.view_factura",)
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -137,6 +136,7 @@ class FacturaUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = "recupero.change_factura"
     fields = ['estado', 'obra_social']
     success_message = "Actualizado con éxito."
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
