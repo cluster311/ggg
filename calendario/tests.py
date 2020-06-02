@@ -246,6 +246,6 @@ class CalendarioTests(TestCase, FullUsersMixin):
         f = str(form_json).replace("\'", "\"")
         request = self.factory.post('/turnos/crear_sobreturno/' + str(self.tr2.pk))
         request.user = self.user_admin
-        response = crear_sobreturno(request, pk=self.tr2.pk)
-        self.assertEqual(response.status_code, 200)
+        with self.assertRaises(PermissionDenied):
+            crear_sobreturno(request, pk=self.tr2.pk)
 
