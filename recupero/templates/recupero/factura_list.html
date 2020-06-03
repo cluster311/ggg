@@ -5,6 +5,7 @@
 <table class="table">
     <thead>
         <tr>
+            <th scope="col"></th>
             <th scope="col">Estado</th>
             <th scope="col">Fecha</th>
             <th scope="col">Obra social</th>
@@ -16,6 +17,14 @@
     <tbody>
         {% for cs in object_list %}
         <tr>
+            <td>
+                <a role="button" class="btn btn-warning btn-sm active" data-target="#detalle_factura_{{ cs.id }}" data-toggle="collapse"
+                aria-expanded="false">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 9l6 6 6-6" /></svg>
+            </a>
+            </td>
             <td scope="row">{{ cs.get_estado_display }}</td>
             <td scope="row">{{ cs.created|date:"Y/m/d" }}</td>
             <td scope="row">{{ cs.obra_social|default_if_none:"Sin definir" }}</td>
@@ -24,8 +33,6 @@
             <td scope="row">
                 <a role="button" class="btn btn-warning btn-sm active"
                     href="{% url 'recupero.anexo2' factura_id=cs.id %}">Factura</a>
-                <a role="button" class="btn btn-warning btn-sm active" data-target="#detalle_factura_{{ cs.id }}"
-                    data-toggle="collapse" aria-expanded="false">Detalles</a>
                 {% if perms.recupero.change_factura %}
                 <a role="button" class="btn btn-warning btn-sm active"
                     href="{% url 'recupero.factura.edit' pk=cs.id %}">Editar</a>
@@ -33,12 +40,15 @@
             </td>
         </tr>
         <tr>
-            <td class="p-0" colspan="6">
-                <div id="detalle_factura_{{ cs.id }}" class="collapse">
-                    <p>Nro de factura: {{ cs.id }} </p>
-                    <p>Profesional: {{ cs.consulta.profesional }} </p>
-                    <p>CIE10 Principal: {{ cs.consulta.codigo_cie_principal }}</p>
-                    <p>Total factura: $ 123</p>
+            <td class="p-0" colspan="8">
+                <div id="detalle_factura_{{ cs.id }}" class="m-2 collapse">
+                    <span>
+                        <b>Nro de factura:</b> {{ cs.id }} -   
+                        <b>Profesional:</b> {{ cs.consulta.profesional }} -   
+                        <b>CIE10 Principal:</b> {{ cs.consulta.codigo_cie_principal }} -   
+                        <b>Total factura:</b> $ 123
+                        <a role="button" class="btn btn-warning btn-sm active" href="{% url 'recupero.factura.detail' pk=cs.id %}">Más detalles</a>
+                    </span>
                 </div>
             </td>
         </tr>
