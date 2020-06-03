@@ -16,9 +16,11 @@ from .forms import ServicioForm
 
 
 class ServicioListView(PermissionRequiredMixin, ListView):
-    """
-    Lista de Servicios
-    """
+    '''
+        Listado de Servicios
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = Servicio
     permission_required = ("centros_de_salud.view_servicio",)
     paginate_by = 10
@@ -52,8 +54,13 @@ class ServicioListView(PermissionRequiredMixin, ListView):
 class ServicioCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
+    '''
+        Vista de creación de Servicios
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = Servicio
-    permission_required = ("centros_de_salud.view_servicio",)
+    permission_required = ("centros_de_salud.add_servicio",)
     success_message = "Creado con éxito."
     form_class = ServicioForm
 
@@ -75,6 +82,11 @@ class ServicioCreateView(PermissionRequiredMixin,
 
 
 class ServicioDetailView(PermissionRequiredMixin, DetailView):
+    '''
+        Vista detallada de Servicios
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = Servicio
     permission_required = ("centros_de_salud.view_servicio",)
 
@@ -86,6 +98,11 @@ class ServicioDetailView(PermissionRequiredMixin, DetailView):
 
 
 class ServicioUpdateView(PermissionRequiredMixin, UpdateView):
+    '''
+        Vista de actualización de Servicios
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = Servicio
     permission_required = "centros_de_salud.change_servicio"
     success_message = "Actualizado con éxito."
@@ -111,6 +128,14 @@ class ServicioUpdateView(PermissionRequiredMixin, UpdateView):
 @permission_required('calendario.can_schedule_turno')
 @require_http_methods(["GET"])
 def servicios_by_centro_salud(request, pk):
+    '''
+        Función llamada mediante Ajax que devuelve los servicios 
+        ofrecidos en un Centro de Salud
+
+        `pk`= ID del centro de salud
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     instance = get_object_or_404(CentroDeSalud, id=pk)
     servicios = Servicio.objects.filter(centro=instance)
     data = {'results': [] }
