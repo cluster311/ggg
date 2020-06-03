@@ -6,7 +6,7 @@ from centros_de_salud.models import Servicio
 
 def centro_de_salud_habilitado_form(function):
     '''Decorador para asegurarse que un formulario X no pueda ejecutar su operación
-       si no tiene permiso el usuario Y, esta implementacion sirve mas para los CREATE
+       si no tiene permiso el usuario Y, esta implementacion sirve mas para los CREATE.
     '''
     def _inner(request, *args, **kwargs):
         centro = Servicio.objects.get(id=json.loads(request.body)['servicio']).centro
