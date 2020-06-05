@@ -57,7 +57,7 @@ class FacturaListView(PermissionRequiredMixin, ListView):
         if self.request.user.has_perm('recupero.add_factura'):
             context['use_add_btn'] = True
             context['add_url'] = 'recupero.factura.create'
-        context['obra_sociales'] = Factura.objects.filter(obra_social__isnull=False).annotate(identificador=F('obra_social__id'), valor=F('obra_social__nombre')).values('identificador', 'valor').distinct()
+        context['obra_sociales'] = Factura.objects.filter(obra_social__isnull=False).annotate(identificador=F('obra_social__id'), valor=F('obra_social__siglas')).values('identificador', 'valor').distinct()
         context['centro_de_salud'] = Factura.objects.all().annotate(identificador=F('consulta__centro_de_salud__id'), valor=F('consulta__centro_de_salud__nombre')).values('identificador', 'valor').distinct()
         context['especialidad'] = Factura.objects.all().annotate(identificador=F('consulta__especialidad__id'), valor=F('consulta__especialidad__nombre')).values('identificador', 'valor').distinct()
         context['estado'] = Factura.objects.all().annotate(identificador=F('estado'), valor=F('estado')).values('identificador', 'valor').distinct()
@@ -118,6 +118,7 @@ class FacturaCreateView(PermissionRequiredMixin,
         return reverse(
             "recupero.facturas"
         )
+
 
 class FacturaDetailView(PermissionRequiredMixin, DetailView):
     model = Factura
