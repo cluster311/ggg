@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse
 from django.views import View
 from django.template import Context, Template
@@ -6,11 +7,12 @@ from recupero.models import Factura
 from anexo2.docs import Anexo2
 
 
-class Anexo2View(View):
+class Anexo2View(PermissionRequiredMixin, View):
     """ Devuelve el HTML con el Anexo II listo para imprimir
         Recibe el parametro factura_id. """
-    
+
     permission_required = ("recupero.view_factura", )
+    raise_exception = True
 
     def get(self, request, *args, **kwargs):
         factura_id = self.kwargs['factura_id']

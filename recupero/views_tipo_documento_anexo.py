@@ -16,6 +16,7 @@ class TipoDocumentoAnexoListView(PermissionRequiredMixin, ListView):
     """
     model = TipoDocumentoAnexo
     permission_required = ("recupero.view_tipodocumentoanexo",)
+    raise_exception = True
     paginate_by = 10
 
     def get_queryset(self):   
@@ -47,6 +48,7 @@ class TipoDocumentoAnexoCreateView(PermissionRequiredMixin,
     permission_required = ("recupero.add_tipodocumentoanexo",)
     fields = ['nombre']
     success_message = "Creado con éxito."
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -63,6 +65,7 @@ class TipoDocumentoAnexoCreateView(PermissionRequiredMixin,
 class TipoDocumentoAnexoDetailView(PermissionRequiredMixin, DetailView):
     model = TipoDocumentoAnexo
     permission_required = ("recupero.view_tipodocumentoanexo",)
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -76,6 +79,7 @@ class TipoDocumentoAnexoUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = "recupero.change_tipodocumentoanexo"
     fields = ['nombre']
     success_message = "Actualizado con éxito."
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

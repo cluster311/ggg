@@ -3,9 +3,9 @@
 <div class="pagination" style='margin: 10px;'>
     {% if page_obj.has_previous %}
         {% if search_text|length > 0 %}
-            <a role="button" class="btn btn-primary btn-sm active" href="?page={{ page_obj.previous_page_number }}&search={{ search_text }}">Anterior</a>
+            <a role="button" class="btn btn-primary btn-sm active" href="?page={{ page_obj.previous_page_number }}&search={{ search_text }}{{ filter_txt }}">Anterior</a>
         {% else %}
-            <a role="button" class="btn btn-primary btn-sm active" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+            <a role="button" class="btn btn-primary btn-sm active" href="?page={{ page_obj.previous_page_number }}{{ filter_txt }}">Anterior</a>
         {% endif %}
     {% else %}
     <a role="button" class="btn btn-primary btn-sm disabled">Anterior</a>
@@ -15,9 +15,9 @@
     
     {% if page_obj.has_next %}
         {% if search_text|length > 0 %}
-            <a role="button" class="btn btn-primary btn-sm active" href="?page={{ page_obj.next_page_number }}&search={{ search_text }}">siguiente</a>
+            <a role="button" class="btn btn-primary btn-sm active" href="?page={{ page_obj.next_page_number }}&search={{ search_text }}{{ filter_txt }}">siguiente</a>
         {% else %}
-            <a role="button" class="btn btn-primary btn-sm active" href="?page={{ page_obj.next_page_number }}">siguiente</a>
+            <a role="button" class="btn btn-primary btn-sm active" href="?page={{ page_obj.next_page_number }}{{ filter_txt }}">siguiente</a>
         {% endif %}
     {% else %}
     <a role="button" class="btn btn-primary btn-sm disabled">Siguiente</a>
