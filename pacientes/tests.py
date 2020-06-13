@@ -2,6 +2,8 @@ from django.test import TestCase, RequestFactory
 from django.test import Client
 from django.core.exceptions import PermissionDenied
 from core.base_permission import start_roles_and_permissions, create_test_users, create_test_paciente_data
+import datetime as dt
+import time_machine
 from .models import Paciente, Consulta
 from .views import ConsultaListView, ConsultaDetailView
 
@@ -112,3 +114,32 @@ class PacienteTests(TestCase, FullUsersMixin):
         request.user = self.user_admin
         with self.assertRaises(PermissionDenied):
             ConsultaListView.as_view()(request)
+
+@time_machine.travel("2020-06-12")
+class EdadPacienteTest(TestCase):
+    """ 
+        Se usa la librería `time-machine` para "congelar" la fecha ya que
+        la función para calcular la edad de la persona usa `now()`
+    """
+
+    def setUp(self):
+        paciente = Paciente.objects.create(apellidos='Garcia', nombres='Alberto', sexo='masculino',
+                                       fecha_nacimiento='1980-04-29',
+                                       tipo_documento='DNI', numero_documento='24987563', nacionalidad='argentina',
+                                       vinculo='Padre', grupo_sanguineo="0-"
+                                       )
+    def tearDown(self):
+        paciente = Paciente.objects.get(numero_documento='24987563')
+        paciente.delete()
+
+    def test_nacimiento(self):
+        paciente = Paciente.objects.get(numero_documento='24987563')
+        self.assertEqual(paciente.edad, 40)
+
+    def test_nacimiento_bisiesto(self):
+        paciente = Paciente.objects.get(numero_documento='24987563')
+
+        paciente.fecha_nacimiento = dt.date(1960, 2, 29)
+        paciente.save()
+
+        self.assertEqual(paciente.edad, 60)

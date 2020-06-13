@@ -115,12 +115,6 @@ class Paciente(Persona):
         blank=True
     )
 
-    @property
-    def edad(self):
-        if self.fecha_nacimiento is None:
-            return None
-        return (now().date() - self.fecha_nacimiento).days / 365
-
     def as_json(self):
         return {
             'nombres': self.nombres,
@@ -360,6 +354,7 @@ class Consulta(TimeStampedModel):
         if not hasattr(self, 'factura'):
         # no funciona (?) if self.factura is None:
             f = Factura.objects.create(consulta=self)
+            # TODO - Crear factura más completa con todos los datos de la consulta
             logger.info(f'Factura {f.id} creada para la consulta {self}')
         else:
             f = self.factura
