@@ -180,7 +180,7 @@ class Factura(TimeStampedModel):
     )
     paciente = models.ForeignKey(
         "pacientes.Paciente",
-        related_name="paciente_factura",
+        related_name="facturas_paciente",
         on_delete=models.CASCADE,
         default="",
         null=True,
