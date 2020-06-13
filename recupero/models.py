@@ -191,7 +191,6 @@ class Factura(TimeStampedModel):
                                              related_name='diagnosticos_principales_factura')
     codigos_cie_secundarios = models.ManyToManyField(CIE10,
                                                      blank=True,
-                                                     null=True,
                                                      related_name='diagnosticos_secundarios_factura')
 
 
