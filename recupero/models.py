@@ -205,7 +205,7 @@ class Factura(TimeStampedModel):
     codigos_cie_secundarios = models.ManyToManyField(CIE10,
                                                      blank=True,
                                                      null=True,
-                                                     related_name='diagnositicos_secundarios_factura')
+                                                     related_name='diagnosticos_secundarios_factura')
 
 
     def __str__(self):
