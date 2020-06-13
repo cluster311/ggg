@@ -74,7 +74,9 @@ class Persona(models.Model):
 
     @property
     def edad(self):
-        return (now().date() - self.fecha_nacimiento).days / 365
+        if self.fecha_nacimiento is None:
+            return None
+        return int((now().date() - self.fecha_nacimiento).days / 365.2425)
 
     class Meta:
         abstract = True
