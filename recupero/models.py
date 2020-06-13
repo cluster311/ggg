@@ -111,9 +111,6 @@ class Prestacion(TimeStampedModel):
 
     def __str__(self):
         return f'{self.cantidad} de {self.tipo}'
-# in your models.py, or in a separate storage.py
-
-
 
 
 class DocumentoAnexo(TimeStampedModel):
@@ -173,7 +170,29 @@ class Factura(TimeStampedModel):
         blank=True
     )
 
-    fecha = models.DateTimeField(default=timezone.now)
+    fecha_atencion = models.DateTimeField(blank=True, null=True)
+    centro_de_salud = models.ForeignKey(
+        "centros_de_salud.CentroDeSalud",
+        related_name="facturas_centro",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    paciente = models.ForeignKey(
+        "pacientes.Paciente",
+        related_name="facturas_paciente",
+        on_delete=models.CASCADE,
+        default="",
+        null=True,
+        blank=True,
+    )
+    codigo_cie_principal = models.ForeignKey(CIE10, null=True, blank=True,
+                                             on_delete=models.SET_NULL,
+                                             related_name='diagnosticos_principales_factura')
+    codigos_cie_secundarios = models.ManyToManyField(CIE10,
+                                                     blank=True,
+                                                     related_name='diagnosticos_secundarios_factura')
+
 
     def __str__(self):
         return f'Factura {self.id}'
@@ -216,9 +235,13 @@ class Factura(TimeStampedModel):
                    'ultimo_recibo_de_sueldo': {'mes': 7, 'anio': 2019},
                    'cuit': '31-91203043-8'}
 
-        data = {'dia': self.fecha.day,
-                'mes': self.fecha.month,
-                'anio': self.fecha.year,
+        dia = None if self.fecha_atencion is None else self.fecha_atencion.day
+        mes = None if self.fecha_atencion is None else self.fecha_atencion.month
+        anio = None if self.fecha_atencion is None else self.fecha_atencion.year
+        
+        data = {'dia': dia,
+                'mes': mes,
+                'anio': anio,
                 'hospital': hospital,
                 'beneficiario': beneficiario,
                 'atencion': atencion,
@@ -227,3 +250,14 @@ class Factura(TimeStampedModel):
                 }
 
         return data
+
+   
+class FacturaPrestacion(TimeStampedModel):
+    """ una prestacion que se le da a un paciente pero en este caso es para las facturas ya que no tiene una consulta"""
+    consulta = models.ForeignKey('pacientes.Consulta', on_delete=models.CASCADE, related_name='prestacionesFactura')
+    tipo = models.ForeignKey(TipoPrestacion, on_delete=models.SET_NULL, null=True)
+    cantidad = models.PositiveIntegerField(default=1)
+    observaciones = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.cantidad} de {self.tipo}'
