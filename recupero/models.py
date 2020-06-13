@@ -170,7 +170,7 @@ class Factura(TimeStampedModel):
         blank=True
     )
 
-    fecha_atencion = models.DateTimeField(default=timezone.now)
+    fecha_atencion = models.DateTimeField(blank=True, null=True)
     centro_de_salud = models.ForeignKey(
         "centros_de_salud.CentroDeSalud",
         related_name="facturas_centro",
@@ -235,9 +235,9 @@ class Factura(TimeStampedModel):
                    'ultimo_recibo_de_sueldo': {'mes': 7, 'anio': 2019},
                    'cuit': '31-91203043-8'}
 
-        data = {'dia': self.fecha.day,
-                'mes': self.fecha.month,
-                'anio': self.fecha.year,
+        data = {'dia': self.fecha_atencion.day,
+                'mes': self.fecha_atencion.month,
+                'anio': self.fecha_atencion.year,
                 'hospital': hospital,
                 'beneficiario': beneficiario,
                 'atencion': atencion,
