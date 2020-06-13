@@ -201,7 +201,7 @@ class Factura(TimeStampedModel):
     )
     codigo_cie_principal = models.ForeignKey(CIE10, null=True, blank=True,
                                              on_delete=models.SET_NULL,
-                                             related_name='diagnositicos_principales_factura')
+                                             related_name='diagnosticos_principales_factura')
     codigos_cie_secundarios = models.ManyToManyField(CIE10,
                                                      blank=True,
                                                      null=True,
