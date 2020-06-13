@@ -113,18 +113,6 @@ class Prestacion(TimeStampedModel):
         return f'{self.cantidad} de {self.tipo}'
 
 
-class FacturaPrestacion(TimeStampedModel):
-    """ una prestacion que se le da a un paciente pero en este caso es para las facturas ya que no tiene una consulta"""
-    consulta = models.ForeignKey('pacientes.Consulta', on_delete=models.CASCADE, related_name='prestacionesFactura')
-    tipo = models.ForeignKey(TipoPrestacion, on_delete=models.SET_NULL, null=True)
-    cantidad = models.PositiveIntegerField(default=1)
-    observaciones = models.TextField(null=True, blank=True)
-
-    def __str__(self):
-        return f'{self.cantidad} de {self.tipo}'
-# in your models.py, or in a separate storage.py
-
-
 class DocumentoAnexo(TimeStampedModel):
     """ Cada uno de los documentos que se pueden adjuntar a una prestacion """
     prestacion = models.ForeignKey(Prestacion, on_delete=models.CASCADE, related_name='documentos')
@@ -182,7 +170,6 @@ class Factura(TimeStampedModel):
         blank=True
     )
 
-    fecha = models.DateTimeField(default=timezone.now)
     fecha_atencion = models.DateTimeField(default=timezone.now)
     centro_de_salud = models.ForeignKey(
         "centros_de_salud.CentroDeSalud",
@@ -260,3 +247,14 @@ class Factura(TimeStampedModel):
                 }
 
         return data
+
+   
+class FacturaPrestacion(TimeStampedModel):
+    """ una prestacion que se le da a un paciente pero en este caso es para las facturas ya que no tiene una consulta"""
+    consulta = models.ForeignKey('pacientes.Consulta', on_delete=models.CASCADE, related_name='prestacionesFactura')
+    tipo = models.ForeignKey(TipoPrestacion, on_delete=models.SET_NULL, null=True)
+    cantidad = models.PositiveIntegerField(default=1)
+    observaciones = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.cantidad} de {self.tipo}'
