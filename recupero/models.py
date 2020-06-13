@@ -235,9 +235,13 @@ class Factura(TimeStampedModel):
                    'ultimo_recibo_de_sueldo': {'mes': 7, 'anio': 2019},
                    'cuit': '31-91203043-8'}
 
-        data = {'dia': self.fecha_atencion.day,
-                'mes': self.fecha_atencion.month,
-                'anio': self.fecha_atencion.year,
+        dia = None if self.fecha_atencion is None else self.fecha_atencion.day
+        mes = None if self.fecha_atencion is None else self.fecha_atencion.month
+        anio = None if self.fecha_atencion is None else self.fecha_atencion.year
+        
+        data = {'dia': dia,
+                'mes': mes,
+                'anio': anio,
                 'hospital': hospital,
                 'beneficiario': beneficiario,
                 'atencion': atencion,
