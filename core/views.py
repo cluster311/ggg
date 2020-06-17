@@ -2,6 +2,7 @@ from dal import autocomplete
 from cie10_django.models import CIE10
 from django.shortcuts import render, render_to_response, redirect
 
+from obras_sociales.models import ObraSocialPaciente, ObraSocial
 from pacientes.models import Paciente, CarpetaFamiliar
 from profesionales.models import Profesional
 from centros_de_salud.models import (CentroDeSalud, ProfesionalesEnServicio,
@@ -35,6 +36,21 @@ class CIE10Autocomplete(autocomplete.Select2QuerySetView):
                            )
 
         return qs.order_by("code")
+
+
+class ObraSocialAutocomplete(autocomplete.Select2QuerySetView):
+    """
+     Base de autompletado para obra sociales.
+    """
+
+    def get_queryset(self):
+        if not self.request.user.has_perm('pacientes.view_obra'):
+            return ObraSocial.objects.none()
+        qs = ObraSocialPaciente.objects.filter(paciente_id=self.forwarded.get('paciente', None))
+        osp = []
+        for q in qs:
+            osp.append(q.obra_social)
+        return osp
 
 
 class PacienteAutocomplete(autocomplete.Select2QuerySetView):

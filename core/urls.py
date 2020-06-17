@@ -6,7 +6,7 @@ from core.views import (CIE10Autocomplete,
                         CentroDeSaludAutocomplete,
                         TipoPrestacionAutocomplete,
                         CarpetaFamiliarAutocomplete,
-                        ServicioAutocomplete
+                        ServicioAutocomplete, ObraSocialAutocomplete
                         )
 
 
@@ -31,6 +31,11 @@ urlpatterns = [
         r"^paciente-autocomplete/$",
         PacienteAutocomplete.as_view(),
         name="paciente-autocomplete",
+    ),
+    url(
+        r"^obra-social-autocomplete/$",
+        ObraSocialAutocomplete.as_view(),
+        name="obra-social-autocomplete",
     ),
     url(
         r"^profesional-autocomplete/$",
