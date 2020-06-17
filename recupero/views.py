@@ -6,6 +6,8 @@ from django.urls import reverse
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.decorators import method_decorator
 from django.contrib.messages.views import SuccessMessageMixin
+
+from .forms import FacturaForm, FacturaPrestacionFormSet
 from .models import Factura, TipoDocumentoAnexo, TipoPrestacion
 
 
@@ -106,15 +108,21 @@ class FacturaCreateView(PermissionRequiredMixin,
                                SuccessMessageMixin):
     model = Factura
     permission_required = ("recupero.add_factura",)
-    fields = ['estado', 'obra_social']
     success_message = "Creado con éxito."
     template_name = "recupero/factura_create_form.html"
     raise_exception = True
+    form_class = FacturaForm
+
+    def get_form_kwargs(self):
+        kwargs = super(FacturaCreateView, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Facturas de rcupero'
         context['title_url'] = 'recupero.facturas'
+        context['prestaciones'] = FacturaPrestacionFormSet()
         return context
 
     def get_success_url(self):
@@ -130,6 +138,7 @@ class FacturaDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['prestaciones'] = FacturaPrestacionFormSet()
         context['title'] = 'Factura de recupero'
         context['title_url'] = 'recupero.facturas'
         return context

@@ -254,7 +254,7 @@ class Factura(TimeStampedModel):
    
 class FacturaPrestacion(TimeStampedModel):
     """ una prestacion que se le da a un paciente pero en este caso es para las facturas ya que no tiene una consulta"""
-    consulta = models.ForeignKey('pacientes.Consulta', on_delete=models.CASCADE, related_name='prestacionesFactura')
+    factura = models.ForeignKey('recupero.Factura', on_delete=models.CASCADE, related_name='prestacionesFactura')
     tipo = models.ForeignKey(TipoPrestacion, on_delete=models.SET_NULL, null=True)
     cantidad = models.PositiveIntegerField(default=1)
     observaciones = models.TextField(null=True, blank=True)
