@@ -32,7 +32,7 @@
          {% endwith %}
         </div>
     </div>
-      <button type="submit" class="btn btn-success">Crear Factura</button>
+      <button type="submit" class="btn btn-success">Guardar Factura</button>
     </form>
 {% endblock %}
 {% block js_footer %}
@@ -43,7 +43,7 @@
         $( document ).ready(function() {
            {% with prestaciones.prefix|slugify as p %}
               $('.{{ p }}-form').formset({
-                      prefix: '{{ prestaciones.prefix|slugify }}',
+                      prefix: '{{ prestaciones.prefix }}',
                       addText: 'Agregar otro',
                       deleteText: 'Eliminar',
                       deleteCssClass: 'btn btn-sm btn-danger',
