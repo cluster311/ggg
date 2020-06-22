@@ -212,22 +212,26 @@ class Factura(TimeStampedModel):
             la librería Anexo2 (en Pypi) requiere
             Requisitos acá: https://github.com/cluster311/Anexo2
             """
-        hospital = self.consulta.centro_de_salud.as_anexo2_json()
+        
+        hospital = self.centro_de_salud.as_anexo2_json()
         if hospital['codigo_hpgd'] is None:
             hospital['codigo_hpgd'] = 'DESC'  # TODO, no permitido
-        beneficiario = self.consulta.paciente.as_anexo2_json()
-        atencion = self.consulta.as_anexo2_json()
         
-        # TODO, detectar esto que todavía no esta relevado
-        # obra_social_paciente = None
-        # obra_social = obra_social_paciente.as_anexo2_json()
-        obra_social = {'codigo_rnos': '800501',
-                    'nombre': 'OBRA SOCIAL ACEROS PARANA',
-                    'nro_carnet_obra_social': '9134818283929101',
-                    'fecha_de_emision': {'dia': 11, 'mes': 9, 'anio': 2009},
-                    'fecha_de_vencimiento': {'dia': 11, 'mes': 9, 'anio': 2029}}
+        beneficiario = self.paciente.as_anexo2_json()
 
-        # TODO, detectar esto que todavía no esta relevado
+        # TODO - Cuando se guarda la factura hay que crear 
+        # la relación con FacturaPrestacion
+        pf = self.prestacionesFactura.get()
+        atencion = pf.as_anexo2_json()
+        
+        # atencion = self.consulta.as_anexo2_json()
+
+        # Obtener los datos de la Obra Social del Paciente 
+        # usando la relación ObraSocialPaciente
+        obra_social_paciente = self.paciente.m2m_obras_sociales.get(obra_social=self.obra_social.id)
+        obra_social = obra_social_paciente.as_anexo2_json()
+
+        # TODO, Se podrían cargar algunas empresas de prueba
         # empresa_paciente = None
         # empresa = empresa_paciente.as_anexo2_json()
         empresa = {'nombre': 'Telescopios Hubble',
@@ -261,3 +265,25 @@ class FacturaPrestacion(TimeStampedModel):
 
     def __str__(self):
         return f'{self.cantidad} de {self.tipo}'
+    
+    def as_anexo2_json(self):
+        tipo_atencion =  'consulta' # Debería sacarse de TipoPrestacion.tipo pero ahora devuelve un numero
+        especialidad = self.tipo.descripcion
+        codigo_hpgd = self.tipo.codigo # Se deben poder cargar varios códigos por tipo de prestación
+        cie_principal = 'DESC' if self.factura.codigo_cie_principal is None else self.factura.codigo_cie_principal.code
+        cie_secundarios = [c10.code for c10 in self.factura.codigos_cie_secundarios.all()]
+
+
+        ret = {'tipo': tipo_atencion,
+               'especialidad': especialidad,
+               'codigos_N_HPGD': [codigo_hpgd],
+               'fecha': {
+                   'dia': self.factura.fecha_atencion.day,
+                   'mes': self.factura.fecha_atencion.month,
+                   'anio': self.factura.fecha_atencion.year
+                },
+               'diagnostico_ingreso_cie10': {'principal': cie_principal, 
+                                             'otros': cie_secundarios}
+                }
+
+        return ret

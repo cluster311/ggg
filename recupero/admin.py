@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (TipoDocumentoAnexo, TipoPrestacion,
-                     Prestacion, DocumentoAnexo, Factura)
+                     Prestacion, DocumentoAnexo, Factura, FacturaPrestacion)
 
 
 @admin.register(TipoDocumentoAnexo)
@@ -51,3 +51,16 @@ class FacturaAdmin(admin.ModelAdmin):
                    'consulta__profesional',
                    'consulta__especialidad']
     
+
+@admin.register(FacturaPrestacion)
+class FacturaPrestacionAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'created',
+        'modified',
+        'factura',
+        'tipo',
+        'cantidad',
+        'observaciones',
+    )
+    list_filter = ('created', 'modified', 'factura', 'tipo')
