@@ -142,6 +142,7 @@ class FacturaCreateView(PermissionRequiredMixin,
             fp.save()
         return super(FacturaCreateView, self).form_valid(form)
 
+
 class FacturaDetailView(PermissionRequiredMixin, DetailView):
     model = Factura
     permission_required = ("recupero.view_factura",)

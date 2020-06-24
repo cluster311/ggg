@@ -8,22 +8,32 @@ from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMi
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
 from django.conf import settings
 
+
 from recupero.models import Prestacion
-from .models import Consulta, CarpetaFamiliar, Receta, Derivacion
+from .models import Consulta, CarpetaFamiliar, Receta, Derivacion, Paciente
 from especialidades.models import MedidasAnexasEspecialidad, MedidaAnexaEnConsulta
 from especialidades.forms import MedidaAnexaEnConsultaForm, MedidaAnexaEnConsultaFormset
 from calendario.models import Turno
 from .forms import (EvolucionForm, ConsultaForm,
-                   RecetaFormset, DerivacionFormset, 
-                   PrestacionFormset, CarpetaFamiliarForm)
+                    RecetaFormset, DerivacionFormset,
+                    PrestacionFormset, CarpetaFamiliarForm, PacienteFormPopUp)
 from crispy_forms.utils import render_crispy_form
 import logging
 logger = logging.getLogger(__name__)
+
+
+def PacienteCreatePopup(request):
+    form = PacienteFormPopUp(request.POST or None)
+    if form.is_valid():
+        instance = form.save()
+        return HttpResponse(
+            '<script>opener.closePopup(window, "%s", "%s", "#id_paciente");</script>' % (instance.pk, instance))
+    return render(request, "pacientes/paciente_createview.html", {"form": form})
 
 
 class ConsultaListView(PermissionRequiredMixin, ListView):
