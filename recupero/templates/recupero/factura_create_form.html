@@ -13,7 +13,24 @@
     <div class="col-12 col-md-12 " style="display: flex;" >
         <div class="col-6 col-md-6">
         {% csrf_token %}
-            {{ form|crispy}}
+            <div class="form-group col-md-12 col-lg-12 " style="display: flex;">
+                {{ form.paciente|as_crispy_field }}
+                <a href="{%  url 'PacienteCreate' %}" id="add_paciente" class="button-add-popup" onclick="return showAddPopup(this);">
+                    <button type="button" class="btn btn-success">+</button>
+                </a>
+            </div>
+            <div class="form-group col-md-12 ">
+                {{ form.obra_social|as_crispy_field }}
+            </div>
+            <div class="form-group col-md-12 ">
+                {{ form.centro_de_salud|as_crispy_field }}
+            </div>
+            <div class="form-group col-md-12 ">
+                {{ form.codigo_cie_principal|as_crispy_field }}
+            </div>
+            <div class="form-group col-md-12 ">
+                {{ form.codigos_cie_secundarios|as_crispy_field }}
+            </div>
         </div>
         <div class="col-6 col-md-6" style=" width: 50%;
   height: 600px;
@@ -51,5 +68,23 @@
                   });
            {% endwith %}
         })
+    </script>
+    <script type="text/javascript">
+        function showEditPopup(url) {
+            var win = window.open(url, "Edit",
+                'height=500,width=800,resizable=yes,scrollbars=yes');
+            return false;
+        }
+        function showAddPopup(triggeringLink) {
+            var name = triggeringLink.id.replace(/^add_/, '');
+            href = triggeringLink.href;
+            var win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
+            win.focus();
+            return false;
+        }
+        function closePopup(win, newID, newRepr, id) {
+            $(id).append('<option value=' + newID + ' selected >' + newRepr + '</option>')
+            win.close();
+        }
     </script>
 {% endblock js_footer %}
