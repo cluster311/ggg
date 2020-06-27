@@ -119,16 +119,28 @@ class FacturaCreateView(PermissionRequiredMixin,
         return kwargs
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super(FacturaCreateView, self).get_context_data(**kwargs)
         context['title'] = 'Facturas de rcupero'
         context['title_url'] = 'recupero.facturas'
-        context['prestaciones'] = FacturaPrestacionFormSet()
+        if self.request.POST:
+            context['prestaciones'] = FacturaPrestacionFormSet(self.request.POST)
+        else:
+            context['prestaciones'] = FacturaPrestacionFormSet()
         return context
 
     def get_success_url(self):
         return reverse(
             "recupero.facturas"
         )
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        fp = context["prestaciones"]
+        self.object = form.save()
+        if fp.is_valid():
+            fp.instance = self.object
+            fp.save()
+        return super(FacturaCreateView, self).form_valid(form)
 
 
 class FacturaDetailView(PermissionRequiredMixin, DetailView):
@@ -147,15 +159,30 @@ class FacturaDetailView(PermissionRequiredMixin, DetailView):
 class FacturaUpdateView(PermissionRequiredMixin, UpdateView):
     model = Factura
     permission_required = "recupero.change_factura"
-    fields = ['estado', 'obra_social']
+    form_class = FacturaForm
+    template_name = "recupero/factura_create_form.html"
     success_message = "Actualizado con éxito."
     raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        instance = getattr(self, 'object', None)
+        if self.request.POST:
+            context['prestaciones'] = FacturaPrestacionFormSet(self.request.POST, instance=self.object)
+        else:
+            context['prestaciones'] = FacturaPrestacionFormSet(instance=self.object)
         context['title'] = 'Factura de recupero'
         context['title_url'] = 'recupero.facturas'
         return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        fp = context["prestaciones"]
+        self.object = form.save()
+        if fp.is_valid():
+            fp.instance = self.object
+            fp.save()
+        return super(FacturaUpdateView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse(
