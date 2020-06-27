@@ -1,7 +1,7 @@
 from django.conf.urls import url, include
 from django.urls import path
-from .views import (TableroObraSocialPorPorvinciaView, ObraSocialListView, 
-                    ObraSocialCreateView, ObraSocialUpdateView, ObraSocialDetailView)
+from .views import (TableroObraSocialPorPorvinciaView, ObraSocialListView,
+                    ObraSocialCreateView, ObraSocialUpdateView, ObraSocialDetailView, ObraSocialPacienteCreatePopup)
 
 
 urlpatterns = [
@@ -30,4 +30,9 @@ urlpatterns = [
         ObraSocialUpdateView.as_view(),
         name="obras-sociales.edit",
     ),
+    path(
+        r"obrasocial-paciente/(?P<paciente>.*)$",
+        ObraSocialPacienteCreatePopup,
+        name="ObraSocialPacienteCreate"),
+
 ]

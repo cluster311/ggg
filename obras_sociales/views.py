@@ -7,10 +7,13 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from django.http import Http404
-from django.shortcuts import get_object_or_404
+from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.conf import settings
+
+from pacientes.models import Paciente
+from .forms import ObraSocialPacienteCreatePopUp
 from .models import ObraSocial
 
 
@@ -145,3 +148,15 @@ class TableroObraSocialPorPorvinciaView(PermissionRequiredMixin, TemplateView):
             ]
 
         return context
+
+
+def ObraSocialPacienteCreatePopup(request, paciente=None):
+    if request.POST:
+        form = ObraSocialPacienteCreatePopUp(request.POST)
+        form.paciente_id = paciente
+        if form.is_valid():
+            instance = form.save()
+            return HttpResponse(
+                '<script>opener.closePopup(window, "%s", "%s", "#id_obra_social");</script>' % (instance.obra_social.pk, instance.obra_social))
+    form = ObraSocialPacienteCreatePopUp(initial={'paciente': paciente})
+    return render(request, "obras_sociales/obrasocial_paciente_createview.html", {"form": form})

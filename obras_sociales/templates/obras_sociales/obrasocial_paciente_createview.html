@@ -1,0 +1,19 @@
+{% extends "base_admin.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+    <h2>Nuevo Obra Social de Paciente</h2>
+    <form method = 'POST' action= '' novalidate id = "author-form">
+    {% csrf_token %}
+        {{ form|crispy}}
+        <button type="submit" class="btn btn-success">Guardar Obra Social de Paciente</button>
+    </form>
+    <div class="line"></div>
+
+{% endblock %}
+{% block js_footer %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+    {{ form.media }}
+{% endblock js_footer %}
