@@ -219,13 +219,27 @@ class Factura(TimeStampedModel):
         
         beneficiario = self.paciente.as_anexo2_json()
 
-        # TODO - Cuando se guarda la factura hay que crear 
-        # la relación con FacturaPrestacion
-        pf = self.prestacionesFactura.get()
-        atencion = pf.as_anexo2_json()
+        # TODO Verificar si el cod cie principal puede estar vacío
+        cie_principal = 'DESC' if self.codigo_cie_principal is None else self.codigo_cie_principal.code
+        cie_secundarios = [c10.code for c10 in self.codigos_cie_secundarios.all()]
         
-        # atencion = self.consulta.as_anexo2_json()
+        cod_hpgd = [prestacion.tipo.codigo for prestacion in self.prestacionesFactura.all()]
 
+        # Obtener la primer prestacion asociada a la factura
+        prestFactura = self.prestacionesFactura.first()
+
+        atencion = {'tipo': 'consulta', # TODO TipoPrestacion.tipo por ahora devuelve un numero
+                    'especialidad': prestFactura.tipo.descripcion,
+                    'codigos_N_HPGD': cod_hpgd,
+                    'fecha': {
+                        'dia': self.fecha_atencion.day,
+                        'mes': self.fecha_atencion.month,
+                        'anio': self.fecha_atencion.year
+                        },
+                    'diagnostico_ingreso_cie10': {'principal': cie_principal, 
+                                                    'otros': cie_secundarios}
+                    }
+        
         # Obtener los datos de la Obra Social del Paciente 
         # usando la relación ObraSocialPaciente
         obra_social_paciente = self.paciente.m2m_obras_sociales.get(obra_social=self.obra_social.id)
@@ -255,7 +269,7 @@ class Factura(TimeStampedModel):
 
         return data
 
-   
+
 class FacturaPrestacion(TimeStampedModel):
     """ una prestacion que se le da a un paciente pero en este caso es para las facturas ya que no tiene una consulta"""
     factura = models.ForeignKey('recupero.Factura', on_delete=models.CASCADE, related_name='prestacionesFactura')
@@ -265,25 +279,3 @@ class FacturaPrestacion(TimeStampedModel):
 
     def __str__(self):
         return f'{self.cantidad} de {self.tipo}'
-    
-    def as_anexo2_json(self):
-        tipo_atencion =  'consulta' # Debería sacarse de TipoPrestacion.tipo pero ahora devuelve un numero
-        especialidad = self.tipo.descripcion
-        codigo_hpgd = self.tipo.codigo # Se deben poder cargar varios códigos por tipo de prestación
-        cie_principal = 'DESC' if self.factura.codigo_cie_principal is None else self.factura.codigo_cie_principal.code
-        cie_secundarios = [c10.code for c10 in self.factura.codigos_cie_secundarios.all()]
-
-
-        ret = {'tipo': tipo_atencion,
-               'especialidad': especialidad,
-               'codigos_N_HPGD': [codigo_hpgd],
-               'fecha': {
-                   'dia': self.factura.fecha_atencion.day,
-                   'mes': self.factura.fecha_atencion.month,
-                   'anio': self.factura.fecha_atencion.year
-                },
-               'diagnostico_ingreso_cie10': {'principal': cie_principal, 
-                                             'otros': cie_secundarios}
-                }
-
-        return ret

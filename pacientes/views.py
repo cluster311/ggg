@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
 from django.conf import settings
 
-from recupero.models import Prestacion
+from recupero.models import Prestacion, Factura, FacturaPrestacion
 from .models import Consulta, CarpetaFamiliar, Receta, Derivacion
 from especialidades.models import MedidasAnexasEspecialidad, MedidaAnexaEnConsulta
 from especialidades.forms import MedidaAnexaEnConsultaForm, MedidaAnexaEnConsultaFormset
@@ -21,6 +21,7 @@ from calendario.models import Turno
 from .forms import (EvolucionForm, ConsultaForm,
                    RecetaFormset, DerivacionFormset, 
                    PrestacionFormset, CarpetaFamiliarForm)
+from recupero.forms import FacturaPrestacionFormSet
 from crispy_forms.utils import render_crispy_form
 import logging
 logger = logging.getLogger(__name__)
@@ -146,9 +147,36 @@ class ConsultaMixin:
         if ms.is_valid():
             ms.instance = self.object
             ms.save()
+        
+        consulta = self.object
+
+        # TODO - Determinar con que OS se atiende el paciente en la consulta
+        os_paciente = consulta.paciente.m2m_obras_sociales.first().obra_social
+
+        nueva_factura = Factura(
+            consulta=consulta, 
+            obra_social=os_paciente,
+            fecha_atencion=consulta.fecha,
+            centro_de_salud=consulta.turno.servicio.centro,
+            paciente=consulta.paciente,
+            codigo_cie_principal=consulta.codigo_cie_principal,
+            )
+        
+        # Guardar la factura antes de agregar los códigos CIE secundarios (M2M)
+        nueva_factura.save()
+
+        # Agregar códigos CIE secundarios a la factura
+        cod_secundarios = [cod for cod in consulta.codigos_cie_secundarios.all()]
+        nueva_factura.codigos_cie_secundarios.set(cod_secundarios)
+
+        # Crear formset de prestaciones de la factura
+        # con los datos de prestaciones de la consulta
+        prestaciones = FacturaPrestacionFormSet(ps.data, prefix='Prestaciones', instance=nueva_factura)
+
+        if prestaciones.is_valid():
+            prestaciones.save()
 
         return super().form_valid(form)
-
 
 class EvolucionUpdateView(ConsultaMixin, 
                           SuccessMessageMixin, 

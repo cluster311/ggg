@@ -1,10 +1,12 @@
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase, RequestFactory
+from django.utils import timezone
 
 from centros_de_salud.models import CentroDeSalud
 from pacientes.models import Consulta, Paciente
 from profesionales.tests import FullUsersMixin
-from recupero.models import Factura, TipoDocumentoAnexo, TipoPrestacion
+from obras_sociales.models import ObraSocial, ObraSocialPaciente
+from recupero.models import Factura, TipoDocumentoAnexo, TipoPrestacion, FacturaPrestacion
 from recupero.views import FacturaListView, FacturaCreateView, FacturaDetailView, FacturaUpdateView
 from recupero.views_anexo2 import Anexo2View
 from recupero.views_tipo_documento_anexo import TipoDocumentoAnexoListView, TipoDocumentoAnexoCreateView, \
@@ -20,15 +22,30 @@ class RecuperoTests(TestCase, FullUsersMixin):
         self.factory = RequestFactory()
 
         self.cs = CentroDeSalud.objects.create(nombre=f"CdSTEST")
+        self.obra_social = ObraSocial.objects.create(nombre="TEST_Obra_social", codigo=1234)
         self.paciente = Paciente.objects.create(apellidos='Garcia', nombres='Alberto', sexo='masculino',
                                        fecha_nacimiento='1980-04-29',
                                        tipo_documento='DNI', numero_documento='24987563', nacionalidad='argentina',
                                        vinculo='Padre', grupo_sanguineo="0-"
                                        )
         self.consulta = Consulta.objects.create(centro_de_salud=self.cs, paciente=self.paciente)
-        self.fact = Factura.objects.get(consulta=self.consulta)
         self.tipo_documentacion = TipoDocumentoAnexo.objects.create(nombre="TEST")
-        self.tipo_prestacion = TipoPrestacion.objects.create(nombre="TEST", tipo=100)
+        self.tipo_prestacion = TipoPrestacion.objects.create(nombre="TEST", tipo=100)        
+
+        # Crear relación ObraSocial <=> Paciente
+        ObraSocialPaciente.objects.create(paciente=self.paciente, obra_social=self.obra_social)
+
+        os_paciente = self.paciente.m2m_obras_sociales.first().obra_social
+
+        self.fact = Factura.objects.create(
+            consulta=self.consulta, 
+            obra_social=os_paciente,
+            fecha_atencion=timezone.now(),
+            centro_de_salud=self.cs,
+            paciente=self.paciente,
+        )
+        # Crear relaciones FK
+        FacturaPrestacion.objects.create(factura=self.fact, tipo=self.tipo_prestacion)
 
 
     def tearDown(self):
@@ -335,4 +352,3 @@ class RecuperoTests(TestCase, FullUsersMixin):
         request.user = self.user_recupero
         response = TipoPrestacionUpdateView.as_view()(request, pk=self.tipo_prestacion.id)
         self.assertEqual(response.status_code, 200)
-
