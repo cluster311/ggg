@@ -1,5 +1,5 @@
 from django import forms
-from calendario.widgets import DateTimePicker
+from calendario.widgets import DatePicker
 from obras_sociales.models import ObraSocial, ObraSocialPaciente
 from dal import autocomplete
 
@@ -29,6 +29,6 @@ class ObraSocialPacienteCreatePopUp(forms.ModelForm):
                   'fecha_de_emision',
                   'fecha_de_vencimiento',
                    )
-        widgets = {'fecha_de_emision': DateTimePicker(),
-                   'fecha_de_vencimiento': DateTimePicker(),
+        widgets = {'fecha_de_emision': DatePicker(),
+                   'fecha_de_vencimiento': DatePicker(),
                    }
