@@ -92,10 +92,10 @@
     </script>
     <script type="text/javascript">
         document.querySelector('select[name="paciente"]').onchange=function() {
-          $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',$('#id_paciente').val()))
+          $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',$('#id_paciente').val()));
 
+          $("#id_obra_social").empty();
         };
-
     </script>
 
 {% endblock js_footer %}

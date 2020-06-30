@@ -164,6 +164,11 @@ class FacturaUpdateView(PermissionRequiredMixin, UpdateView):
     success_message = "Actualizado con éxito."
     raise_exception = True
 
+    def get_form_kwargs(self):
+        kwargs = super(FacturaUpdateView, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         instance = getattr(self, 'object', None)
