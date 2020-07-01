@@ -5,7 +5,7 @@ from django.forms.models import inlineformset_factory
 from django.utils.translation import gettext_lazy as _
 from cie10_django.models import CIE10
 
-from calendario.widgets import DateTimePicker
+from calendario.widgets import DateTimePicker, DatePicker
 from pacientes.models import (Consulta, Paciente, Receta, Derivacion,
                               CarpetaFamiliar)
 from profesionales.models import Profesional
@@ -21,7 +21,7 @@ class PacienteFormPopUp(forms.ModelForm):
     class Meta:
         model = Paciente
         fields = ('apellidos', 'nombres', 'sexo', 'fecha_nacimiento', 'tipo_documento', 'numero_documento', 'nacionalidad')
-        widgets = {'fecha_nacimiento': DateTimePicker()}
+        widgets = {'fecha_nacimiento': DatePicker()}
 
 
 class RecetaForm(forms.ModelForm):
