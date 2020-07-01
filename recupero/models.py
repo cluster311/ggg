@@ -212,22 +212,40 @@ class Factura(TimeStampedModel):
             la librería Anexo2 (en Pypi) requiere
             Requisitos acá: https://github.com/cluster311/Anexo2
             """
-        hospital = self.consulta.centro_de_salud.as_anexo2_json()
+        
+        hospital = self.centro_de_salud.as_anexo2_json()
         if hospital['codigo_hpgd'] is None:
             hospital['codigo_hpgd'] = 'DESC'  # TODO, no permitido
-        beneficiario = self.consulta.paciente.as_anexo2_json()
-        atencion = self.consulta.as_anexo2_json()
         
-        # TODO, detectar esto que todavía no esta relevado
-        # obra_social_paciente = None
-        # obra_social = obra_social_paciente.as_anexo2_json()
-        obra_social = {'codigo_rnos': '800501',
-                    'nombre': 'OBRA SOCIAL ACEROS PARANA',
-                    'nro_carnet_obra_social': '9134818283929101',
-                    'fecha_de_emision': {'dia': 11, 'mes': 9, 'anio': 2009},
-                    'fecha_de_vencimiento': {'dia': 11, 'mes': 9, 'anio': 2029}}
+        beneficiario = self.paciente.as_anexo2_json()
 
-        # TODO, detectar esto que todavía no esta relevado
+        # TODO Verificar si el cod cie principal puede estar vacío
+        cie_principal = 'DESC' if self.codigo_cie_principal is None else self.codigo_cie_principal.code
+        cie_secundarios = [c10.code for c10 in self.codigos_cie_secundarios.all()]
+        
+        cod_hpgd = [prestacion.tipo.codigo for prestacion in self.prestacionesFactura.all()]
+
+        # Obtener la primer prestacion asociada a la factura
+        prestFactura = self.prestacionesFactura.first()
+
+        atencion = {'tipo': 'consulta', # TODO TipoPrestacion.tipo por ahora devuelve un numero
+                    'especialidad': prestFactura.tipo.descripcion,
+                    'codigos_N_HPGD': cod_hpgd,
+                    'fecha': {
+                        'dia': self.fecha_atencion.day,
+                        'mes': self.fecha_atencion.month,
+                        'anio': self.fecha_atencion.year
+                        },
+                    'diagnostico_ingreso_cie10': {'principal': cie_principal, 
+                                                    'otros': cie_secundarios}
+                    }
+        
+        # Obtener los datos de la Obra Social del Paciente 
+        # usando la relación ObraSocialPaciente
+        obra_social_paciente = self.paciente.m2m_obras_sociales.get(obra_social=self.obra_social.id)
+        obra_social = obra_social_paciente.as_anexo2_json()
+
+        # TODO, Se podrían cargar algunas empresas de prueba
         # empresa_paciente = None
         # empresa = empresa_paciente.as_anexo2_json()
         empresa = {'nombre': 'Telescopios Hubble',
@@ -251,7 +269,7 @@ class Factura(TimeStampedModel):
 
         return data
 
-   
+
 class FacturaPrestacion(TimeStampedModel):
     """ una prestacion que se le da a un paciente pero en este caso es para las facturas ya que no tiene una consulta"""
     factura = models.ForeignKey('recupero.Factura', on_delete=models.CASCADE, related_name='prestacionesFactura')

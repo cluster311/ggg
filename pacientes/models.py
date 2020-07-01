@@ -353,9 +353,7 @@ class Consulta(TimeStampedModel):
         super().save(*args, **kwargs)
         if not hasattr(self, 'factura'):
         # no funciona (?) if self.factura is None:
-            f = Factura.objects.create(consulta=self)
-            # TODO - Crear factura más completa con todos los datos de la consulta
-            logger.info(f'Factura {f.id} creada para la consulta {self}')
+            logger.info(f'Creación Consulta {self}')
         else:
             f = self.factura
             logger.info(f'Factura {f.id} OK para la consulta {self}')

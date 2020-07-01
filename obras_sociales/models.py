@@ -91,13 +91,13 @@ class ObraSocialPaciente(models.Model):
                     'fecha_de_emision': {'dia': 11, 'mes': 9, 'anio': 2009},
                     'fecha_de_vencimiento': {'dia': 11, 'mes': 9, 'anio': 2029}}
         """
-        emision_dia = None if self.fecha_de_emision is None else self.fecha_de_emision.day
-        emision_mes = None if self.fecha_de_emision is None else self.fecha_de_emision.month
-        emision_ano = None if self.fecha_de_emision is None else self.fecha_de_emision.year
+        emision_dia = 1 if self.fecha_de_emision is None else self.fecha_de_emision.day
+        emision_mes = 2 if self.fecha_de_emision is None else self.fecha_de_emision.month
+        emision_ano = 2019 if self.fecha_de_emision is None else self.fecha_de_emision.year
 
-        vto_dia = None if self.fecha_de_emision is None else self.fecha_de_vencimiento.day
-        vto_mes = None if self.fecha_de_emision is None else self.fecha_de_vencimiento.month
-        vto_ano = None if self.fecha_de_emision is None else self.fecha_de_vencimiento.year
+        vto_dia = 1 if self.fecha_de_vencimiento is None else self.fecha_de_vencimiento.day
+        vto_mes = 2 if self.fecha_de_vencimiento is None else self.fecha_de_vencimiento.month
+        vto_ano = 2020 if self.fecha_de_vencimiento is None else self.fecha_de_vencimiento.year
 
         ret = {'codigo_rnos': self.obra_social.codigo,
                     'nombre': self.obra_social.nombre,

@@ -53,7 +53,6 @@ class FacturaAdmin(admin.ModelAdmin):
                    'consulta__especialidad']
     inlines = [FacturaPrestacionInline, ]
 
-
 @admin.register(FacturaPrestacion)
 class FacturaPrestacion(admin.ModelAdmin):
     model = FacturaPrestacion
