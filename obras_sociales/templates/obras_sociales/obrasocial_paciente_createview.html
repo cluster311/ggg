@@ -3,11 +3,11 @@
 {% load static %}
 
 {% block content %}
-    <h2>Nuevo Paciente</h2>
+    <h2>Nuevo Obra Social de Paciente</h2>
     <form method = 'POST' action= '' novalidate id = "author-form">
     {% csrf_token %}
         {{ form|crispy}}
-        <button type="submit" class="btn btn-success">Guardar Paciente</button>
+        <button type="submit" class="btn btn-success">Guardar Obra Social de Paciente</button>
     </form>
     <div class="line"></div>
 

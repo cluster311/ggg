@@ -32,7 +32,7 @@ def PacienteCreatePopup(request):
     if form.is_valid():
         instance = form.save()
         return HttpResponse(
-            '<script>opener.closePopup(window, "%s", "%s", "#id_paciente");</script>' % (instance.pk, instance))
+            '<script>opener.closePopupCleanField(window, "%s", "%s", "#id_paciente");</script>' % (instance.pk, instance))
     return render(request, "pacientes/paciente_createview.html", {"form": form})
 
 

@@ -19,8 +19,11 @@
                     <button type="button" class="btn btn-success">+</button>
                 </a>
             </div>
-            <div class="form-group col-md-12 ">
+            <div class="form-group col-md-12 " style="display: flex;">
                 {{ form.obra_social|as_crispy_field }}
+                <a href="{%  url 'ObraSocialPacienteCreate' paciente=None%}" id="add_obrasocial" class="button-add-popup" onclick="return showAddPopup(this);">
+                    <button type="button" class="btn btn-success">+</button>
+                </a>
             </div>
             <div class="form-group col-md-12 ">
                 {{ form.centro_de_salud|as_crispy_field }}
@@ -85,6 +88,24 @@
         function closePopup(win, newID, newRepr, id) {
             $(id).append('<option value=' + newID + ' selected >' + newRepr + '</option>')
             win.close();
+            $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',$('#id_paciente').val()));
         }
+        function closePopupCleanField(win, newID, newRepr, id) {
+            $(id).append('<option value=' + newID + ' selected >' + newRepr + '</option>')
+            win.close();
+            $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',$('#id_paciente').val()));
+            $("#id_obra_social").empty();
+        }
+
     </script>
+    <script type="text/javascript">
+        document.querySelector('select[name="paciente"]').onchange=function() {
+            $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',$('#id_paciente').val()));
+            $("#id_obra_social").empty();
+        };
+    </script>
+
+
+
+
 {% endblock js_footer %}

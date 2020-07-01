@@ -53,6 +53,23 @@ class ObraSocialAutocomplete(autocomplete.Select2QuerySetView):
         return osp
 
 
+class ObraSocialAllAutocomplete(autocomplete.Select2QuerySetView):
+    """
+     Base de autompletado para obra sociales.
+    """
+
+    def get_queryset(self):
+        if not self.request.user.has_perm('obras_sociales.view_obrasocial'):
+            return ObraSocial.objects.none()
+        qs = ObraSocial.objects.all()
+        if self.q:
+            qs = qs.filter(Q(nombre__icontains=self.q) |
+                           Q(codigo__icontains=self.q) |
+                           Q(siglas__icontains=self.q)
+                           )
+        return qs[:10]
+
+
 class PacienteAutocomplete(autocomplete.Select2QuerySetView):
     """
     Base de autompletado para pacientes.
