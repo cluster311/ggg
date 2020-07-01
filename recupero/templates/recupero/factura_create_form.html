@@ -88,14 +88,24 @@
         function closePopup(win, newID, newRepr, id) {
             $(id).append('<option value=' + newID + ' selected >' + newRepr + '</option>')
             win.close();
+            $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',$('#id_paciente').val()));
         }
+        function closePopupCleanField(win, newID, newRepr, id) {
+            $(id).append('<option value=' + newID + ' selected >' + newRepr + '</option>')
+            win.close();
+            $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',$('#id_paciente').val()));
+            $("#id_obra_social").empty();
+        }
+
     </script>
     <script type="text/javascript">
         document.querySelector('select[name="paciente"]').onchange=function() {
-          $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',$('#id_paciente').val()));
-
-          $("#id_obra_social").empty();
+            $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',$('#id_paciente').val()));
+            $("#id_obra_social").empty();
         };
     </script>
+
+
+
 
 {% endblock js_footer %}
