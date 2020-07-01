@@ -7,14 +7,23 @@ from centros_de_salud.models import CentroDeSalud
 from obras_sociales.models import ObraSocial
 from pacientes.models import Paciente
 from dal import autocomplete
-from recupero.models import Factura, FacturaPrestacion
+from recupero.models import Factura, FacturaPrestacion, TipoPrestacion
 
 
 class FacturaPrestacionForm(forms.ModelForm):
+    tipo = forms.ModelChoiceField(
+        label='Tipo',
+        required=False,
+        queryset=TipoPrestacion.objects.all(),
+        widget=autocomplete.ModelSelect2(
+            url="tipo_prestacion-autocomplete",
+        ),
+    )
+
     class Meta:
         model = FacturaPrestacion
-        fields = '__all__'
-        widgets = {'observaciones':  forms.Textarea(attrs={'rows':2, 'cols':10})}
+        fields = ('tipo', 'cantidad', 'observaciones',)
+        widgets = {'observaciones':  forms.Textarea(attrs={'rows': 2, 'cols': 10})}
 
 
 class FacturaForm(forms.ModelForm):
