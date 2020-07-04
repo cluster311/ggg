@@ -159,7 +159,7 @@ class ConsultaMixin:
         
         consulta = self.object
 
-        # TODO - Determinar con que OS se atiende el paciente en la consulta
+        # TODO #248 - Determinar con que OS se atiende el paciente en la consulta
         os_paciente = consulta.paciente.m2m_obras_sociales.first().obra_social
 
         nueva_factura = Factura(
