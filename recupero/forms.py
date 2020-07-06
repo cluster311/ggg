@@ -3,10 +3,12 @@ from django import forms
 from django.forms import inlineformset_factory
 
 from calendario.widgets import DateTimePicker
-from centros_de_salud.models import CentroDeSalud
+from centros_de_salud.models import CentroDeSalud, Especialidad
 from obras_sociales.models import ObraSocial
 from pacientes.models import Paciente
 from dal import autocomplete
+
+from profesionales.models import Profesional
 from recupero.models import Factura, FacturaPrestacion, TipoPrestacion
 
 
@@ -46,11 +48,30 @@ class FacturaForm(forms.ModelForm):
             attrs={"data-placeholder": "Seleccione una Obra social"}
         ),
     )
+    profesional = forms.ModelChoiceField(
+        label='Profesional',
+        required=False,
+        queryset=Profesional.objects.all(),
+        widget=autocomplete.ModelSelect2(
+            url="profesional-autocomplete",
+            attrs={"data-placeholder": "Seleccione un Profesional"}
+        ),
+    )
     centro_de_salud = forms.ModelChoiceField(
         label='Centro de Salud',
         required=False,
         queryset=CentroDeSalud.objects.all(),
         empty_label="Seleccione un valor",
+    )
+    especialidad = forms.ModelChoiceField(
+        label='Especialidad',
+        required=False,
+        queryset=Especialidad.objects.all(),
+        widget=autocomplete.ModelSelect2(
+            url="especialidad-autocomplete",
+            forward=['centro_de_salud'],
+            attrs={"data-placeholder": "Seleccione un Especialidad"}
+        ),
     )
     codigo_cie_principal = forms.ModelChoiceField(
         label='Código CIE10 principal',
@@ -84,10 +105,13 @@ class FacturaForm(forms.ModelForm):
         model = Factura
         fields = ('paciente',
                   'obra_social',
+                  'profesional',
+                  'especialidad',
                   'centro_de_salud', 'fecha_atencion',
                   'codigo_cie_principal',
                   'codigos_cie_secundarios',
                    )
         widgets = {'fecha_atencion': DateTimePicker()}
+
 
 FacturaPrestacionFormSet = inlineformset_factory(Factura, FacturaPrestacion, form=FacturaPrestacionForm, extra=1)
