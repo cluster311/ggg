@@ -192,7 +192,19 @@ class Factura(TimeStampedModel):
     codigos_cie_secundarios = models.ManyToManyField(CIE10,
                                                      blank=True,
                                                      related_name='diagnosticos_secundarios_factura')
-
+    profesional = models.ForeignKey(
+        'profesionales.Profesional',
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL
+    )
+    especialidad = models.ForeignKey(
+        'centros_de_salud.Especialidad',
+         on_delete=models.CASCADE,
+         related_name='especialidad_factura',
+         blank=True,
+         null=True,
+    )
 
     def __str__(self):
         return f'Factura {self.id}'
