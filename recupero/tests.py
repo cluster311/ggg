@@ -3,7 +3,7 @@ from django.test import TestCase, RequestFactory
 from django.utils import timezone
 
 from centros_de_salud.models import CentroDeSalud
-from pacientes.models import Consulta, Paciente
+from pacientes.models import Consulta, Paciente, Empresa, EmpresaPaciente
 from profesionales.tests import FullUsersMixin
 from obras_sociales.models import ObraSocial, ObraSocialPaciente
 from recupero.models import Factura, TipoDocumentoAnexo, TipoPrestacion, FacturaPrestacion
@@ -46,6 +46,10 @@ class RecuperoTests(TestCase, FullUsersMixin):
         )
         # Crear relaciones FK
         FacturaPrestacion.objects.create(factura=self.fact, tipo=self.tipo_prestacion)
+
+        self.empresa = Empresa.objects.create(nombre='Telescopios Hubble', direccion='Av Astronómica s/n', cuit='31-91203043-8')
+        
+        EmpresaPaciente.objects.create(empresa=self.empresa, paciente=self.paciente)
 
 
     def tearDown(self):
