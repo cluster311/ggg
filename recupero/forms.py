@@ -96,7 +96,8 @@ class FacturaForm(forms.ModelForm):
 
     class Meta:
         model = Factura
-        fields = ('paciente',
+        fields = ('fecha_atencion',
+                  'paciente',
                   'obra_social',
                   'profesional',
                   'especialidad',
