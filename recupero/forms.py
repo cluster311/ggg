@@ -1,7 +1,6 @@
 from cie10_django.models import CIE10
 from django import forms
 from django.forms import inlineformset_factory
-
 from calendario.widgets import DateTimePicker
 from centros_de_salud.models import CentroDeSalud, Especialidad
 from obras_sociales.models import ObraSocial
@@ -13,19 +12,12 @@ from recupero.models import Factura, FacturaPrestacion, TipoPrestacion
 
 
 class FacturaPrestacionForm(forms.ModelForm):
-    tipo = forms.ModelChoiceField(
-        label='Tipo',
-        required=False,
-        queryset=TipoPrestacion.objects.all(),
-        widget=autocomplete.ModelSelect2(
-            url="tipo_prestacion-autocomplete",
-        ),
-    )
 
     class Meta:
         model = FacturaPrestacion
         fields = ('tipo', 'cantidad', 'observaciones',)
-        widgets = {'observaciones':  forms.Textarea(attrs={'rows': 2, 'cols': 10})}
+        widgets = {'observaciones':  forms.Textarea(attrs={'rows': 2, 'cols': 10}),
+                   }
 
 
 class FacturaForm(forms.ModelForm):
@@ -48,15 +40,6 @@ class FacturaForm(forms.ModelForm):
             attrs={"data-placeholder": "Seleccione una Obra social"}
         ),
     )
-    profesional = forms.ModelChoiceField(
-        label='Profesional',
-        required=False,
-        queryset=Profesional.objects.all(),
-        widget=autocomplete.ModelSelect2(
-            url="profesional-autocomplete",
-            attrs={"data-placeholder": "Seleccione un Profesional"}
-        ),
-    )
     centro_de_salud = forms.ModelChoiceField(
         label='Centro de Salud',
         required=False,
@@ -71,6 +54,16 @@ class FacturaForm(forms.ModelForm):
             url="especialidad-autocomplete",
             forward=['centro_de_salud'],
             attrs={"data-placeholder": "Seleccione un Especialidad"}
+        ),
+    )
+    profesional = forms.ModelChoiceField(
+        label='Profesional',
+        required=False,
+        queryset=Profesional.objects.all(),
+        widget=autocomplete.ModelSelect2(
+            url="profesional-autocomplete",
+            forward=['especialidad', 'centro_de_salud'],
+            attrs={"data-placeholder": "Seleccione un Profesional"}
         ),
     )
     codigo_cie_principal = forms.ModelChoiceField(
