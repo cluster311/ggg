@@ -23,4 +23,6 @@ before_script:
   - flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
   - flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 script:
-  - python manage.py test
+  - coverage erase
+  - coverage run manage.py test
+  - coverage report
