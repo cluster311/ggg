@@ -53,7 +53,7 @@ class FacturaForm(forms.ModelForm):
         widget=autocomplete.ModelSelect2(
             url="especialidad-autocomplete",
             forward=['centro_de_salud'],
-            attrs={"data-placeholder": "Seleccione un Especialidad"}
+            attrs={"data-placeholder": "Seleccione una Especialidad"}
         ),
     )
     profesional = forms.ModelChoiceField(
