@@ -13,6 +13,9 @@
     <div class="col-12 col-md-12 " style="display: flex;" >
         <div class="col-6 col-md-6">
         {% csrf_token %}
+            <div class="form-group col-md-12 ">
+                {{ form.fecha_atencion|as_crispy_field }}
+            </div>
             <div class="form-group col-md-12 col-lg-12 " style="display: flex;">
                 {{ form.paciente|as_crispy_field }}
                 <a href="{%  url 'PacienteCreate' %}" id="add_paciente" class="button-add-popup" onclick="return showAddPopup(this);">
@@ -26,8 +29,15 @@
                 </a>
             </div>
             <div class="form-group col-md-12 ">
+                {{ form.profesional|as_crispy_field }}
+            </div>
+            <div class="form-group col-md-12 ">
                 {{ form.centro_de_salud|as_crispy_field }}
             </div>
+            <div class="form-group col-md-12 ">
+                {{ form.especialidad|as_crispy_field }}
+            </div>
+
             <div class="form-group col-md-12 ">
                 {{ form.codigo_cie_principal|as_crispy_field }}
             </div>
@@ -67,9 +77,16 @@
                       addText: 'Agregar otro',
                       deleteText: 'Eliminar',
                       deleteCssClass: 'btn btn-sm btn-danger',
-                      addCssClass: 'btn btn-sm btn-success'
+                      addCssClass: 'btn btn-sm btn-success',
+                      added: function($row) {
+                            $('#id_prestacionesFactura-'+$row.index()+'-tipo').select2();
+                      }
                   });
            {% endwith %}
+            var max_prestacion_factura = $('#id_prestacionesFactura-TOTAL_FORMS').val();
+            for (var x=0; x<max_prestacion_factura; x++) {
+                $('#id_prestacionesFactura-'+x+'-tipo').select2();
+            }
         })
     </script>
     <script type="text/javascript">

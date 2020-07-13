@@ -1,29 +1,23 @@
 from cie10_django.models import CIE10
 from django import forms
 from django.forms import inlineformset_factory
-
 from calendario.widgets import DateTimePicker
-from centros_de_salud.models import CentroDeSalud
+from centros_de_salud.models import CentroDeSalud, Especialidad
 from obras_sociales.models import ObraSocial
 from pacientes.models import Paciente
 from dal import autocomplete
+
+from profesionales.models import Profesional
 from recupero.models import Factura, FacturaPrestacion, TipoPrestacion
 
 
 class FacturaPrestacionForm(forms.ModelForm):
-    tipo = forms.ModelChoiceField(
-        label='Tipo',
-        required=False,
-        queryset=TipoPrestacion.objects.all(),
-        widget=autocomplete.ModelSelect2(
-            url="tipo_prestacion-autocomplete",
-        ),
-    )
 
     class Meta:
         model = FacturaPrestacion
         fields = ('tipo', 'cantidad', 'observaciones',)
-        widgets = {'observaciones':  forms.Textarea(attrs={'rows': 2, 'cols': 10})}
+        widgets = {'observaciones':  forms.Textarea(attrs={'rows': 2, 'cols': 10}),
+                   }
 
 
 class FacturaForm(forms.ModelForm):
@@ -51,6 +45,26 @@ class FacturaForm(forms.ModelForm):
         required=False,
         queryset=CentroDeSalud.objects.all(),
         empty_label="Seleccione un valor",
+    )
+    especialidad = forms.ModelChoiceField(
+        label='Especialidad',
+        required=False,
+        queryset=Especialidad.objects.all(),
+        widget=autocomplete.ModelSelect2(
+            url="especialidad-autocomplete",
+            forward=['centro_de_salud'],
+            attrs={"data-placeholder": "Seleccione una Especialidad"}
+        ),
+    )
+    profesional = forms.ModelChoiceField(
+        label='Profesional',
+        required=False,
+        queryset=Profesional.objects.all(),
+        widget=autocomplete.ModelSelect2(
+            url="profesional-autocomplete",
+            forward=['especialidad', 'centro_de_salud'],
+            attrs={"data-placeholder": "Seleccione un Profesional"}
+        ),
     )
     codigo_cie_principal = forms.ModelChoiceField(
         label='Código CIE10 principal',
@@ -82,12 +96,16 @@ class FacturaForm(forms.ModelForm):
 
     class Meta:
         model = Factura
-        fields = ('paciente',
+        fields = ('fecha_atencion',
+                  'paciente',
                   'obra_social',
-                  'centro_de_salud', 'fecha_atencion',
+                  'profesional',
+                  'especialidad',
+                  'centro_de_salud',
                   'codigo_cie_principal',
                   'codigos_cie_secundarios',
                    )
         widgets = {'fecha_atencion': DateTimePicker()}
+
 
 FacturaPrestacionFormSet = inlineformset_factory(Factura, FacturaPrestacion, form=FacturaPrestacionForm, extra=1)

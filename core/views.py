@@ -6,7 +6,7 @@ from obras_sociales.models import ObraSocialPaciente, ObraSocial
 from pacientes.models import Paciente, CarpetaFamiliar
 from profesionales.models import Profesional
 from centros_de_salud.models import (CentroDeSalud, ProfesionalesEnServicio,
-                                     Servicio)
+                                     Servicio, Especialidad)
 from recupero.models import TipoPrestacion
 from django.db.models import Q
 import logging
@@ -88,6 +88,22 @@ class PacienteAutocomplete(autocomplete.Select2QuerySetView):
                            )
 
         return qs.order_by("apellidos", "nombres")[:5]
+
+
+class EspecialidadAutocomplete(autocomplete.Select2QuerySetView):
+    """
+    Base de autocompletado para especialidades.
+    """
+
+    def get_queryset(self):
+        if self.q:
+            servicio = Servicio.objects.filter(centro=self.forwarded.get('centro_de_salud', None), especialidad__nombre__icontains=self.q)
+        else:
+            servicio = Servicio.objects.filter(centro=self.forwarded.get('centro_de_salud', None))
+        esp = []
+        for s in servicio:
+            esp.append(s.especialidad)
+        return esp
 
 
 class ProfesionalAutocomplete(autocomplete.Select2QuerySetView):
