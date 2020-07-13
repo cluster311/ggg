@@ -101,7 +101,7 @@ class FacturaForm(forms.ModelForm):
                   'obra_social',
                   'profesional',
                   'especialidad',
-                  'centro_de_salud', 'fecha_atencion',
+                  'centro_de_salud',
                   'codigo_cie_principal',
                   'codigos_cie_secundarios',
                    )
