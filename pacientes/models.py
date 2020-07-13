@@ -139,7 +139,7 @@ class Paciente(Persona):
         elif self.sexo == 'femenino':
             sexo = 'F'
         
-        # TODO definir como obtener el tipo de beneficiario y su parentesco
+        # TODO #251 definir como obtener el tipo de beneficiario y su parentesco
         edad = 0 if self.edad is None else self.edad
         ret = {'apellido_y_nombres': f'{self.apellidos}, {self.nombres}',
                 'tipo_dni': self.tipo_documento,

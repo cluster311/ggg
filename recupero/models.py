@@ -224,7 +224,7 @@ class Factura(TimeStampedModel):
             la librería Anexo2 (en Pypi) requiere
             Requisitos acá: https://github.com/cluster311/Anexo2
             """
-        
+
         hospital = self.centro_de_salud.as_anexo2_json()
         if hospital['codigo_hpgd'] is None:
             hospital['codigo_hpgd'] = 'DESC'  # TODO, no permitido
@@ -239,14 +239,18 @@ class Factura(TimeStampedModel):
 
         # Obtener la primer prestacion asociada a la factura
         prestFactura = self.prestacionesFactura.first()
+        
+        # Devuelve el string en minúsculas
+        tipo = prestFactura.tipo.get_tipo_display().casefold()
 
-        atencion = {'tipo': 'consulta', # TODO TipoPrestacion.tipo por ahora devuelve un numero
+        # TODO - Hay que agregar tipo de atención a las prestaciones
+        atencion = {'tipo': 'consulta', # if tipo is None else tipo
                     'especialidad': prestFactura.tipo.descripcion,
                     'codigos_N_HPGD': cod_hpgd,
                     'fecha': {
                         'dia': self.fecha_atencion.day,
                         'mes': self.fecha_atencion.month,
-                        'anio': self.fecha_atencion.year
+                        'anio': self.fecha_atencion.year,
                         },
                     'diagnostico_ingreso_cie10': {'principal': cie_principal, 
                                                     'otros': cie_secundarios}
@@ -257,21 +261,15 @@ class Factura(TimeStampedModel):
         obra_social_paciente = self.paciente.m2m_obras_sociales.get(obra_social=self.obra_social.id)
         obra_social = obra_social_paciente.as_anexo2_json()
 
-        # TODO, Se podrían cargar algunas empresas de prueba
-        # empresa_paciente = None
-        # empresa = empresa_paciente.as_anexo2_json()
-        empresa = {'nombre': 'Telescopios Hubble',
-                   'direccion': 'Av Astronómica s/n',
-                   'ultimo_recibo_de_sueldo': {'mes': 7, 'anio': 2019},
-                   'cuit': '31-91203043-8'}
+        # Obtener la primera empresa del paciente
+        empresa_paciente = self.paciente.empresapaciente_set.first()
+        empresa = empresa_paciente.as_anexo2_json()
 
-        dia = None if self.fecha_atencion is None else self.fecha_atencion.day
-        mes = None if self.fecha_atencion is None else self.fecha_atencion.month
-        anio = None if self.fecha_atencion is None else self.fecha_atencion.year
-        
-        data = {'dia': dia,
-                'mes': mes,
-                'anio': anio,
+        fecha_actual = timezone.now().date()
+
+        data = {'dia': fecha_actual.day,
+                'mes': fecha_actual.month,
+                'anio': fecha_actual.year,
                 'hospital': hospital,
                 'beneficiario': beneficiario,
                 'atencion': atencion,
