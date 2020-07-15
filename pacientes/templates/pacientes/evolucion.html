@@ -48,7 +48,7 @@
                 <div class="card-header" id="heading-{{ cp.id }}">
                   <h2 class="mb-0">
                     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-{{ cp.id }}" aria-expanded="true" aria-controls="collapse-{{ cp.id }}">
-                        {{ cp.created|date:"Y/m/d H:i" }} {{ cp.codigo_cie_principal|default_if_none:"" }} 
+                        {{ cp.created|date:"d/m/Y" }} {{ cp.especialidad }} {{ cp.codigo_cie_principal|default_if_none:"" }}
                     </button>
                   </h2>
                 </div>
