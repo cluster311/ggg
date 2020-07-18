@@ -61,7 +61,7 @@ class FacturaForm(forms.ModelForm):
         required=False,
         queryset=Profesional.objects.all(),
         widget=autocomplete.ModelSelect2(
-            url="profesional-autocomplete",
+            url="profesional-factura-autocomplete",
             forward=['especialidad', 'centro_de_salud'],
             attrs={"data-placeholder": "Seleccione un Profesional"}
         ),
@@ -99,9 +99,9 @@ class FacturaForm(forms.ModelForm):
         fields = ('fecha_atencion',
                   'paciente',
                   'obra_social',
-                  'profesional',
-                  'especialidad',
                   'centro_de_salud',
+                  'especialidad',
+                  'profesional',
                   'codigo_cie_principal',
                   'codigos_cie_secundarios',
                    )

@@ -7,7 +7,7 @@ from core.views import (CIE10Autocomplete,
                         TipoPrestacionAutocomplete,
                         CarpetaFamiliarAutocomplete,
                         ServicioAutocomplete, ObraSocialAutocomplete, ObraSocialAllAutocomplete,
-                        EspecialidadAutocomplete
+                        EspecialidadAutocomplete, ProfesionalFacturaAutocomplete
                         )
 
 
@@ -47,6 +47,11 @@ urlpatterns = [
         r"^profesional-autocomplete/$",
         ProfesionalAutocomplete.as_view(),
         name="profesional-autocomplete",
+    ),
+    url(
+        r"^profesional-factura-autocomplete/$",
+        ProfesionalFacturaAutocomplete.as_view(),
+        name="profesional-factura-autocomplete",
     ),
     path(
         r"profesional-autocomplete-por-servicio/<int:servicio_id>",
