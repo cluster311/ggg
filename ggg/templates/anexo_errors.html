@@ -1,0 +1,33 @@
+{% extends "base_admin.html" %}
+
+{% load static %}
+{% block title %} Anexo II {% endblock %}
+{% block content %}
+<div class="card-header">
+  Se detectaron los siguientes errores en la generación del Anexo II:
+</div>
+<div>
+    {% for key, values in errors.items %}
+    
+    <div>
+      <b>Sección:</b> {{ key }}
+      <br>
+      <b>Errores:</b>
+      <ul>
+        
+      {% for v in values %}
+        {% for k, v in v.items %}
+
+        <li>{{ k }} - {{ v.0 }}</li>
+
+        {% endfor %}
+      {% endfor %}
+      </ul>
+
+    </div> 
+    {% endfor %}
+  
+</div>
+
+
+{% endblock %}
