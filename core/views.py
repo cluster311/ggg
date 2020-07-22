@@ -131,6 +131,29 @@ class ProfesionalAutocomplete(autocomplete.Select2QuerySetView):
         return qs.order_by("apellidos", "nombres")[:5]
 
 
+class ProfesionalFacturaAutocomplete(autocomplete.Select2QuerySetView):
+    """
+    Base de autocompletado para profesionales en factura.
+    """
+
+    def get_queryset(self):
+        if not self.request.user.has_perm('profesionales.view_profesional'):
+            return Profesional.objects.none()
+
+        qs = Profesional.objects.all()
+        if self.forwarded.get('centro_de_salud', None) and self.forwarded.get('especialidad', None):
+            servicio = Servicio.objects.get(centro=self.forwarded.get('centro_de_salud'), especialidad=self.forwarded.get('especialidad'))
+            qs = qs.filter(servicios__servicio=servicio, servicios__estado=ProfesionalesEnServicio.EST_ACTIVO)
+            if self.q:
+                qs = qs.filter(Q(numero_documento__icontains=self.q) |
+                               Q(nombres__icontains=self.q) |
+                               Q(apellidos__icontains=self.q)
+                               )
+            return qs.order_by("apellidos", "nombres")[:5]
+        else:
+            return []
+
+
 class CentroDeSaludAutocomplete(autocomplete.Select2QuerySetView):
     """
     Base de autompletado para Centros de Salud.
