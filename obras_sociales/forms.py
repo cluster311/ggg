@@ -26,6 +26,8 @@ class ObraSocialPacienteCreatePopUp(forms.ModelForm):
         fields = ('paciente',
                   'obra_social',
                   'numero_afiliado',
+                  'tipo_beneficiario',
+                  'parentesco',
                   'fecha_de_emision',
                   'fecha_de_vencimiento',
                    )

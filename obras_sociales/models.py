@@ -1,7 +1,7 @@
 from django.db import models
 import logging
+from model_utils import Choices
 from oss_ar.oss import ObrasSocialesArgentinas
-
 
 logger = logging.getLogger(__name__)
 
@@ -81,6 +81,16 @@ class ObraSocialPaciente(models.Model):
     numero_afiliado = models.CharField(max_length=50, null=True, blank=True)
     fecha_de_emision = models.DateField(null=True, blank=True)
     fecha_de_vencimiento = models.DateField(null=True, blank=True)
+    tipo_beneficiario = models.CharField(
+        max_length=20,
+        choices=Choices("titular", "no titular", "adherente"),
+        default="Titular",
+    )
+    parentesco = models.CharField(
+        max_length=20,
+        choices=Choices("conyugue", "hijo", "otro"),
+        default="otro",
+    )
 
     def as_anexo2_json(self):
         """ devuelve el JSON compatible con la librería Anexo2 https://github.com/cluster311/Anexo2
