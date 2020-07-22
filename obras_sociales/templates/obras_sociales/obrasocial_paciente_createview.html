@@ -6,7 +6,30 @@
     <h2>Nuevo Obra Social de Paciente</h2>
     <form method = 'POST' action= '' novalidate id = "author-form">
     {% csrf_token %}
-        {{ form|crispy}}
+         <div class="form-row">
+            <div class="col-md-6  col-lg-6">
+                {{ form.obra_social|as_crispy_field }}
+            </div>
+            <div class="col-md-6  col-lg-6">
+                {{ form.numero_afiliado|as_crispy_field }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-6  col-lg-6">
+                {{ form.tipo_beneficiario|as_crispy_field }}
+            </div>
+            <div class="col-md-6  col-lg-6">
+                {{ form.parentesco|as_crispy_field }}
+            </div>
+        </div>
+         <div class="form-row">
+            <div class="col-md-6  col-lg-6">
+                {{ form.fecha_de_emision|as_crispy_field }}
+            </div>
+            <div class="col-md-6  col-lg-6">
+                {{ form.fecha_de_vencimiento|as_crispy_field }}
+            </div>
+        </div>
         <button type="submit" class="btn btn-success">Guardar Obra Social de Paciente</button>
     </form>
     <div class="line"></div>
