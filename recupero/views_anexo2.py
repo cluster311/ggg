@@ -32,6 +32,6 @@ class Anexo2View(PermissionRequiredMixin, View):
             newDict = dict()
             newDict['errors'] = anx.errors
 
-            return render(request, template_name='anexo_errors.html', context=newDict)
+            return render(request, template_name='recupero/anexo_errors.html', context=newDict)
 
         return HttpResponse(res)
