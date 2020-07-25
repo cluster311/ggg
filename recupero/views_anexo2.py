@@ -6,6 +6,7 @@ from django.template import Context, Template
 
 from recupero.models import Factura
 from anexo2.docs import Anexo2
+from core.signals import app_log
 
 
 class Anexo2View(PermissionRequiredMixin, View):
@@ -28,6 +29,19 @@ class Anexo2View(PermissionRequiredMixin, View):
 
         # Si hay errores en la generación se muestran en otro template
         if res is None:
+            
+            # Registrar el error para monitoreo por parte de administración
+            data = {
+                'user': request.user.username,
+                'errors': anx.errors,
+            }
+
+            app_log.send(
+                    sender=self.__class__,
+                    code='ANEXO2_ERROR',
+                    severity=1,
+                    description=f'Se encontraron los siguientes errores en la generación del Anexo2 para la factura {factura_id}',
+                    data=data)
 
             newDict = dict()
             newDict['errors'] = anx.errors
