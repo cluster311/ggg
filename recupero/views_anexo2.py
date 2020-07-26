@@ -1,10 +1,12 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponse
-from django.views import View
+from django.views.generic import View
+from django.shortcuts import render
 from django.template import Context, Template
 
 from recupero.models import Factura
 from anexo2.docs import Anexo2
+from core.signals import app_log
 
 
 class Anexo2View(PermissionRequiredMixin, View):
@@ -18,14 +20,32 @@ class Anexo2View(PermissionRequiredMixin, View):
         factura_id = self.kwargs['factura_id']
         factura = Factura.objects.get(pk=factura_id)
         
+        # Juntar los datos para el Anexo2
         data = factura.as_anexo2_json()
         anx = Anexo2(data=data)
+
+        # Generar el Anexo2
         res = anx.get_html()
+
+        # Si hay errores en la generación se muestran en otro template
         if res is None:
-            res = '<h1>ERRORES al procesar pedido</h1>'
-            res += '<ul>'
-            for field, error in anx.errors.items():
-                res += f'<li>{field}: {error}</li>'
-            res += '</ul>'
+            
+            # Registrar el error para monitoreo por parte de administración
+            data = {
+                'user': request.user.username,
+                'errors': anx.errors,
+            }
+
+            app_log.send(
+                    sender=self.__class__,
+                    code='ANEXO2_ERROR',
+                    severity=1,
+                    description=f'Se encontraron los siguientes errores en la generación del Anexo2 para la factura {factura_id}',
+                    data=data)
+
+            newDict = dict()
+            newDict['errors'] = anx.errors
+
+            return render(request, template_name='recupero/anexo_errors.html', context=newDict)
 
         return HttpResponse(res)
