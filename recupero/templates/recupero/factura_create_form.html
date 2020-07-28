@@ -22,27 +22,33 @@
             </div>
             <div class="form-row">
 
-                <div class="col-md-6 col-lg-6" style="display: flex;">
-                    <div class="form-group">
-                        <label class="col-form-label ">
-                            paciente
-                        </label>
-                        <input name="dni" id="id_dni" class="form-control" placeholder="DNI">
-                    </div>
-                    {{ form.paciente|as_crispy_field }}
-                     <a  id="add_paciente" class="button-add-popup" >
-                        <button type="button" class="btn btn-success ">
-                            <i class="fa fa-search" id="search"></i>
-                            <i id="loading" style="display: none" class="fa fa-spinner fa-spin"></i>
-                        </button>
+                <div class="col-md-6 col-lg-6" >
+                    <div style="display: flex;margin-bottom:0;">
+                        <div>
+                            <label class="col-form-label ">
+                                paciente
+                            </label>
+                            <input name="dni" id="id_dni" class="form-control" placeholder="DNI">
+                        </div>
+                        {{ form.paciente|as_crispy_field }}
+                         <a   class="button-add-popup" >
+                            <button type="button" class="btn btn-success" id="add_paciente">
+                                <i class="fa fa-search" id="search"></i>
+                                <i id="loading" style="display: none" class="fa fa-spinner fa-spin"></i>
+                                <i id="found" style="display: none" class="fa fa-check"></i>
+                            </button>
 
-                     </a>
+                         </a>
+                    </div>
+                    <span class="help_text_style" style="margin-top: 0;clear: both;font-weight: bold" id="nombre_paciente"></span>
+
                 </div>
                 <div class=" col-md-6  col-lg-6 " style="display: flex;">
                     {{ form.obra_social|as_crispy_field }}
                     <a href="{%  url 'ObraSocialPacienteCreate' paciente=None%}" id="add_obrasocial" class="button-add-popup" onclick="return showAddPopup(this);">
                         <button type="button" class="btn btn-success">+</button>
                     </a>
+
                 </div>
             </div>
             <div class="form-row">
@@ -142,9 +148,11 @@
             win.close();
             $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',$('#id_paciente').val()));
         }
-        function closePopupCleanField(win, pk, doc) {
+        function closePopupCleanField(win, pk, doc){
             $("#id_paciente").val(pk);
             $("#id_dni").val(doc);
+            $("#loading").hide();
+            $("#found").show();
             win.close();
             $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',pk));
             $("#id_obra_social").empty();
@@ -169,29 +177,26 @@
                     success: function (data) {
                         if (data.encontrado){
                             $("#id_paciente").val(data.id);
+                            $("#add_paciente").prop("disabled", true);
+                            $("#nombre_paciente").text(data.nombre);
+                            $("#loading").hide();
+                            $("#found").show();
                         }else{
                             showAddPopupPaciente();
+                            $("#add_paciente").prop("disabled", true);
+
                         }
 
                     },
                     complete: function () {
-                        $('#search').show();
-                        $('#loading').hide();
+
                     },
                 });
             }
         });
 
     </script>
-    <script type="text/javascript">
 
-        //document.querySelector('select[name="paciente"]').onchange=function() {
-        //    $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',$('#id_paciente').val()));
-        //    $("#id_obra_social").empty();
-        //};
-
-
-    </script>
 
 
 {% endblock js_footer %}
