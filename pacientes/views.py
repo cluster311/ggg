@@ -1,3 +1,5 @@
+import time
+
 from braces.views import GroupRequiredMixin
 from django.views.generic import TemplateView, ListView, UpdateView
 from django.views.generic.detail import DetailView
@@ -8,7 +10,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMi
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
 from django.conf import settings
@@ -32,7 +34,7 @@ def PacienteCreatePopup(request):
     if form.is_valid():
         instance = form.save()
         return HttpResponse(
-            '<script>opener.closePopupCleanField(window, "%s", "%s", "#id_paciente");</script>' % (instance.pk, instance))
+            '<script>opener.closePopupCleanField(window, "%s", "%s" );</script>' % (instance.pk,instance.numero_documento))
     return render(request, "pacientes/paciente_createview.html", {"form": form})
 
 
@@ -238,3 +240,11 @@ class CarpetaFamiliarCreateView(PermissionRequiredMixin,
         return reverse(
             "calendario.agendar"
         )
+
+
+def BuscarPaciente(request, dni):
+
+    data = {"id": "4",
+            "encontrado": False}
+    time.sleep(3)
+    return JsonResponse(data, status=200)

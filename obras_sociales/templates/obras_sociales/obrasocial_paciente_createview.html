@@ -22,7 +22,7 @@
                 {{ form.parentesco|as_crispy_field }}
             </div>
         </div>
-         <div class="form-row">
+        <div class="form-row">
             <div class="col-md-6  col-lg-6">
                 {{ form.fecha_de_emision|as_crispy_field }}
             </div>
@@ -30,6 +30,9 @@
                 {{ form.fecha_de_vencimiento|as_crispy_field }}
             </div>
         </div>
+         <div class="col-md-6  col-lg-6">
+                {{ form.paciente|as_crispy_field }}
+         </div>
         <button type="submit" class="btn btn-success">Guardar Obra Social de Paciente</button>
     </form>
     <div class="line"></div>

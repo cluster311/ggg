@@ -25,10 +25,7 @@ class FacturaForm(forms.ModelForm):
         label='Paciente',
         required=False,
         queryset=Paciente.objects.all(),
-        widget=autocomplete.ModelSelect2(
-            url="paciente-autocomplete",
-            attrs={"data-placeholder": "Ingrese nombre, apellido o documento"}
-        ),
+        widget=forms.HiddenInput()
     )
     obra_social = forms.ModelChoiceField(
         label='Obra Social',

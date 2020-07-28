@@ -67,6 +67,7 @@ class ObraSocialCreateView(PermissionRequiredMixin,
             "obras-sociales.lista"
         )
 
+
 class ObraSocialUpdateView(PermissionRequiredMixin, UpdateView):
     model = ObraSocial
     permission_required = "obras_sociales.change_obrasocial"
@@ -153,7 +154,6 @@ class TableroObraSocialPorPorvinciaView(PermissionRequiredMixin, TemplateView):
 def ObraSocialPacienteCreatePopup(request, paciente=None):
     if request.POST:
         form = ObraSocialPacienteCreatePopUp(request.POST)
-        form.paciente_id = paciente
         if form.is_valid():
             instance = form.save()
             return HttpResponse(

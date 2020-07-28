@@ -3,6 +3,7 @@
 {% load static %}
 
 {% block content %}
+    <link rel="stylesheet" href="{% static 'css/ldbtn.min.css' %}">
     <h2>Crear factura {{ object.id }}</h2>
 
     <a role="button" 
@@ -10,20 +11,32 @@
         href="{% url 'recupero.facturas' %}">Volver a la lista</a>
 
     <form method="post" novalidate>
+
     <div class="col-12 col-md-12 " style="display: flex;" >
         <div class="col-6 col-md-6">
-        {% csrf_token %}
+            {% csrf_token %}
             <div class="form-row">
                 <div class="col-md-6  col-lg-6">
                     {{ form.fecha_atencion|as_crispy_field }}
                 </div>
             </div>
             <div class="form-row">
+
                 <div class="col-md-6 col-lg-6" style="display: flex;">
+                    <div class="form-group">
+                        <label class="col-form-label ">
+                            paciente
+                        </label>
+                        <input name="dni" id="id_dni" class="form-control" placeholder="DNI">
+                    </div>
                     {{ form.paciente|as_crispy_field }}
-                    <a href="{%  url 'PacienteCreate' %}" id="add_paciente" class="button-add-popup" onclick="return showAddPopup(this);">
-                        <button type="button" class="btn btn-success">+</button>
-                    </a>
+                     <a  id="add_paciente" class="button-add-popup" >
+                        <button type="button" class="btn btn-success ">
+                            <i class="fa fa-search" id="search"></i>
+                            <i id="loading" style="display: none" class="fa fa-spinner fa-spin"></i>
+                        </button>
+
+                     </a>
                 </div>
                 <div class=" col-md-6  col-lg-6 " style="display: flex;">
                     {{ form.obra_social|as_crispy_field }}
@@ -129,22 +142,57 @@
             win.close();
             $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',$('#id_paciente').val()));
         }
-        function closePopupCleanField(win, newID, newRepr, id) {
-            $(id).append('<option value=' + newID + ' selected >' + newRepr + '</option>')
+        function closePopupCleanField(win, pk, doc) {
+            $("#id_paciente").val(pk);
+            $("#id_dni").val(doc);
             win.close();
-            $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',$('#id_paciente').val()));
+            $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',pk));
             $("#id_obra_social").empty();
         }
+        function showAddPopupPaciente() {
+            var href = "{%  url 'PacienteCreate' %}";
+            var win = window.open(href, 'paciente', 'height=500,width=800,resizable=yes,scrollbars=yes');
+            win.focus();
+            return false;
+        }
+         $('#add_paciente').click(function () {
+            if ($("#id_dni").val().length>=7){
+                var url = '{% url 'BuscarPaciente' dni=None %}'.replace('None',  $("#id_dni").val() );
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: 'json',
+                    beforeSend: function () {
+                        $("#loading").show();
+                        $("#search").hide();
+                    },
+                    success: function (data) {
+                        if (data.encontrado){
+                            $("#id_paciente").val(data.id);
+                        }else{
+                            showAddPopupPaciente();
+                        }
+
+                    },
+                    complete: function () {
+                        $('#search').show();
+                        $('#loading').hide();
+                    },
+                });
+            }
+        });
 
     </script>
     <script type="text/javascript">
-        document.querySelector('select[name="paciente"]').onchange=function() {
-            $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',$('#id_paciente').val()));
-            $("#id_obra_social").empty();
-        };
+
+        //document.querySelector('select[name="paciente"]').onchange=function() {
+        //    $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',$('#id_paciente').val()));
+        //    $("#id_obra_social").empty();
+        //};
+
+
     </script>
 
 
-
-
 {% endblock js_footer %}
+
