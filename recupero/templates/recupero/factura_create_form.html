@@ -48,7 +48,6 @@
                     <a href="{%  url 'ObraSocialPacienteCreate' paciente=None%}" id="add_obrasocial" class="button-add-popup" onclick="return showAddPopup(this);">
                         <button type="button" class="btn btn-success">+</button>
                     </a>
-
                 </div>
             </div>
             <div class="form-row">
@@ -176,7 +175,9 @@
                     },
                     success: function (data) {
                         if (data.encontrado){
-                            $("#id_paciente").val(data.id);
+                            $("#id_paciente").val(data.paciente_id);
+                            $("#id_dni").prop("disabled", true);
+                            $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',data.paciente_id));
                             $("#add_paciente").prop("disabled", true);
                             $("#nombre_paciente").text(data.nombre);
                             $("#loading").hide();

@@ -245,7 +245,8 @@ class CarpetaFamiliarCreateView(PermissionRequiredMixin,
 def BuscarPaciente(request, dni):
     if Paciente.objects.filter(numero_documento=dni).exists():
         paciente = Paciente.objects.get(numero_documento=dni)
-        data = {"id": paciente.id,
+        print(paciente.id)
+        data = {"paciente_id": paciente.id,
                 "nombre": str(paciente.apellidos + ', ' + paciente.nombres),
                 "encontrado": True}
         time.sleep(2)
