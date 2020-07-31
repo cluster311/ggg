@@ -73,6 +73,14 @@ class Profesional(Persona):
         # )
         # self.domicilio = domicilio
         self.agregar_dato_de_contacto('teléfono', tel)
+    
+    def as_anexo2_json(self):
+        ret = {
+            'apellido_y_nombres': f'{self.apellidos}, {self.nombres}',
+            'matricula_profesional': self.matricula_profesional
+        }
+
+        return ret
 
     class Meta:
         permissions = [

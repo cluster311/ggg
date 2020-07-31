@@ -224,12 +224,32 @@ class Factura(TimeStampedModel):
             la librería Anexo2 (en Pypi) requiere
             Requisitos acá: https://github.com/cluster311/Anexo2
             """
-
-        hospital = self.centro_de_salud.as_anexo2_json()
-        if hospital['codigo_hpgd'] is None:
-            hospital['codigo_hpgd'] = 'DESC'  # TODO, no permitido
         
-        beneficiario = self.paciente.as_anexo2_json()
+        # Dict para almacenar errores de datos faltantes
+        errores_generacion = {}
+
+        try:
+            hospital = self.centro_de_salud.as_anexo2_json()
+
+            if hospital['codigo_hpgd'] is None:
+                hospital['codigo_hpgd'] = 'DESC'  # TODO, no permitido
+
+        except AttributeError as error:
+            errores_generacion['hospital'] = "Debe asignar un centro de salud en la factura"
+            hospital = None
+
+        try:
+            beneficiario = self.paciente.as_anexo2_json()
+        except AttributeError as error:
+            errores_generacion['beneficiario'] = "Debe asignar un paciente en la factura"
+            beneficiario = None
+
+        try:
+            profesional = self.profesional.as_anexo2_json()
+        except AttributeError as error:
+            errores_generacion['profesional'] = "Debe asignar un profesional en la factura"
+            profesional = None
+
 
         # TODO Verificar si el cod cie principal puede estar vacío
         cie_principal = 'DESC' if self.codigo_cie_principal is None else self.codigo_cie_principal.code
@@ -245,8 +265,9 @@ class Factura(TimeStampedModel):
 
         # TODO - Hay que agregar tipo de atención a las prestaciones
         atencion = {'tipo': 'consulta', # if tipo is None else tipo
+                    'profesional': profesional,
                     'especialidad': prestFactura.tipo.descripcion,
-                    'codigos_N_HPGD': cod_hpgd,
+                    'codigos_N_HPGD': None,
                     'fecha': {
                         'dia': self.fecha_atencion.day,
                         'mes': self.fecha_atencion.month,
@@ -277,7 +298,7 @@ class Factura(TimeStampedModel):
                 'empresa': empresa
                 }
 
-        return data
+        return data, errores_generacion
 
 
 class FacturaPrestacion(TimeStampedModel):

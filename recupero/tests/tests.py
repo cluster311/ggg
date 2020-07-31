@@ -367,22 +367,3 @@ class RecuperoTests(TestCase, FullUsersMixin):
         request.user = self.user_recupero
         response = TipoPrestacionUpdateView.as_view()(request, pk=self.tipo_prestacion.id)
         self.assertEqual(response.status_code, 200)
-
-    # def test_errores_creacion_Anexo2(self):
-    #     # Generar un error en la generación del anexo 2 y 
-    #     # lo que se ve es esta nueva vista con los errores explicados
-    #     request = self.factory.get('/anexo-II/' + str(self.fact.id))
-
-    #     request.user = self.user_recupero
-
-    #     # Juntar los datos para el Anexo2
-    #     data = self.fact.as_anexo2_json()
-    #     anx = Anexo2(data=data)
-
-    #     # Generar el Anexo2
-    #     res = anx.get_html()
-        
-    #     response = Anexo2View.as_view()(
-    #         request, factura_id=self.fact.id)
-
-    #     self.assertEqual(response.status_code, 200)
