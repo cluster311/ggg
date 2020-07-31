@@ -267,7 +267,7 @@ class Factura(TimeStampedModel):
         atencion = {'tipo': 'consulta', # if tipo is None else tipo
                     'profesional': profesional,
                     'especialidad': prestFactura.tipo.descripcion,
-                    'codigos_N_HPGD': None,
+                    'codigos_N_HPGD': cod_hpgd,
                     'fecha': {
                         'dia': self.fecha_atencion.day,
                         'mes': self.fecha_atencion.month,

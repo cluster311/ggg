@@ -1,5 +1,6 @@
 from django.test import TestCase, RequestFactory, Client
 from django.utils import timezone
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from datetime import datetime
 
@@ -158,3 +159,27 @@ class Anexo2Tests(TestCase, FullUsersMixin):
                 response = self.client.get(url)
 
                 self.assertIn(error, response.content)
+
+
+    def test_permisos_Anexo2(self):
+        '''
+            Corroborar que se les deniega el acceso a ver el Anexo2 
+            a usuarios que no tengan el rol recupero
+        '''
+        self.factory = RequestFactory()
+        
+        # Se definen los kwargs porque tienen que ser pasados junto con la request en el assert
+        # https://stackoverflow.com/questions/48580465/django-requestfactory-loses-url-kwargs
+        kwargs={'factura_id': self.factura_completa.id}
+        url = reverse('recupero.anexo2', kwargs=kwargs)
+        request = self.factory.get(url)
+
+        # Lista de usuarios a probar
+        users = [self.user_admin, self.user_anon, self.user_city, self.user_prof]
+
+        for user in users:
+            with self.subTest(user=user):
+
+                request.user = user
+                with self.assertRaises(PermissionDenied):
+                    Anexo2View.as_view()(request, **kwargs) # Acá se pasan los kwargs definidos más arriba
