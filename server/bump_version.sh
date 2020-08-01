@@ -11,7 +11,3 @@ new_line="VERSION = '$new_version'"
 echo "NEW LINE: $new_line"
 
 sed -i '/'"${line_to_replace}"'/s/.*/'"${new_line}"'/' $version_file
-
-git add $version_file
-git commit -m "Bump version from $old_version to $new_version"
-git push
