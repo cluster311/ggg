@@ -110,6 +110,8 @@ DATABASES = {
         'NAME': os.environ.get('DATABASE_NAME', 'test_db'),
         'USER': os.environ.get('DATABASE_USER', 'postgres'),
         'PASSWORD': os.environ.get('DATABASE_PASSWORD', ''),
+        "HOST": os.environ.get("DATABASE_HOST", "localhost"),
+        "PORT": os.environ.get("DATABASE_PORT", "5432")
     }
 }
 
@@ -169,6 +171,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+PRIVATE_FILES_ROOT = os.path.join(BASE_DIR, 'file_private')
 
 LOGGING = {
     'version': 1,
@@ -262,6 +265,13 @@ GRUPO_CIUDADANO = 'grupo_ciudadano'
 GRUPO_ADMIN = 'grupo_administrativo'
 # Profesionales médicos que dan servicios en el municipio
 GRUPO_PROFESIONAL = 'grupo_profesional'
+# Analistas de datos
+GRUPO_DATOS = 'grupo_datos'
+# Administradores generales (acceso a modificar las listas base)
+GRUPO_SUPER_ADMIN = 'grupo_super_admin'
+# Recupero de gasto
+GRUPO_RECUPERO = 'grupo_recupero'
+
 # ------------------------------------------
 # ------------------------------------------
 try:

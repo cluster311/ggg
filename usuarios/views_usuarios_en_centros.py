@@ -15,15 +15,15 @@ class UsuarioEnCentroDeSaludListView(PermissionRequiredMixin, ListView):
     Lista de Usuarios en Centros de Salud
     """
     model = UsuarioEnCentroDeSalud
-    permission_required = ("view_usuarioencentrodesalud",)
+    permission_required = ("usuarios.view_usuarioencentrodesalud",)
     paginate_by = 10
 
     def get_queryset(self):   
         if 'search' in self.request.GET:
             q = self.request.GET['search']
             objects = UsuarioEnCentroDeSalud.objects.filter(
-                Q(centro__nombre__icontains=q) |
-                Q(especialidad__nombre__icontains=q)
+                Q(centro_de_salud__nombre__icontains=q) |
+                Q(usuario__username__icontains=q)
             )
         else:
             objects = UsuarioEnCentroDeSalud.objects.all()

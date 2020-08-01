@@ -1,5 +1,5 @@
 
-{% if user__es_administrativo or user__es_profesional %}
+{% if user__es_administrativo or user__es_profesional or user__es_super %}
 {# centros de salud autorizados para este usuario #}
 Centro de salud activo
 <select class="custom-select custom-select-sm" 
@@ -139,7 +139,7 @@ Centro de salud activo
     </li>
     {% endif %}
 
-    {% if perms.calendario.add_turno or perms.calendario.can_schedule_turno or perms.profesionales.add_consulta or perms.calendario.can_view_misturnos %}
+    {% if perms.calendario.add_turno or perms.calendario.can_schedule_turno or perms.pacientes.add_consulta or perms.pacientes.view_consulta or perms.calendario.can_view_misturnos %}
     <li>
         <!-- menu link suelto <a href="#">Otro Menu principal</a> -->
         <a href="#menu_turnos" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Turnos</a>
@@ -162,13 +162,7 @@ Centro de salud activo
         </li>
         {% endif %}
 
-        {% if perms.calendario.can_gestionar_turnos %}
-        <li>
-            <a href="{% url 'calendario.gestion_turnos' %}">Gestion de turnos</a>
-        </li>
-        {% endif %}
-
-        {% if perms.profesionales.add_consulta %}
+        {% if perms.pacientes.view_consulta %}
         <li>
             <a href="{% url 'profesionales.home' %}">Turnos profesional</a>
         </li>
@@ -207,12 +201,9 @@ Centro de salud activo
         <ul class="collapse list-unstyled" id="menu_recupero">
         {% if perms.recupero.view_factura %}
         <li>
-            <a href="{% url 'recupero.factura.lista-pendientes-envio' %}">Facturación pendiente de envío</a>
+            <a href="{% url 'recupero.facturas' %}">Facturación</a>
         </li>
             
-        <li>
-            <a href="{% url 'recupero.factura.lista-pendientes-cobro' %}">Facturación pendiente de cobro</a>
-        </li>
         {% endif %}
         
         {% if perms.recupero.view_tipodocumentoanexo %}

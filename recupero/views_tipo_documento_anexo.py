@@ -15,7 +15,8 @@ class TipoDocumentoAnexoListView(PermissionRequiredMixin, ListView):
     Lista de tipos de prestaciones habilitadas para recuperar
     """
     model = TipoDocumentoAnexo
-    permission_required = ("view_tipodocumentoanexo",)
+    permission_required = ("recupero.view_tipodocumentoanexo",)
+    raise_exception = True
     paginate_by = 10
 
     def get_queryset(self):   
@@ -44,9 +45,10 @@ class TipoDocumentoAnexoCreateView(PermissionRequiredMixin,
                                    CreateView,
                                    SuccessMessageMixin):
     model = TipoDocumentoAnexo
-    permission_required = ("view_tipodocumentoanexo",)
+    permission_required = ("recupero.add_tipodocumentoanexo",)
     fields = ['nombre']
     success_message = "Creado con éxito."
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -62,7 +64,8 @@ class TipoDocumentoAnexoCreateView(PermissionRequiredMixin,
 
 class TipoDocumentoAnexoDetailView(PermissionRequiredMixin, DetailView):
     model = TipoDocumentoAnexo
-    permission_required = ("view_tipodocumentoanexo",)
+    permission_required = ("recupero.view_tipodocumentoanexo",)
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -73,9 +76,10 @@ class TipoDocumentoAnexoDetailView(PermissionRequiredMixin, DetailView):
 
 class TipoDocumentoAnexoUpdateView(PermissionRequiredMixin, UpdateView):
     model = TipoDocumentoAnexo
-    permission_required = "change_tipodocumentoanexo"
+    permission_required = "recupero.change_tipodocumentoanexo"
     fields = ['nombre']
     success_message = "Actualizado con éxito."
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

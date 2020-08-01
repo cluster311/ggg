@@ -7,9 +7,15 @@ from django.shortcuts import get_object_or_404, render
 from django.utils.dateparse import parse_datetime
 from django.views.decorators.http import require_http_methods
 import json
+
+from calendario.decorators import centro_de_salud_habilitado_form, \
+    centro_de_salud_habilitado_pk
 from calendario.models import Turno
 from calendario.forms import BulkTurnoForm, FeedForm, TurnoForm
 import logging
+
+from usuarios.models import UsuarioEnCentroDeSalud
+
 logger = logging.getLogger(__name__)
 from django.contrib.auth.decorators import permission_required
 from centros_de_salud.models import Servicio, Especialidad
@@ -17,9 +23,14 @@ from pacientes.models import Paciente
 from obras_sociales.models import ObraSocial
 
 
-@permission_required('calendario.view_turno')
+@permission_required('calendario.view_turno', raise_exception=True)
 @require_http_methods(["GET"])
 def index(request):
+    '''
+        Vista inicial con calendario que permite agregar turnos
+
+        Grupo acceso disponible: grupo_administrativo
+    '''
     context = {
         'modal_title': 'Agregar turno',
         'modal_close': 'Cancelar',
@@ -43,9 +54,15 @@ def index(request):
     return render(request, 'calendario.html', context)
 
 
-@permission_required('calendario.add_turno')
+@permission_required('calendario.add_turno', raise_exception=True)
 @require_http_methods(["POST"])
+@centro_de_salud_habilitado_form
 def add_appointment(request):
+    '''
+        Recibe los datos del formulario para crear los turnos disponibles
+
+        Grupo acceso disponible: grupo_administrativo
+    '''
     form_data = json.loads(request.body)
     if form_data['bulk']:
         form = BulkTurnoForm(form_data)
@@ -81,7 +98,14 @@ def add_appointment(request):
     return JsonResponse(response_data)
 
 
+@permission_required('calendario.add_turno', raise_exception=True)
+@require_http_methods(["GET"])
 def copy_appointments(request):
+    '''
+        Copia los turnos de la semana anterior a la semana actual
+        
+        Grupo acceso disponible: grupo_administrativo
+    '''
     if 'start' in request.GET:
         c_start = parse_datetime(request.GET['start'])
     else:
@@ -129,10 +153,14 @@ def copy_appointments(request):
     )
 
 
-
-@permission_required('calendario.view_turno')
+@permission_required('calendario.view_turno', raise_exception=True)
 @require_http_methods(["GET"])
 def feed(request, servicio=None):
+    '''
+        Vista llamada al inicializar el calendario que devuelve los turnos disponibles 
+
+        Grupo acceso disponible: grupo_administrativo
+    '''
     turnos = get_appointments_list(servicio, user=request.user, **request.GET)
     turnos = [{
         'id': t.id,
@@ -150,6 +178,10 @@ def feed(request, servicio=None):
 
 
 def get_appointments_list(servicio, user, **kwargs):
+    '''
+        Función usada para obtener los turnos en base al 
+        servicio, usuario que lo solicita y otros argumentos
+    '''
     if 'id' in kwargs:
         pk = kwargs['id'][0] if isinstance(kwargs['id'], list) else \
              kwargs['id']
@@ -165,111 +197,40 @@ def get_appointments_list(servicio, user, **kwargs):
         kw['fin__lte'] = parse_datetime(end)
     if servicio is not None:
         kw['servicio__pk'] = servicio
-        kw['estado'] = 0
+        kw['estado__in'] = [Turno.DISPONIBLE, Turno.CANCELADO_PACIENTE, Turno.CANCELADO_ESTABLECIMIENTO]
         return Turno.objects.filter(**kw)
     else:
-        csp = user.centros_de_salud_permitidos.all()
+        csp = user.centros_de_salud_permitidos.filter(estado=UsuarioEnCentroDeSalud.EST_ACTIVO)
         centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
         
         return Turno.objects.filter(servicio__centro__in=centros_de_salud_permitidos, **kw)
 
 
-@permission_required('calendario.can_schedule_turno')
+@permission_required('calendario.can_schedule_turno', raise_exception=True)
 @require_http_methods(["GET"])
 def agendar(request):
+    '''
+        Vista que permite agendar turnos disponibles de las 
+        Especialidades disponibles en Centros de Salud
+
+        Grupo acceso disponible: grupo_administrativo
+    '''
     context = {
-        'especialidades': Especialidad.objects.all(),
+        'obras_sociales': ObraSocial.objects.all(),
         'sys_logo': settings.SYS_LOGO
     }
     return render(request, 'calendario-agregar.html', context)
 
 
-@permission_required('calendario.can_schedule_turno')
+@permission_required('calendario.can_schedule_turno', raise_exception=True)
 @require_http_methods(["PUT"])
+@centro_de_salud_habilitado_pk
 def confirm_turn(request, pk):
-    instance = get_object_or_404(Turno, id=pk)
-    form_data = json.loads(request.body)
-    form_data['solicitante'] = request.user
-    form = TurnoForm(form_data, instance=instance)
-    save, result = form.update(form_data)
-    if save:
-        return JsonResponse({
-            'success': save,
-            'turno': instance.as_json()}
-        )
-    else:
-        return JsonResponse({
-            'success': save,
-            'errors': result}
-        )
+    '''
+        Confirma el turno de un paciente (Llamada mediante Ajax)
 
-
-@permission_required('calendario.can_change_turno')
-@require_http_methods(["PUT"])
-def edit_turn(request, pk):
-    instance = get_object_or_404(Turno, id=pk)
-    form_data = json.loads(request.body)
-    form = TurnoForm(form_data, instance=instance)
-    save, result = form.change_state(form_data)
-    if save:
-        return JsonResponse({
-            'success': save,
-            'turno': instance.as_json()}
-        )
-    else:
-        return JsonResponse({
-            'success': save,
-            'errors': result}
-        )
-
-
-@permission_required('calendario.can_view_misturnos')
-@require_http_methods(["GET"])
-def mis_turnos(request):
-    today = datetime.now().replace(hour=0,minute=0,second=0)
-    turnos = Turno.objects.filter(
-        (Q(solicitante=request.user) | Q(paciente__user=request.user))
-        ).filter(inicio__gt=today).order_by('inicio')
-    context = {
-        'turnos' : turnos,
-        'CANCELADO_PACIENTE': Turno.CANCELADO_PACIENTE,
-        'CANCELADO_ESTABLECIMIENTO': Turno.CANCELADO_ESTABLECIMIENTO,
-    }
-    return render(request, 'mis-turnos.html', context)
-
-
-@permission_required('calendario.can_cancel_turno')
-@require_http_methods(["PUT"])
-def cancelar_turno(request, pk):
-    instance = get_object_or_404(Turno, id=pk)
-    form_data = {'state': Turno.CANCELADO_PACIENTE}
-    form = TurnoForm(form_data, instance=instance)
-    save, result = form.change_state(form_data)
-    if save:
-        return JsonResponse({
-            'success': save,
-            'turno': instance.as_json()}
-        )
-    else:
-        return JsonResponse({
-            'success': save,
-            'errors': result}
-        )
-
-
-@permission_required('calendario.can_gestionar_turnos')
-@require_http_methods(["GET"])
-def gestion_turnos(request):
-    context = {
-        'servicios': Servicio.objects.all(),
-        'obras_sociales': ObraSocial.objects.all()
-    }
-    return render(request, 'calendario-gestionar.html', context)
-
-
-@permission_required('calendario.can_gestionar_turnos')
-@require_http_methods(["PUT"])
-def gestion_turno(request, pk):
+        Grupo acceso disponible: grupo_administrativo
+    '''
     instance = get_object_or_404(Turno, id=pk)
     form_data = json.loads(request.body)
     logger.info(f'Gestion de turno {pk}: {form_data}')
@@ -287,9 +248,87 @@ def gestion_turno(request, pk):
             'errors': result}
         )
 
-@permission_required('calendario.can_gestionar_turnos')
+
+@permission_required('calendario.change_turno', raise_exception=True)
+@require_http_methods(["PUT"])
+@centro_de_salud_habilitado_pk
+def edit_turn(request, pk):
+    '''
+        Edita el estado de un turno (Llamada mediante Ajax)
+
+        Grupo acceso disponible: grupo_administrativo
+    '''
+    instance = get_object_or_404(Turno, id=pk)
+    form_data = json.loads(request.body)
+    form = TurnoForm(form_data, instance=instance)
+    save, result = form.change_state(form_data)
+    if save:
+        return JsonResponse({
+            'success': save,
+            'turno': instance.as_json()}
+        )
+    else:
+        return JsonResponse({
+            'success': save,
+            'errors': result}
+        )
+
+
+@permission_required('calendario.can_view_misturnos', raise_exception=True)
+@require_http_methods(["GET"])
+def mis_turnos(request):
+    '''
+        Muestra información sobre los turnos solicitados 
+        por el usuario con la posibilidad de cancelarlo
+
+        Grupo acceso disponible: grupo_ciudadano
+    '''
+    today = datetime.now().replace(hour=0,minute=0,second=0)
+    turnos = Turno.objects.filter(
+        (Q(solicitante=request.user) | Q(paciente__user=request.user))
+        ).filter(inicio__gt=today).order_by('inicio')
+    context = {
+        'turnos' : turnos,
+        'CANCELADO_PACIENTE': Turno.CANCELADO_PACIENTE,
+        'CANCELADO_ESTABLECIMIENTO': Turno.CANCELADO_ESTABLECIMIENTO,
+    }
+    return render(request, 'mis-turnos.html', context)
+
+
+@permission_required('calendario.can_cancel_turno', raise_exception=True)
+@require_http_methods(["PUT"])
+@centro_de_salud_habilitado_pk
+def cancelar_turno(request, pk):
+    '''
+        Vista para cambiar el estado de un turno a 'Cancelado por el paciente'
+        (Llamada mediante Ajax)
+
+        Grupo acceso disponible: grupo_administrativo
+    '''
+    instance = get_object_or_404(Turno, id=pk)
+    form_data = {'state': Turno.CANCELADO_PACIENTE}
+    form = TurnoForm(form_data, instance=instance)
+    save, result = form.change_state(form_data)
+    if save:
+        return JsonResponse({
+            'success': save,
+            'turno': instance.as_json()}
+        )
+    else:
+        return JsonResponse({
+            'success': save,
+            'errors': result}
+        )
+
+@permission_required('calendario.can_schedule_turno', raise_exception=True)
 @require_http_methods(["POST"])
+@centro_de_salud_habilitado_pk
 def crear_sobreturno(request, pk):
+    '''
+        Crea un nuevo turno después del último disponible.
+
+        Grupo acceso disponible: grupo_administrativo
+    '''
     instance = get_object_or_404(Turno, id=pk)
     form = TurnoForm({}, instance=instance)
     save, result = form.sobreturno()

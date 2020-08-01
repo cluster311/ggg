@@ -1,0 +1,10 @@
+[run]
+source = .
+omit = 
+    manage.py
+    */migrations/*
+
+[report]
+fail_under = 10
+show_missing = False
+skip_covered = False

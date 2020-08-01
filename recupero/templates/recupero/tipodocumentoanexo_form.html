@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-    <h2>Nuevo tipo de documentop anexo</h2>
+    <h2>Nuevo tipo de documento anexo</h2>
     <a role="button" class="btn btn-warning btn-sm active" href="{% url 'recupero.tipos-doc-anexo' %}">Volver a la lista</a>
     <form method="post" novalidate>
     {% csrf_token %}
@@ -14,6 +14,7 @@
 
 {% endblock %}
 {% block js_footer %}
+    {{ block.super }}
     <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
     {{ form.media }}
 {% endblock js_footer %}

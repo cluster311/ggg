@@ -3,29 +3,30 @@ from django.test import TestCase, RequestFactory
 from django.test import Client
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from profesionales.models import Profesional
-from .views import ProfesionalHome
+from core.base_permission import start_roles_and_permissions, create_test_users
+from .models import Profesional
+from .views import ProfesionalHome, ProfesionalListView, ProfesionalCreateView, ProfesionalUpdateView, \
+    ProfesionalDetailView
 
 
 class FullUsersMixin:
     def create_users_and_groups(self):
         #create permissions group
-        self.group_city, created = Group.objects.get_or_create(name=settings.GRUPO_CIUDADANO)
-        self.group_admin, created = Group.objects.get_or_create(name=settings.GRUPO_ADMIN)
-        self.group_prof, created = Group.objects.get_or_create(name=settings.GRUPO_PROFESIONAL)
+        start_roles_and_permissions()
+        ret = create_test_users()
+
+        self.group_city = ret['group_city']
+        self.group_admin = ret['group_admin']
+        self.group_prof = ret['group_prof']
+        self.group_recupero = ret['group_recupero']
         
-        self.user_anon = AnonymousUser()
-        self.user_city = User.objects.create_user(username="city", email="city@test.com", password="city")
-        self.user_city.groups.add(self.group_city)
-        self.user_admin = User.objects.create_user(username="admin", email="admin@test.com", password="admin")
-        self.user_admin.groups.add(self.group_admin)
-        prof = Profesional.objects.create(nombres="prof name", numero_documento="10101090")
-        self.user_prof = User.objects.create_user(username="prof", email="prof@test.com", password="prof")
-        prof.user = self.user_prof
-        self.user_prof.groups.add(self.group_prof)
+        self.user_anon = ret['user_anon']
+        self.user_city = ret['user_city']
+        self.user_admin = ret['user_admin']
+        self.user_prof = ret['user_prof']
+        self.user_recupero = ret['user_recupero']
 
 class ProfesionalesTests(TestCase, FullUsersMixin):
-
 
     def setUp(self):
         self.c = Client()
@@ -66,25 +67,132 @@ class ProfesionalHomeTest(TestCase, FullUsersMixin):
 
     def test_environment_set_in_context(self):
         request = self.factory.get('/')
-        view = ProfesionalHome()
-        
-        request.user = self.user_anon
-        try:
-            view.setup(request)
-            assert 'Anon access to profesional'
-        except PermissionDenied:
-            pass
-        
-        request.user = self.user_admin
-        try:
-            view.setup(request)
-            assert 'ADMIN access to profesional'
-        except PermissionDenied:
-            pass
+        request.user = self.user_city
+        with self.assertRaises(PermissionDenied):
+            ProfesionalHome.as_view()(request)
 
+        request.user = self.user_anon
+        with self.assertRaises(PermissionDenied):
+            ProfesionalHome.as_view()(request)
+
+        request.user = self.user_prof
+        response = ProfesionalHome.as_view()(request)
+        self.assertEqual(response.status_code, 200)
+
+        request.user = self.user_admin
+        with self.assertRaises(PermissionDenied):
+            ProfesionalHome.as_view()(request)
+
+        view = ProfesionalHome()
         request.user = self.user_prof
         view.setup(request)
         context = view.get_context_data()
         self.assertIn('hoy', context)
         self.assertIn('estados', context)
-    
+
+
+class ProfesionalListViewTest(TestCase, FullUsersMixin):
+    def setUp(self):
+        # Every test needs access to the request factory.
+        self.factory = RequestFactory()
+
+        self.create_users_and_groups()
+
+    def test_login(self):
+        request = self.factory.get('/profesionales/lista.html')
+        request.user = self.user_city
+        with self.assertRaises(PermissionDenied):
+            ProfesionalListView.as_view()(request)
+
+        request.user = self.user_anon
+        with self.assertRaises(PermissionDenied):
+            ProfesionalListView.as_view()(request)
+
+        request.user = self.user_prof
+        with self.assertRaises(PermissionDenied):
+            ProfesionalListView.as_view()(request)
+
+        request.user = self.user_admin
+        response = ProfesionalListView.as_view()(request)
+        self.assertEqual(response.status_code, 200)
+
+
+class ProfesionalCreateViewTest(TestCase, FullUsersMixin):
+    def setUp(self):
+        # Every test needs access to the request factory.
+        self.factory = RequestFactory()
+
+        self.create_users_and_groups()
+
+    def test_login(self):
+        request = self.factory.get('/profesionales/crear-profesional.html')
+        request.user = self.user_city
+        with self.assertRaises(PermissionDenied):
+            ProfesionalCreateView.as_view()(request)
+
+        request.user = self.user_anon
+        with self.assertRaises(PermissionDenied):
+            ProfesionalCreateView.as_view()(request)
+
+        request.user = self.user_prof
+        with self.assertRaises(PermissionDenied):
+            ProfesionalCreateView.as_view()(request)
+
+        request.user = self.user_admin
+        with self.assertRaises(PermissionDenied):
+            ProfesionalCreateView.as_view()(request)
+
+
+class ProfesionalUpdateViewTest(TestCase, FullUsersMixin):
+    def setUp(self):
+        # Every test needs access to the request factory.
+        self.factory = RequestFactory()
+
+        self.create_users_and_groups()
+
+    def test_login(self):
+        request = self.factory.get('/profesionales/editar-profesional.html/')
+        request.user = self.user_city
+        with self.assertRaises(PermissionDenied):
+            ProfesionalUpdateView.as_view()(request)
+
+        request.user = self.user_anon
+        with self.assertRaises(PermissionDenied):
+            ProfesionalUpdateView.as_view()(request)
+
+        request.user = self.user_prof
+        with self.assertRaises(PermissionDenied):
+            ProfesionalUpdateView.as_view()(request)
+
+        request.user = self.user_admin
+        with self.assertRaises(PermissionDenied):
+            ProfesionalUpdateView.as_view()(request)
+
+
+class ProfesionalDetailViewTest(TestCase, FullUsersMixin):
+    def setUp(self):
+        # Every test needs access to the request factory.
+        self.factory = RequestFactory()
+
+        self.create_users_and_groups()
+
+    def test_login(self):
+        request = self.factory.get('/profesionales/detalle-profesional.html/1/')
+
+        request.user = self.user_city
+        with self.assertRaises(PermissionDenied):
+            ProfesionalDetailView.as_view()(request)
+
+        request.user = self.user_anon
+        with self.assertRaises(PermissionDenied):
+            ProfesionalDetailView.as_view()(request)
+
+        request.user = self.user_prof
+        with self.assertRaises(PermissionDenied):
+            ProfesionalDetailView.as_view()(request)
+
+        request.user = self.user_admin
+        profesional = Profesional.objects.get(user=self.user_prof)
+        response = ProfesionalDetailView.as_view()(request, pk=profesional.pk)
+        self.assertEqual(response.status_code, 200)
+

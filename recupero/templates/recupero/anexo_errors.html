@@ -1,0 +1,35 @@
+{% extends "base_admin.html" %}
+
+{% load static %}
+{% block title %} Anexo II {% endblock %}
+{% block content %}
+<div class="alert alert-danger">
+  Se detectaron los siguientes errores en la generación del Anexo II:
+</div>
+<div class="col-9">
+    <!-- Loop en cada sección del Anexo2 -->
+    {% for seccion, errores in errors.items %}
+    <div>
+      <h5>Sección: {{ seccion }}</h5>
+      <b>Errores:</b>
+      <ul>
+        <!-- Loop en cada error de la sección -->
+        {% for error in errores %}
+          {% for k, v in error.items %}
+
+          <!-- Ej: apellido_y_nombres - null value not allowed -->
+          <li>{{ k }} - {{ v.0 }}</li>
+
+          {% endfor %}
+        {% endfor %}
+      </ul>
+      <div class="dropdown-divider"></div>
+    </div> 
+    {% endfor %}
+  
+</div>
+
+<a role="button" class="btn btn-warning btn-sm active" href="{% url 'recupero.facturas' %}">Volver</a>
+
+
+{% endblock %}

@@ -12,16 +12,26 @@ function cargarData(data){
     $("#paciente-doc").html(data.extendedProps.patient.numero_documento);
   }
   const ASIGNADO = "{{turno_states.ASIGNADO}}";
+  const CANCELADO_ESTABLECIMIENTO = "{{turno_states.CANCELADO_ESTABLECIMIENTO}}";
+  const ATENDIDO = "{{turno_states.ATENDIDO}}";
   $("#title").html(data.title);
   $("#start").html(formatDatetime(data.start));
   $("#state").html(states[data.extendedProps.status].replace(/\_/g, ' '));
+  $("#btnCancelar").prop('disabled','');
+  $("#btnCancelar").attr('class','btn btn-danger');
   if (data.extendedProps.status == ASIGNADO){
     /*Solo se podra confirmar el turno cuando este ASIGNADO
       y el paciente llegue */
     $("#btnConfirmar").prop('disabled','');
+    $("#btnConfirmar").attr('class','btn btn-primary');
   }
   else{
     $("#btnConfirmar").prop('disabled','disabled');
+    $("#btnConfirmar").attr('class','btn btn-dark');
+    if ((data.extendedProps.status == CANCELADO_ESTABLECIMIENTO)||(data.extendedProps.status == ATENDIDO)){
+        $("#btnCancelar").prop('disabled','disabled');
+        $("#btnCancelar").attr('class','btn btn-dark');
+    }
   }
   $("#idTurno").val(data.id);
 }
@@ -103,10 +113,12 @@ function crearSobreturno(){
       </div>
       <input hidden id="idTurno">
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" onclick="crearSobreturno()">Crear Sobreturno</button>
-        <button type="button" class="btn btn-danger" onclick="cancelarTurno()">Cancelar Turno</button>
-        <button type="button" class="btn btn-primary" id='btnConfirmar'
+        <div class="container" >
+        <button type="button" class="btn btn-primary espacio-margin"  onclick="crearSobreturno()">Crear Sobreturno</button>
+        <button type="button" class="btn btn-danger espacio-margin"  onclick="cancelarTurno()">Cancelar Turno</button>
+        <button type="button" class="btn btn-primary espacio-margin"  id='btnConfirmar'
           onclick="confirmarTurno()">Confirmar</button>
+        </div>
       </div>
     </div>
   </div>

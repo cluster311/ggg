@@ -11,11 +11,13 @@ from .models import Especialidad
 
 
 class EspecialidadListView(PermissionRequiredMixin, ListView):
-    """
-    Lista de Especialidades
-    """
+    '''
+        Listado de Especialidades
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = Especialidad
-    permission_required = ("view_especialidad",)
+    permission_required = ("centros_de_salud.view_especialidad",)
     paginate_by = 10
 
     def get_queryset(self):   
@@ -43,8 +45,13 @@ class EspecialidadListView(PermissionRequiredMixin, ListView):
 class EspecialidadCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
+    '''
+        Vista de creación de Especialidades
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = Especialidad
-    permission_required = ("view_especialidad",)
+    permission_required = ("centros_de_salud.add_especialidad",)
     fields = ['nombre', 'tiempo_predeterminado_turno']
     success_message = "Creado con éxito."
 
@@ -61,8 +68,13 @@ class EspecialidadCreateView(PermissionRequiredMixin,
 
 
 class EspecialidadDetailView(PermissionRequiredMixin, DetailView):
+    '''
+        Vista detallada de Especialidades
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = Especialidad
-    permission_required = ("view_especialidad",)
+    permission_required = ("centros_de_salud.view_especialidad",)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -72,8 +84,13 @@ class EspecialidadDetailView(PermissionRequiredMixin, DetailView):
 
 
 class EspecialidadUpdateView(PermissionRequiredMixin, UpdateView):
+    '''
+        Vista de actualización de Especialidades
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = Especialidad
-    permission_required = "change_especialidad"
+    permission_required = "centros_de_salud.change_especialidad"
     fields = ['nombre', 'tiempo_predeterminado_turno']
     success_message = "Actualizado con éxito."
 

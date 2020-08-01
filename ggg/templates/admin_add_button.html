@@ -1,3 +1,5 @@
-<a role="button" 
-    class="btn btn-warning btn-me active" 
-    href="{% url add_url %}">Agregar</a>
+    <div class="form-group col-md-1 {% if use_filter_bar %}admin-add-bar{% endif %}">
+        <a role="button"
+        class="btn btn-warning btn-me active"
+        href="{% url add_url %}">Agregar</a>
+    </div>

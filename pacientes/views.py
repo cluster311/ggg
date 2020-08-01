@@ -8,21 +8,32 @@ from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMi
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
 from django.conf import settings
-from .models import Consulta, CarpetaFamiliar
+
+from recupero.models import Prestacion, Factura, FacturaPrestacion
+from .models import Consulta, CarpetaFamiliar, Receta, Derivacion, Paciente
 from especialidades.models import MedidasAnexasEspecialidad, MedidaAnexaEnConsulta
-from especialidades.forms import MedidaAnexaEnConsultaForm
+from especialidades.forms import MedidaAnexaEnConsultaForm, MedidaAnexaEnConsultaFormset
 from calendario.models import Turno
 from .forms import (EvolucionForm, ConsultaForm,
                    RecetaFormset, DerivacionFormset, 
-                   PrestacionFormset, CarpetaFamiliarForm)
+                   PrestacionFormset, CarpetaFamiliarForm, PacienteFormPopUp)
+from recupero.forms import FacturaPrestacionFormSet
 from crispy_forms.utils import render_crispy_form
 import logging
 logger = logging.getLogger(__name__)
+
+
+def PacienteCreatePopup(request):
+    form = PacienteFormPopUp(request.POST or None)
+    if form.is_valid():
+        instance = form.save()
+        return HttpResponse(
+            '<script>opener.closePopupCleanField(window, "%s", "%s", "#id_paciente");</script>' % (instance.pk, instance))
+    return render(request, "pacientes/paciente_createview.html", {"form": form})
 
 
 class ConsultaListView(PermissionRequiredMixin, ListView):
@@ -31,8 +42,9 @@ class ConsultaListView(PermissionRequiredMixin, ListView):
     """
 
     model = Consulta
-    permission_required = ("can_view_tablero",)
+    permission_required = ("pacientes.view_consulta",)
     template_name = "pacientes/consulta_listview.html"
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -50,8 +62,9 @@ class ConsultaDetailView(PermissionRequiredMixin, DetailView):
     """
 
     model = Consulta
-    permission_required = ("view_consulta",)
+    permission_required = ("pacientes.view_consulta",)
     template_name = "pacientes/consulta_detailview.html"
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -87,32 +100,29 @@ class ConsultaMixin:
             context['consultas_previas'] = None
         else:
             # evitar la consulta automática que se creo en relacion al turno
+            consultas_previas_completas = []
             consultas_previas = Consulta.objects.filter(
                 paciente=instance.paciente
-                ).exclude(pk=instance.pk).order_by('-created')
-            context['consultas_previas'] = consultas_previas
+                ).exclude(pk=instance.pk).exclude(turno__estado__in=[Turno.ASIGNADO, Turno.ESPERANDO_EN_SALA, Turno.CANCELADO_PACIENTE]).order_by('-created')
+            for cp in consultas_previas:
+                mac = MedidaAnexaEnConsulta.objects.filter(consulta=cp)
+                rec = Receta.objects.filter(consulta=cp)
+                der = Derivacion.objects.filter(consulta=cp)
+                pre = Prestacion.objects.filter(consulta=cp)
+                consultas_previas_completas.append((cp, mac, rec, der, pre))
+            context['consultas_previas'] = consultas_previas_completas
         
-        # ver las medidas anexas que deben tomarse
-        # asegurarse de no duplicar si ya se crearon antes
-        # TODO ver si esto podría hacerse al momento de crear la consulta en la aceptación de turno
         consulta = self.object
         medidas_a_tomar = MedidasAnexasEspecialidad.objects.filter(
             especialidad=consulta.especialidad
         )
-        medidas_en_consulta = []
         for medida in medidas_a_tomar:
-            medida_en_consulta, created = MedidaAnexaEnConsulta.objects.get_or_create(
+            MedidaAnexaEnConsulta.objects.get_or_create(
                 consulta=consulta,
                 medida=medida.medida
                 )
-            
-            frm = MedidaAnexaEnConsultaForm(instance=medida_en_consulta, obligatorio=medida.obligatorio)
-            medidas_en_consulta.append({'medida_en_consulta': medida_en_consulta,
-                                        'frm': frm,
-                                        'medida_en_especialidad': medida})
-        
-        context['medidas_en_consulta'] = medidas_en_consulta
-
+        context["recetas_frm"] = RecetaFormset(data, prefix='Recetas', instance=instance)
+        context["medidas_frm"] = MedidaAnexaEnConsultaFormset(data, prefix='Medidas', instance=instance)
         return context
 
     def form_valid(self, form):
@@ -121,6 +131,7 @@ class ConsultaMixin:
         rs = context["recetas_frm"]
         ds = context["derivaciones_frm"]
         ps = context["prestaciones_frm"]
+        ms = context["medidas_frm"]
 
         self.object = form.save()
         logger.info(f'Pasando el turno {self.object.turno} a "atendido"')
@@ -140,25 +151,41 @@ class ConsultaMixin:
             ps.instance = self.object
             ps.save()
         
-        # TODO usar MedidaAnexaEnConsultaForm
-        data = context["data"]
-        for field, value in data.items():
-            if field.startswith('medida_'):
-                medida_en_consulta_id = field.split('_')[1]
-                medida_en_consulta = MedidaAnexaEnConsulta.objects.get(pk=medida_en_consulta_id)
+        # ISSUE usar MedidaAnexaEnConsultaForm
+        # https://github.com/cluster311/ggg/issues/120
+        if ms.is_valid():
+            ms.instance = self.object
+            ms.save()
+        
+        consulta = self.object
 
-                try:
-                    a = float(value)
-                except:
-                    error = 'Valor inválido para {medida_en_consulta.medida_en_consulta.nombre}'
-                    logger.error(error)
-                    # form.add_error(None, error)
-                else:
-                    medida_en_consulta.valor = value
-                    medida_en_consulta.save()
+        # TODO #248 - Determinar con que OS se atiende el paciente en la consulta
+        os_paciente = consulta.paciente.m2m_obras_sociales.first().obra_social
+
+        nueva_factura = Factura(
+            consulta=consulta, 
+            obra_social=os_paciente,
+            fecha_atencion=consulta.fecha,
+            centro_de_salud=consulta.turno.servicio.centro,
+            paciente=consulta.paciente,
+            codigo_cie_principal=consulta.codigo_cie_principal,
+            )
+        
+        # Guardar la factura antes de agregar los códigos CIE secundarios (M2M)
+        nueva_factura.save()
+
+        # Agregar códigos CIE secundarios a la factura
+        cod_secundarios = [cod for cod in consulta.codigos_cie_secundarios.all()]
+        nueva_factura.codigos_cie_secundarios.set(cod_secundarios)
+
+        # Crear formset de prestaciones de la factura
+        # con los datos de prestaciones de la consulta
+        prestaciones = FacturaPrestacionFormSet(ps.data, prefix='Prestaciones', instance=nueva_factura)
+
+        if prestaciones.is_valid():
+            prestaciones.save()
 
         return super().form_valid(form)
-
 
 class EvolucionUpdateView(ConsultaMixin, 
                           SuccessMessageMixin, 
@@ -167,10 +194,11 @@ class EvolucionUpdateView(ConsultaMixin,
                           UpdateView):
     """Evolución /Consulta de paciente"""
     model = Consulta
-    permission_required = ("add_consulta",)
+    permission_required = ("pacientes.add_consulta",)
     template_name = "pacientes/evolucion.html"
     form_class = EvolucionForm
     success_message = "Datos guardados con éxito."
+    raise_exception = True
 
     def test_func(self):
         # ver si este profesional es el dueño de la consulta
@@ -187,7 +215,6 @@ class EvolucionUpdateView(ConsultaMixin,
     def get_success_url(self):
         return reverse(
             "profesionales.home",
-            kwargs=({"dni": self.object.paciente.numero_documento}),
         )
 
 
@@ -197,7 +224,7 @@ class CarpetaFamiliarCreateView(PermissionRequiredMixin,
     model = CarpetaFamiliar
     success_message = "Carpeta creada con éxito."
     form_class = CarpetaFamiliarForm
-    permission_required = ("calendario.can_gestionar_turnos",)
+    permission_required = ("calendario.can_schedule_turno",)
 
     # descomentar si queremos un boton con link arriba a la derecha
     # def get_context_data(self, **kwargs):
@@ -209,5 +236,5 @@ class CarpetaFamiliarCreateView(PermissionRequiredMixin,
 
     def get_success_url(self):
         return reverse(
-            "calendario.gestion_turno"
+            "calendario.agendar"
         )

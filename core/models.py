@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from model_utils import Choices
 from address.models import AddressField
 from django.contrib.auth.models import User
@@ -10,7 +11,7 @@ from django.utils.timezone import now
 import logging
 
 logger = logging.getLogger(__name__)
-
+private_file_storage = FileSystemStorage(location=settings.PRIVATE_FILES_ROOT)
 
 class Persona(models.Model):
     VINCULO_TYPE = Choices(
@@ -73,7 +74,9 @@ class Persona(models.Model):
 
     @property
     def edad(self):
-        return (now().date() - self.fecha_nacimiento).days / 365
+        if self.fecha_nacimiento is None:
+            return None
+        return int((now().date() - self.fecha_nacimiento).days / 365.2425)
 
     class Meta:
         abstract = True

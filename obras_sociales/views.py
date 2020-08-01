@@ -7,17 +7,19 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from django.http import Http404
-from django.shortcuts import get_object_or_404
+from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.conf import settings
+
+from pacientes.models import Paciente
+from .forms import ObraSocialPacienteCreatePopUp
 from .models import ObraSocial
 
 
-@method_decorator(cache_page(60 * 5), name='dispatch')
 class ObraSocialListView(PermissionRequiredMixin, ListView):
     model = ObraSocial
-    permission_required = ("view_obrasocial",)
+    permission_required = ("obras_sociales.view_obrasocial",)
     paginate_by = 10  # pagination
 
     def get_queryset(self):        
@@ -39,7 +41,7 @@ class ObraSocialListView(PermissionRequiredMixin, ListView):
         context['title'] = 'Lista de Obras sociales'
         context['title_url'] = 'obras-sociales.lista'
         context['use_search_bar'] = True
-        if self.request.user.has_perm('obras-sociales.add_obrasocial'):
+        if self.request.user.has_perm('obras_sociales.add_obrasocial'):
             context['use_add_btn'] = True
             context['add_url'] = 'obras-sociales.create'
         return context
@@ -49,7 +51,7 @@ class ObraSocialCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
     model = ObraSocial
-    permission_required = ("add_obrasocial",)
+    permission_required = ("obras_sociales.add_obrasocial",)
     fields =  '__all__'
     success_message = "Creado con éxito."
 
@@ -67,7 +69,7 @@ class ObraSocialCreateView(PermissionRequiredMixin,
 
 class ObraSocialUpdateView(PermissionRequiredMixin, UpdateView):
     model = ObraSocial
-    permission_required = "change_obrasocia"
+    permission_required = "obras_sociales.change_obrasocial"
     fields =  '__all__'
     success_message = "Actualizado con éxito."
 
@@ -86,7 +88,7 @@ class ObraSocialUpdateView(PermissionRequiredMixin, UpdateView):
 
 class ObraSocialDetailView(PermissionRequiredMixin, DetailView):
     model = ObraSocial
-    permission_required = ("view_obrasocial",)
+    permission_required = ("obras_sociales.view_obrasocial",)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -99,7 +101,7 @@ class ObraSocialDetailView(PermissionRequiredMixin, DetailView):
 class TableroObraSocialPorPorvinciaView(PermissionRequiredMixin, TemplateView):
     """ mostrar datos de los profesionales """
     model = ObraSocial
-    permission_required = ('can_view_tablero', )
+    permission_required = ('obras_sociales.can_view_tablero', )
     template_name = 'profesionales/tableros.html'
     # https://bootstrapious.com/tutorial/sidebar/index5.html
 
@@ -146,3 +148,15 @@ class TableroObraSocialPorPorvinciaView(PermissionRequiredMixin, TemplateView):
             ]
 
         return context
+
+
+def ObraSocialPacienteCreatePopup(request, paciente=None):
+    if request.POST:
+        form = ObraSocialPacienteCreatePopUp(request.POST)
+        form.paciente_id = paciente
+        if form.is_valid():
+            instance = form.save()
+            return HttpResponse(
+                '<script>opener.closePopup(window, "%s", "%s", "#id_obra_social");</script>' % (instance.obra_social.pk, instance.obra_social))
+    form = ObraSocialPacienteCreatePopUp(initial={'paciente': paciente})
+    return render(request, "obras_sociales/obrasocial_paciente_createview.html", {"form": form})

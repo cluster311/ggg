@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.test import TestCase
 from pacientes.models import Paciente
 from django.utils import timezone
@@ -37,3 +38,14 @@ class TestCore(TestCase):
             assert ok == True
             assert msg is None
         """
+
+
+class UsuarioTest(TestCase):
+    def tearDown(self):
+        self.user.delete()
+
+    def test_nuevo_usuario(self):
+        user = User.objects.create_user(username='testuser', password='12345')
+        self.user = user
+        self.assertEqual(user.groups.count(), 0)
+

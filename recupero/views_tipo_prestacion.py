@@ -15,8 +15,9 @@ class TipoPrestacionListView(PermissionRequiredMixin, ListView):
     Lista de tipos de prestaciones habilitadas para recuperar
     """
     model = TipoPrestacion
-    permission_required = ("view_tipoprestacion",)
+    permission_required = ("recupero.view_tipoprestacion",)
     paginate_by = 10
+    raise_exception = True
 
     def get_queryset(self):   
         if 'search' in self.request.GET:
@@ -44,10 +45,11 @@ class TipoPrestacionCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
     model = TipoPrestacion
-    permission_required = ("view_tipoprestacion",)
+    permission_required = ("recupero.add_tipoprestacion",)
     fields = ['nombre', 'codigo', 'descripcion', 'observaciones',
               'tipo', 'documentos_requeridos', 'documentos_sugeridos']
     success_message = "Creado con éxito."
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -63,7 +65,8 @@ class TipoPrestacionCreateView(PermissionRequiredMixin,
 
 class TipoPrestacionDetailView(PermissionRequiredMixin, DetailView):
     model = TipoPrestacion
-    permission_required = ("view_tipoprestacion",)
+    permission_required = ("recupero.view_tipoprestacion",)
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -74,10 +77,11 @@ class TipoPrestacionDetailView(PermissionRequiredMixin, DetailView):
 
 class TipoPrestacionUpdateView(PermissionRequiredMixin, UpdateView):
     model = TipoPrestacion
-    permission_required = "change_tipoprestacion"
+    permission_required = "recupero.change_tipoprestacion"
     fields = ['nombre', 'codigo', 'descripcion', 'observaciones',
               'tipo', 'documentos_requeridos', 'documentos_sugeridos']
     success_message = "Actualizado con éxito."
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

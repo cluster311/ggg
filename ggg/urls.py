@@ -3,7 +3,9 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls import url, include
 from django.contrib.staticfiles.urls import static
-from .views import LandingPage, choice_homepage, CiudadanoHome
+from .views import (LandingPage, choice_homepage, 
+                   CiudadanoHome, RecuperoHome, SuperAdminHome, DataHome )
+
 
 
 urlpatterns = [
@@ -22,7 +24,12 @@ urlpatterns = [
     url(r'^pacientes/', include('pacientes.urls')),
     url(r'^$', LandingPage.as_view(), name='landing'),
     url(r'^ciudadano/$', CiudadanoHome.as_view(), name='ciudadano.home'),
-    url(r'^home$', choice_homepage, name='home'),
+    url(r'^hsuper/$', SuperAdminHome.as_view(), name='super.home'),
+    url(r'^hrecupero/$', RecuperoHome.as_view(), name='recupero.home'),
+    url(r'^hdata/$', DataHome.as_view(), name='data.home'),
+    url(r'^home/$', choice_homepage, name='home'),
 ] 
+
+handler403 = 'core.views.handler403'
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -6,17 +6,20 @@ from django.db.models import Q
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
 from django.conf import settings
 from django.urls import reverse
 from .models import CentroDeSalud
 from .forms import CentroDeSaludForm
 
 
-@method_decorator(cache_page(60 * 5), name='dispatch')
 class CentroDeSaludListView(PermissionRequiredMixin, ListView):
+    '''
+        Listado de Centros de Salud
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = CentroDeSalud
-    permission_required = ("view_centrodesalud",)
+    permission_required = ("centros_de_salud.view_centrodesalud",)
     paginate_by = 10  # pagination
 
     def get_queryset(self):
@@ -52,8 +55,13 @@ class CentroDeSaludListView(PermissionRequiredMixin, ListView):
 class CentroDeSaludCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
+    '''
+        Vista de creación de Centros de Salud
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = CentroDeSalud
-    permission_required = ("add_centrodesalud",)
+    permission_required = ("centros_de_salud.add_centrodesalud",)
     form_class = CentroDeSaludForm
     success_message = "Creado con éxito."
 
@@ -70,8 +78,13 @@ class CentroDeSaludCreateView(PermissionRequiredMixin,
         )
 
 class CentroDeSaludUpdateView(PermissionRequiredMixin, UpdateView):
+    '''
+        Vista de actualización de Centros de Salud
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = CentroDeSalud
-    permission_required = "change_centrodesalud"
+    permission_required = "centros_de_salud.change_centrodesalud"
     form_class = CentroDeSaludForm
     success_message = "Actualizado con éxito."
 
@@ -89,12 +102,17 @@ class CentroDeSaludUpdateView(PermissionRequiredMixin, UpdateView):
 
 
 class CentroDeSaludDetailView(PermissionRequiredMixin, DetailView):
+    '''
+        Vista detallada de Centros de Salud
+
+        Grupo acceso disponible: grupo_super_usuario
+    '''
     model = CentroDeSalud
-    permission_required = ("view_centrodesalud",)
+    permission_required = ("centros_de_salud.view_centrodesalud",)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Centros de Saludos'
+        context['title'] = 'Centros de Salud'
         context['title_url'] = 'centros_de_salud.lista'
         context['GOOGLE_API_LEY'] = settings.GOOGLE_API_KEY
         return context

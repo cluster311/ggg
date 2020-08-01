@@ -1,9 +1,12 @@
 from dal import autocomplete
 from cie10_django.models import CIE10
+from django.shortcuts import render, render_to_response, redirect
+
+from obras_sociales.models import ObraSocialPaciente, ObraSocial
 from pacientes.models import Paciente, CarpetaFamiliar
 from profesionales.models import Profesional
 from centros_de_salud.models import (CentroDeSalud, ProfesionalesEnServicio,
-                                     Servicio)
+                                     Servicio, Especialidad)
 from recupero.models import TipoPrestacion
 from django.db.models import Q
 import logging
@@ -35,6 +38,38 @@ class CIE10Autocomplete(autocomplete.Select2QuerySetView):
         return qs.order_by("code")
 
 
+class ObraSocialAutocomplete(autocomplete.Select2QuerySetView):
+    """
+     Base de autompletado para obra sociales.
+    """
+
+    def get_queryset(self):
+        if not self.request.user.has_perm('obras_sociales.view_obrasocial'):
+            return ObraSocial.objects.none()
+        qs = ObraSocialPaciente.objects.filter(paciente_id=self.forwarded.get('paciente', None))
+        osp = []
+        for q in qs:
+            osp.append(q.obra_social)
+        return osp
+
+
+class ObraSocialAllAutocomplete(autocomplete.Select2QuerySetView):
+    """
+     Base de autompletado para obra sociales.
+    """
+
+    def get_queryset(self):
+        if not self.request.user.has_perm('obras_sociales.view_obrasocial'):
+            return ObraSocial.objects.none()
+        qs = ObraSocial.objects.all()
+        if self.q:
+            qs = qs.filter(Q(nombre__icontains=self.q) |
+                           Q(codigo__icontains=self.q) |
+                           Q(siglas__icontains=self.q)
+                           )
+        return qs[:10]
+
+
 class PacienteAutocomplete(autocomplete.Select2QuerySetView):
     """
     Base de autompletado para pacientes.
@@ -53,6 +88,22 @@ class PacienteAutocomplete(autocomplete.Select2QuerySetView):
                            )
 
         return qs.order_by("apellidos", "nombres")[:5]
+
+
+class EspecialidadAutocomplete(autocomplete.Select2QuerySetView):
+    """
+    Base de autocompletado para especialidades.
+    """
+
+    def get_queryset(self):
+        if self.q:
+            servicio = Servicio.objects.filter(centro=self.forwarded.get('centro_de_salud', None), especialidad__nombre__icontains=self.q)
+        else:
+            servicio = Servicio.objects.filter(centro=self.forwarded.get('centro_de_salud', None))
+        esp = []
+        for s in servicio:
+            esp.append(s.especialidad)
+        return esp
 
 
 class ProfesionalAutocomplete(autocomplete.Select2QuerySetView):
@@ -78,6 +129,29 @@ class ProfesionalAutocomplete(autocomplete.Select2QuerySetView):
                            )
 
         return qs.order_by("apellidos", "nombres")[:5]
+
+
+class ProfesionalFacturaAutocomplete(autocomplete.Select2QuerySetView):
+    """
+    Base de autocompletado para profesionales en factura.
+    """
+
+    def get_queryset(self):
+        if not self.request.user.has_perm('profesionales.view_profesional'):
+            return Profesional.objects.none()
+
+        qs = Profesional.objects.all()
+        if self.forwarded.get('centro_de_salud', None) and self.forwarded.get('especialidad', None):
+            servicio = Servicio.objects.get(centro=self.forwarded.get('centro_de_salud'), especialidad=self.forwarded.get('especialidad'))
+            qs = qs.filter(servicios__servicio=servicio, servicios__estado=ProfesionalesEnServicio.EST_ACTIVO)
+            if self.q:
+                qs = qs.filter(Q(numero_documento__icontains=self.q) |
+                               Q(nombres__icontains=self.q) |
+                               Q(apellidos__icontains=self.q)
+                               )
+            return qs.order_by("apellidos", "nombres")[:5]
+        else:
+            return []
 
 
 class CentroDeSaludAutocomplete(autocomplete.Select2QuerySetView):
@@ -163,3 +237,13 @@ class ServicioAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter(especialidad__nombre__icontains=self.q)
 
         return qs
+
+
+def handler403(request, exception):
+    if not request.user.is_anonymous:
+        response = render_to_response("errors/403.html")
+        response.status_code = 403
+        return response
+    else:
+        return redirect('../../accounts/login/?next='+request.get_full_path(),)
+

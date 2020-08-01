@@ -1,12 +1,13 @@
 from django.db import models
 import logging
+from model_utils import Choices
 from oss_ar.oss import ObrasSocialesArgentinas
-
 
 logger = logging.getLogger(__name__)
 
 
 class ObraSocial(models.Model):
+    """ Obras sociales argentinas """
     nombre = models.CharField(max_length=240)
     codigo = models.CharField(max_length=50, unique=True)
     siglas = models.CharField(max_length=100, null=True, blank=True)
@@ -23,6 +24,9 @@ class ObraSocial(models.Model):
 
     @classmethod
     def startdb(cls):
+        """ inicializar la base de datos importando desde la libreria oss_ar
+            https://github.com/cluster311/obras-sociales-argentinas/"""
+
         osss = ObrasSocialesArgentinas()
         for rnos, oss in osss.local_json_object.items():
             print(oss)
@@ -55,6 +59,8 @@ class ObraSocial(models.Model):
 
 
 class ObraSocialPaciente(models.Model):
+    """ cada obra social que tiene un paciente """
+
     paciente = models.ForeignKey(
         'pacientes.Paciente',
         on_delete=models.CASCADE,
@@ -73,3 +79,40 @@ class ObraSocialPaciente(models.Model):
     # otros lugares
     data_source = models.CharField(max_length=90)
     numero_afiliado = models.CharField(max_length=50, null=True, blank=True)
+    fecha_de_emision = models.DateField(null=True, blank=True)
+    fecha_de_vencimiento = models.DateField(null=True, blank=True)
+    tipo_beneficiario = models.CharField(
+        max_length=20,
+        choices=Choices("titular", "no titular", "adherente"),
+        default="Titular",
+    )
+    parentesco = models.CharField(
+        max_length=20,
+        choices=Choices("conyugue", "hijo", "otro"),
+        default="otro",
+    )
+
+    def as_anexo2_json(self):
+        """ devuelve el JSON compatible con la librería Anexo2 https://github.com/cluster311/Anexo2
+            Ejemplo:
+                {'codigo_rnos': '800501',
+                    'nombre': 'OBRA SOCIAL ACEROS PARANA',
+                    'nro_carnet_obra_social': '9134818283929101',
+                    'fecha_de_emision': {'dia': 11, 'mes': 9, 'anio': 2009},
+                    'fecha_de_vencimiento': {'dia': 11, 'mes': 9, 'anio': 2029}}
+        """
+        emision_dia = 1 if self.fecha_de_emision is None else self.fecha_de_emision.day
+        emision_mes = 2 if self.fecha_de_emision is None else self.fecha_de_emision.month
+        emision_ano = 2019 if self.fecha_de_emision is None else self.fecha_de_emision.year
+
+        vto_dia = 1 if self.fecha_de_vencimiento is None else self.fecha_de_vencimiento.day
+        vto_mes = 2 if self.fecha_de_vencimiento is None else self.fecha_de_vencimiento.month
+        vto_ano = 2020 if self.fecha_de_vencimiento is None else self.fecha_de_vencimiento.year
+
+        ret = {'codigo_rnos': self.obra_social.codigo,
+                    'nombre': self.obra_social.nombre,
+                    'nro_carnet_obra_social': self.numero_afiliado,
+                    'fecha_de_emision': {'dia': emision_dia, 'mes': emision_mes, 'anio': emision_ano},
+                    'fecha_de_vencimiento': {'dia': vto_dia, 'mes': vto_mes, 'anio': vto_ano}}
+
+        return ret

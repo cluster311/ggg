@@ -1,7 +1,10 @@
 from dal import autocomplete
 from django import forms
-from .models import (MedidaAnexa, 
-                     MedidasAnexasEspecialidad, 
+from django.forms import inlineformset_factory
+
+from pacientes.models import Consulta
+from .models import (MedidaAnexa,
+                     MedidasAnexasEspecialidad,
                      MedidaAnexaEnConsulta
                     )
 
@@ -31,15 +34,18 @@ class MedidasAnexasEspecialidadForm(forms.ModelForm):
 
 class MedidaAnexaEnConsultaForm(forms.ModelForm):
 
-    valor = forms.DecimalField(widget=forms.NumberInput(attrs={'step': 0.25})) 
-    
+    valor = forms.DecimalField(widget=forms.NumberInput(attrs={'step': 0.25}))
+    medida = forms.ModelChoiceField(queryset=MedidaAnexa.objects.all(), widget=forms.HiddenInput())
+
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
-        obligatorio = kwargs.pop('obligatorio', False)
-        super().__init__(*args, **kwargs)  
-        self.fields['valor'].required = obligatorio    
-    
+        super().__init__(*args, **kwargs)
+        medida = MedidaAnexa.objects.get(id=self.initial['medida'])
+        self.fields['valor'].label = medida.nombre
+
     class Meta:
         model = MedidaAnexaEnConsulta
-        fields = ['valor']
+        fields = ['valor', 'medida']
 
+
+MedidaAnexaEnConsultaFormset = inlineformset_factory(Consulta, MedidaAnexaEnConsulta, form=MedidaAnexaEnConsultaForm, extra=0, can_delete=False)

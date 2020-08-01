@@ -6,18 +6,20 @@ from core.views import (CIE10Autocomplete,
                         CentroDeSaludAutocomplete,
                         TipoPrestacionAutocomplete,
                         CarpetaFamiliarAutocomplete,
-                        ServicioAutocomplete
+                        ServicioAutocomplete, ObraSocialAutocomplete, ObraSocialAllAutocomplete,
+                        EspecialidadAutocomplete, ProfesionalFacturaAutocomplete
                         )
+
 
 
 urlpatterns = [
     path(
-        r"servicio-autocomplete",
+        r"servicio-autocomplete/",
         ServicioAutocomplete.as_view(),
         name="servicio-autocomplete",
     ),
     path(
-        r"carpeta-familiar-autocomplete",
+        r"carpeta-familiar-autocomplete/",
         CarpetaFamiliarAutocomplete.as_view(),
         name="carpeta-familiar-autocomplete",
     ),
@@ -32,9 +34,24 @@ urlpatterns = [
         name="paciente-autocomplete",
     ),
     url(
+        r"^obra-social-autocomplete/$",
+        ObraSocialAutocomplete.as_view(),
+        name="obra-social-autocomplete",
+    ),
+    url(
+        r"^obra-social-all-autocomplete/$",
+        ObraSocialAllAutocomplete.as_view(),
+        name="obra-social-all-autocomplete",
+    ),
+    url(
         r"^profesional-autocomplete/$",
         ProfesionalAutocomplete.as_view(),
         name="profesional-autocomplete",
+    ),
+    url(
+        r"^profesional-factura-autocomplete/$",
+        ProfesionalFacturaAutocomplete.as_view(),
+        name="profesional-factura-autocomplete",
     ),
     path(
         r"profesional-autocomplete-por-servicio/<int:servicio_id>",
@@ -47,9 +64,14 @@ urlpatterns = [
         name="centro_de_salud-autocomplete",
     ),
     url(
+        r"^especialidad-autocomplete/$",
+        EspecialidadAutocomplete.as_view(),
+        name="especialidad-autocomplete",
+    ),
+    url(
         r"^tipo-prestacion-autocomplete/$",
         TipoPrestacionAutocomplete.as_view(),
         name="tipo_prestacion-autocomplete",
     ),
-    
+
 ]

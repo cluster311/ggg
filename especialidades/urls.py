@@ -25,7 +25,7 @@ urlpatterns = [
         name="especialidades.medidas_anexas",
     ),
     url(
-        r"^crear-medida_anexa.html",
+        r"^crear-medida_anexa.html$",
         MedidaAnexaCreateView.as_view(),
         name="especialidades.medidas_anexas.create",
     ),
@@ -47,7 +47,7 @@ urlpatterns = [
         name="especialidades.medidas-anexas-en-especialidades",
     ),
     url(
-        r"^crear-medidas-anexas-en-especialidades.html",
+        r"^crear-medidas-anexas-en-especialidades.html$",
         MedidasAnexasEspecialidadCreateView.as_view(),
         name="especialidades.medidas-anexas-en-especialidades.create",
     ),

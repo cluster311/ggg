@@ -6,7 +6,7 @@ from .views_servicios import (ServicioListView,
                               ServicioCreateView,
                               ServicioDetailView,
                               ServicioUpdateView,
-                              servicios_by_especialidad)
+                              servicios_by_centro_salud)
 
 from .views_especialidad import (EspecialidadListView,
                                  EspecialidadCreateView,
@@ -45,7 +45,7 @@ urlpatterns = [
         name="centros_de_salud.servicios",
     ),
     url(
-        r"^crear-servicio.html",
+        r"^crear-servicio.html$",
         ServicioCreateView.as_view(),
         name="centros_de_salud.servicios.create",
     ),
@@ -67,7 +67,7 @@ urlpatterns = [
         name="centros_de_salud.especialidades",
     ),
     url(
-        r"^crear-especialidad.html",
+        r"^crear-especialidad.html$",
         EspecialidadCreateView.as_view(),
         name="centros_de_salud.especialidades.create",
     ),
@@ -89,7 +89,7 @@ urlpatterns = [
         name="centros_de_salud.profesionales-en-servicio",
     ),
     url(
-        r"^crear-profesional-en-servicio.html",
+        r"^crear-profesional-en-servicio.html$",
         ProfesionalesEnServicioCreateView.as_view(),
         name="centros_de_salud.profesionales-en-servicio.create",
     ),
@@ -105,8 +105,8 @@ urlpatterns = [
     ),
 
     path(
-        r"servicio-by-especialidad/<int:pk>",
-        servicios_by_especialidad,
-        name="centros_de_salud.servicio-by-especialidad",
+        r"servicios-by-centro-salud/<int:pk>",
+        servicios_by_centro_salud,
+        name="centros_de_salud.servicios-by-centro-salud",
     ),
 ]

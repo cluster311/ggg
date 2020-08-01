@@ -15,6 +15,18 @@ class CiudadanoHome(TemplateView):
     """ Definir la home del ciudadano """
     template_name = "home-ciudadano.html"
 
+class RecuperoHome(TemplateView):
+    """ Definir la home del usuario de recupero """
+    template_name = "home-recupero.html"
+
+class SuperAdminHome(TemplateView):
+    """ Definir la home del usuario superadministrador """
+    template_name = "home-super.html"
+
+class DataHome(TemplateView):
+    """ Definir la home del analista de datos """
+    template_name = "home-data.html"
+
 
 @login_required
 def choice_homepage(request):
@@ -22,21 +34,22 @@ def choice_homepage(request):
     redirige a un dashboard distinto en funcion del tipo de usuario
     """
     user = request.user
+    es_profesional = user.groups.filter(name=settings.GRUPO_PROFESIONAL).exists()
+    # es_ciudadano = user.groups.filter(name=settings.GRUPO_CIUDADANO)
+    es_administrativo = user.groups.filter(name=settings.GRUPO_ADMIN)
+    es_data = user.groups.filter(name=settings.GRUPO_DATOS)
+    es_super = user.groups.filter(name=settings.GRUPO_SUPER_ADMIN)
+    es_recupero = user.groups.filter(name=settings.GRUPO_RECUPERO)
 
-    # todo usuario pertenece al grupo ciudano
-    if (user.groups.filter(name=settings.GRUPO_PROFESIONAL).exists() and
-        user.groups.filter(name=settings.GRUPO_CIUDADANO).exists()):
+    if es_super:
+        return redirect('super.home')
+    elif es_profesional:
         return redirect('profesionales.home')
-    elif (user.groups.filter(name=settings.GRUPO_ADMIN).exists() and
-    user.groups.filter(name=settings.GRUPO_CIUDADANO).exists()):
+    elif es_administrativo:
         return redirect('calendario.index')
-    elif user.groups.filter(name=settings.GRUPO_PROFESIONAL).exists():
-        # TODO cambiar por la nueva vista para atender turnos
-        return redirect('profesionales.lista')
+    elif es_recupero:
+        return redirect('recupero.home')
+    elif es_data:
+        return redirect('data.home')
     else:
         return redirect('ciudadano.home')
-
-    # default para ciudadano  
-    # TODO. cual es el home para el ciudadano?   
-    # return redirect('ciudadano.home')
-

@@ -1,8 +1,11 @@
+import os
+
 from django.db import models
 from django.utils import timezone
 from cie10_django.models import CIE10
 from model_utils.models import TimeStampedModel
 from core.signals import app_log
+from core.models import private_file_storage
 
 
 class TipoDocumentoAnexo(models.Model):
@@ -114,9 +117,7 @@ class DocumentoAnexo(TimeStampedModel):
     """ Cada uno de los documentos que se pueden adjuntar a una prestacion """
     prestacion = models.ForeignKey(Prestacion, on_delete=models.CASCADE, related_name='documentos')
     tipo = models.ForeignKey(TipoDocumentoAnexo, on_delete=models.CASCADE)
-
-    # TODO definir un destino seguro y privado!
-    documento_adjunto = models.FileField(upload_to='documentos_anexos')
+    documento_adjunto = models.FileField(upload_to='documentos_anexos', storage=private_file_storage)
 
     def __str__(self):
         return f'DOC {self.tipo.nombre} {self.id}'
@@ -168,14 +169,45 @@ class Factura(TimeStampedModel):
         null=True,
         blank=True
     )
-    
+
+    fecha_atencion = models.DateTimeField(blank=True, null=True)
+    centro_de_salud = models.ForeignKey(
+        "centros_de_salud.CentroDeSalud",
+        related_name="facturas_centro",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    paciente = models.ForeignKey(
+        "pacientes.Paciente",
+        related_name="facturas_paciente",
+        on_delete=models.CASCADE,
+        default="",
+        null=True,
+        blank=True,
+    )
+    codigo_cie_principal = models.ForeignKey(CIE10, null=True, blank=True,
+                                             on_delete=models.SET_NULL,
+                                             related_name='diagnosticos_principales_factura')
+    codigos_cie_secundarios = models.ManyToManyField(CIE10,
+                                                     blank=True,
+                                                     related_name='diagnosticos_secundarios_factura')
+    profesional = models.ForeignKey(
+        'profesionales.Profesional',
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL
+    )
+    especialidad = models.ForeignKey(
+        'centros_de_salud.Especialidad',
+         on_delete=models.CASCADE,
+         related_name='especialidad_factura',
+         blank=True,
+         null=True,
+    )
+
     def __str__(self):
         return f'Factura {self.id}'
-    
-    def define_oss(self):
-        # ver si el paciente tiene OSS o le corresponde algun progeama de salud
-        #TODO self.obra_social = X
-        return
     
     def change_status(self, new_status):
         data = {'old_status': self.estado, 'new_status': new_status}
@@ -186,3 +218,74 @@ class Factura(TimeStampedModel):
                      data=data)
         self.estado = new_status
         self.save()
+    
+    def as_anexo2_json(self):
+        """ recuperar los datos de esta factura en el formato que
+            la librería Anexo2 (en Pypi) requiere
+            Requisitos acá: https://github.com/cluster311/Anexo2
+            """
+
+        hospital = self.centro_de_salud.as_anexo2_json()
+        if hospital['codigo_hpgd'] is None:
+            hospital['codigo_hpgd'] = 'DESC'  # TODO, no permitido
+        
+        beneficiario = self.paciente.as_anexo2_json()
+
+        # TODO Verificar si el cod cie principal puede estar vacío
+        cie_principal = 'DESC' if self.codigo_cie_principal is None else self.codigo_cie_principal.code
+        cie_secundarios = [c10.code for c10 in self.codigos_cie_secundarios.all()]
+        
+        cod_hpgd = [prestacion.tipo.codigo for prestacion in self.prestacionesFactura.all()]
+
+        # Obtener la primer prestacion asociada a la factura
+        prestFactura = self.prestacionesFactura.first()
+        
+        # Devuelve el string en minúsculas
+        tipo = prestFactura.tipo.get_tipo_display().casefold()
+
+        # TODO - Hay que agregar tipo de atención a las prestaciones
+        atencion = {'tipo': 'consulta', # if tipo is None else tipo
+                    'especialidad': prestFactura.tipo.descripcion,
+                    'codigos_N_HPGD': cod_hpgd,
+                    'fecha': {
+                        'dia': self.fecha_atencion.day,
+                        'mes': self.fecha_atencion.month,
+                        'anio': self.fecha_atencion.year,
+                        },
+                    'diagnostico_ingreso_cie10': {'principal': cie_principal, 
+                                                    'otros': cie_secundarios}
+                    }
+        
+        # Obtener los datos de la Obra Social del Paciente 
+        # usando la relación ObraSocialPaciente
+        obra_social_paciente = self.paciente.m2m_obras_sociales.get(obra_social=self.obra_social.id)
+        obra_social = obra_social_paciente.as_anexo2_json()
+
+        # Obtener la primera empresa del paciente
+        empresa_paciente = self.paciente.empresapaciente_set.first()
+        empresa = empresa_paciente.as_anexo2_json()
+
+        fecha_actual = timezone.now().date()
+
+        data = {'dia': fecha_actual.day,
+                'mes': fecha_actual.month,
+                'anio': fecha_actual.year,
+                'hospital': hospital,
+                'beneficiario': beneficiario,
+                'atencion': atencion,
+                'obra_social': obra_social,
+                'empresa': empresa
+                }
+
+        return data
+
+
+class FacturaPrestacion(TimeStampedModel):
+    """ una prestacion que se le da a un paciente pero en este caso es para las facturas ya que no tiene una consulta"""
+    factura = models.ForeignKey('recupero.Factura', on_delete=models.CASCADE, related_name='prestacionesFactura')
+    tipo = models.ForeignKey(TipoPrestacion, on_delete=models.SET_NULL, null=True)
+    cantidad = models.PositiveIntegerField(default=1)
+    observaciones = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.cantidad} de {self.tipo}'

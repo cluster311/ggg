@@ -4,7 +4,7 @@ from address.models import AddressField
 from address.forms import AddressWidget
 from dal import autocomplete
 from core.admin import ContactoAdminInline
-from .models import Paciente, Consulta, CarpetaFamiliar
+from .models import Paciente, Consulta, CarpetaFamiliar, Receta
 from .forms import ConsultaForm
 
 
@@ -18,9 +18,14 @@ class CarpetaFamiliarAdmin(admin.ModelAdmin):
     }
 
 
+class RecetaInline(admin.StackedInline):
+    model = Receta
+
+
 class ConsultaAdmin(admin.ModelAdmin):
     form = ConsultaForm
-    list_display = ['paciente', 'turno', 'profesional', 'centro_de_salud', 'especialidad', 'codigo_cie_principal']
+    list_display = ['id', 'paciente', 'turno', 'profesional', 'centro_de_salud', 'especialidad', 'codigo_cie_principal']
+    inlines = [RecetaInline, ]
 
 
 class ConsultaInLine(admin.StackedInline):

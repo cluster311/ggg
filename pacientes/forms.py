@@ -4,6 +4,8 @@ from django import forms
 from django.forms.models import inlineformset_factory
 from django.utils.translation import gettext_lazy as _
 from cie10_django.models import CIE10
+
+from calendario.widgets import DateTimePicker, DatePicker
 from pacientes.models import (Consulta, Paciente, Receta, Derivacion,
                               CarpetaFamiliar)
 from profesionales.models import Profesional
@@ -13,6 +15,13 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 import logging
 logger = logging.getLogger(__name__)
+
+
+class PacienteFormPopUp(forms.ModelForm):
+    class Meta:
+        model = Paciente
+        fields = ('apellidos', 'nombres', 'sexo', 'fecha_nacimiento', 'tipo_documento', 'numero_documento', 'nacionalidad')
+        widgets = {'fecha_nacimiento': DatePicker()}
 
 
 class RecetaForm(forms.ModelForm):
@@ -81,6 +90,7 @@ class EvolucionForm(forms.ModelForm):
         ),
     )
     indicaciones = forms.CharField(
+        required=False,
         label='Indicaciones adicionales',
         widget=forms.Textarea(attrs={'rows': 2})
     )

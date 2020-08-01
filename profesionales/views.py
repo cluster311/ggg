@@ -5,7 +5,7 @@ from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django.db.models import Count, Q
 from django.core.exceptions import PermissionDenied
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
@@ -22,6 +22,8 @@ from pacientes.models import Consulta, Paciente
 from pacientes.forms import ConsultaForm, RecetaFormset, DerivacionFormset, PrestacionFormset
 from crispy_forms.utils import render_crispy_form
 import logging
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -55,13 +57,15 @@ class ProfesionalHome(TemplateView, GroupRequiredMixin):
             else:
                 # este usuario no tiene un profesional conectado
                 raise PermissionDenied
+        else:
+            raise PermissionDenied
         return context
 
 
-@method_decorator(cache_page(60 * 5), name='dispatch')
 class ProfesionalListView(PermissionRequiredMixin, ListView):
     model = Profesional
-    permission_required = ("view_profesional",)
+    permission_required = ("profesionales.view_profesional",)
+    raise_exception = True
     paginate_by = 10  # pagination
 
     def get_queryset(self):        
@@ -94,7 +98,8 @@ class ProfesionalCreateView(PermissionRequiredMixin,
                                CreateView,
                                SuccessMessageMixin):
     model = Profesional
-    permission_required = ("view_profesional",)
+    permission_required = ("profesionales.add_profesional",)
+    raise_exception = True
     fields =  '__all__'
     success_message = "Creado con éxito."
 
@@ -113,7 +118,8 @@ class ProfesionalCreateView(PermissionRequiredMixin,
 
 class ProfesionalDetailView(PermissionRequiredMixin, DetailView):
     model = Profesional
-    permission_required = ("view_profesional",)
+    permission_required = ("profesionales.view_profesional",)
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -124,7 +130,8 @@ class ProfesionalDetailView(PermissionRequiredMixin, DetailView):
 
 class ProfesionalUpdateView(PermissionRequiredMixin, UpdateView):
     model = Profesional
-    permission_required = "change_profesional"
+    permission_required = "profesionales.change_profesional"
+    raise_exception = True
     fields =  '__all__'
     success_message = "Actualizado con éxito."
 
@@ -147,7 +154,7 @@ class TableroProfesionalesPorEspecialidadView(
     """ mostrar datos de los profesionales """
 
     model = Profesional
-    permission_required = ("can_view_tablero",)
+    permission_required = ("profesionales.can_view_tablero",)
     template_name = "profesionales/tableros.html"
     # https://bootstrapious.com/tutorial/sidebar/index5.html
 
@@ -197,7 +204,7 @@ class TableroProfesionalesPorLocalidadView(
     """ mostrar datos de los profesionales """
 
     model = Profesional
-    permission_required = ("can_view_tablero",)
+    permission_required = ("profesionales.can_view_tablero",)
     template_name = "profesionales/tableros.html"
     # https://bootstrapious.com/tutorial/sidebar/index5.html
 
