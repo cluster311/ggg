@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="author" content="Municipalidad de Córdoba">
   <meta name="description" content="{{ site_description }}">
+  <meta name="app_version" content="{{ app_version }}"
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
   <title>{% block title %}{{ site_title }}{% endblock %}</title>
@@ -87,10 +88,14 @@
                     class="article">+ info</a>
               </li>
 
+              {% if user.username %}
               <li>
                 <a target='_blank' href="{% url 'account_logout' %}" 
                     class="article">Salir [{{ user.username }}]</a>
               </li>
+              {% endif %}
+              <li><div style='padding: 20px; text-align: center;'>Versión {{ app_version }}</div></li>
+            
             
           </ul>
       </nav>
