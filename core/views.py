@@ -44,8 +44,6 @@ class ObraSocialAutocomplete(autocomplete.Select2QuerySetView):
     """
 
     def get_queryset(self):
-        #if not self.request.user.has_perm('obras_sociales.view_obrasocial'):
-        #    return ObraSocial.objects.none()
         qs = ObraSocialPaciente.objects.filter(paciente_id=self.forwarded.get('paciente', None))
         osp = []
         for q in qs:

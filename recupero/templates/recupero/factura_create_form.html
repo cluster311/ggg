@@ -152,6 +152,7 @@
             $("#id_dni").val(doc);
             $("#loading").hide();
             $("#found").show();
+            $("#id_dni").prop("disabled", true);
             win.close();
             $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',pk));
             $("#id_obra_social").empty();
@@ -185,7 +186,6 @@
                         }else{
                             showAddPopupPaciente();
                             $("#add_paciente").prop("disabled", true);
-
                         }
 
                     },
