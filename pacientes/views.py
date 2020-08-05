@@ -248,14 +248,15 @@ class CarpetaFamiliarCreateView(PermissionRequiredMixin,
 
 
 def BuscarPaciente(request, dni):
-    if Paciente.objects.filter(numero_documento=dni).exists():
-        paciente = Paciente.objects.get(numero_documento=dni)
+    dni_parseado = (''.join(filter(str.isdigit, dni)))
+    if Paciente.objects.filter(numero_documento=dni_parseado).exists():
+        paciente = Paciente.objects.get(numero_documento=dni_parseado)
         data = {"paciente_id": paciente.id,
                 "nombre": str(paciente.apellidos + ', ' + paciente.nombres),
                 "encontrado": True}
         time.sleep(2)
     else:
-        save, result = Paciente.create_from_sisa(dni)
+        save, result = Paciente.create_from_sisa(dni_parseado)
         if save:
             data = {"paciente_id": result.id,
                     "nombre": str(result.apellidos + ', ' + result.nombres),

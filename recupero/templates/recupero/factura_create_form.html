@@ -108,6 +108,7 @@
 {% block js_footer %}
     {{ block.super }}
     <script type="text/javascript" src="{% static 'js/jquery.formset.js' %}" type="text/javascript"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
     {{ form.media }}
     <script type="text/javascript">
         $( document ).ready(function() {
@@ -125,6 +126,7 @@
            {% endwith %}
             var max_prestacion_factura = $('#id_prestacionesFactura-TOTAL_FORMS').val();
             for (var x=0; x<max_prestacion_factura; x++) {
+                console.log("sss");
                 $('#id_prestacionesFactura-'+x+'-tipo').select2();
             }
         })
