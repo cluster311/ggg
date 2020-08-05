@@ -265,3 +265,13 @@ def BuscarPaciente(request, dni):
         else:
             data = {"encontrado": False}
     return JsonResponse(data, status=200)
+
+
+def DatosPaciente(request, paciente_id):
+    if Paciente.objects.filter(id=paciente_id).exists():
+        paciente = Paciente.objects.get(id=paciente_id)
+        data = {"paciente_id": paciente.id,
+                "nombre": str(paciente.apellidos + ', ' + paciente.nombres),
+                "dni": paciente.numero_documento
+                }
+        return JsonResponse(data, status=200)

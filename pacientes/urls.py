@@ -4,7 +4,7 @@ from .views import (
     EvolucionUpdateView,
     ConsultaListView,
     ConsultaDetailView,
-    CarpetaFamiliarCreateView, PacienteCreatePopup, BuscarPaciente
+    CarpetaFamiliarCreateView, PacienteCreatePopup, BuscarPaciente, DatosPaciente
 )
 
 
@@ -37,6 +37,8 @@ urlpatterns = [
         name="pacientes.carpeta-familiar.crear",
     ),
     path(r'^buscar-paciente/(?P<dni>.*)', BuscarPaciente, name="BuscarPaciente"),
+    path(r'^datos-paciente/(?P<paciente_id>.*)', DatosPaciente, name="DatosPaciente"),
     path(r'^paciente/create', PacienteCreatePopup, name="PacienteCreate"),
+
 
 ]

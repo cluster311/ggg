@@ -126,9 +126,27 @@
            {% endwith %}
             var max_prestacion_factura = $('#id_prestacionesFactura-TOTAL_FORMS').val();
             for (var x=0; x<max_prestacion_factura; x++) {
-                console.log("sss");
                 $('#id_prestacionesFactura-'+x+'-tipo').select2();
             }
+        if ($("#id_paciente").val()){
+            var url = '{% url 'DatosPaciente' paciente_id=None %}'.replace('None',  $("#id_paciente").val() );
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: 'json',
+                success: function (data) {
+                    $("#id_dni").val(data.dni);
+                    $("#id_dni").prop("disabled", true);
+                    $("#nombre_paciente").text(data.nombre);
+                    $("#search").hide();
+                    $("#found").show();
+                    $("#add_paciente").prop("disabled", true);
+                },
+                complete: function () {
+                },
+            });
+
+        }
         })
     </script>
     <script type="text/javascript">
@@ -197,10 +215,6 @@
                 });
             }
         });
-
     </script>
-
-
-
 {% endblock js_footer %}
 
