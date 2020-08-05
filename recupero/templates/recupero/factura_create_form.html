@@ -197,6 +197,7 @@
                     success: function (data) {
                         if (data.encontrado){
                             $("#id_paciente").val(data.paciente_id);
+                            $("#id_dni").val(data.dni);
                             $("#id_dni").prop("disabled", true);
                             $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',data.paciente_id));
                             $("#add_paciente").prop("disabled", true);

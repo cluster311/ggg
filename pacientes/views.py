@@ -253,6 +253,7 @@ def BuscarPaciente(request, dni):
         paciente = Paciente.objects.get(numero_documento=dni_parseado)
         data = {"paciente_id": paciente.id,
                 "nombre": str(paciente.apellidos + ', ' + paciente.nombres),
+                "dni": paciente.numero_documento,
                 "encontrado": True}
         time.sleep(2)
     else:
@@ -260,6 +261,7 @@ def BuscarPaciente(request, dni):
         if save:
             data = {"paciente_id": result.id,
                     "nombre": str(result.apellidos + ', ' + result.nombres),
+                    "dni": result.numero_documento,
                     "encontrado": True}
             time.sleep(2)
         else:
