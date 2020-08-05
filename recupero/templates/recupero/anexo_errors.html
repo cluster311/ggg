@@ -4,15 +4,13 @@
 {% block title %} Anexo II {% endblock %}
 {% block content %}
 <div class="alert alert-danger">
-  Se detectaron los siguientes errores en la generación del Anexo II:
+  Se detectaron los siguientes errores en la generación del Anexo II
 </div>
 
 <div class="container-fluid">
   <div class="row">
-    <div class="col-6">
-        
-        {% if datos != None %}
-          
+    {% if datos %}
+      <div class="col-6">                
           <h4>Errores de datos faltantes</h4>
           {% for seccion, errores in datos.items %}
             <div>
@@ -22,41 +20,45 @@
             </div>
             <div class="dropdown-divider"></div>
           {% endfor %}
+        </div>
+    {% endif %}
+
+    
+    {% if anexo2 %}      
+      <div class="col-6">
+          <h4>Errores de Anexo2</h4>
+          <!-- Loop en cada sección del Anexo2 -->
+          {% for seccion, errores in anexo2.items %}
+          <div>
             
-        {% endif %}
-    </div>
-    <div class="col-6">
-        <h4>Errores de Anexo2</h4>
-        <!-- Loop en cada sección del Anexo2 -->
-        {% for seccion, errores in anexo2.items %}
-        <div>
-          
-          <h5>Sección: {{ seccion }}</h5>
-          <b>Errores:</b>
-          <ul>
-            <!-- Loop en cada error de la sección -->
-            {% for error in errores %}
-            <!-- Si hay un solo error, por ej. dia=None -->
-              {% if error|length > 15 %}
+            <h5>Sección: {{ seccion }}</h5>
+            <b>Errores:</b>
+            <ul>
+              <!-- Loop en cada error de la sección -->
+              {% for error in errores %}
+              <!-- Si hay un solo error, por ej. dia=None -->
+                {% if error|length > 15 %}
 
-                <li>{{error}}</li>
+                  <li>{{error}}</li>
 
-              {% else %}
-                <!-- Si hay errores en campos de una sección -->
+                {% else %}
+                  <!-- Si hay errores en campos de una sección -->
 
-                {% for k, v in error.items %}
+                  {% for k, v in error.items %}
 
-                  <!-- Ej: apellido_y_nombres - null value not allowed -->
-                  <li>{{ k }} - {{ v.0 }}</li>
+                    <!-- Ej: apellido_y_nombres - null value not allowed -->
+                    <li>{{ k }} - {{ v.0 }}</li>
 
-                {% endfor %}
-              {%endif %}
-            {% endfor %}
-          </ul>
-          <div class="dropdown-divider"></div>
-        </div> 
-        {% endfor %}
-    </div>
+                  {% endfor %}
+                {%endif %}
+              {% endfor %}
+            </ul>
+            <div class="dropdown-divider"></div>
+          </div> 
+          {% endfor %}
+      </div>
+    {% endif %}
+
   </div>
 </div>
 

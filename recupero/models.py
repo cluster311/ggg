@@ -222,8 +222,9 @@ class Factura(TimeStampedModel):
     def as_anexo2_json(self):
         """ recuperar los datos de esta factura en el formato que
             la librería Anexo2 (en Pypi) requiere
+        
             Requisitos acá: https://github.com/cluster311/Anexo2
-            """
+        """
         
         # Dict para almacenar errores de datos faltantes
         errores_generacion = {}
@@ -231,8 +232,8 @@ class Factura(TimeStampedModel):
         try:
             hospital = self.centro_de_salud.as_anexo2_json()
 
-            if hospital['codigo_hpgd'] is None:
-                hospital['codigo_hpgd'] = 'DESC'  # TODO, no permitido
+            # TODO, no permitido
+            hospital['codigo_hpgd'] = hospital['codigo_hpgd'] or 'DESC'
 
         except AttributeError as error:
             errores_generacion['hospital'] = "Debe asignar un centro de salud en la factura"
@@ -250,23 +251,39 @@ class Factura(TimeStampedModel):
             errores_generacion['profesional'] = "Debe asignar un profesional en la factura"
             profesional = None
 
+        especialidad = str(self.especialidad) if self.especialidad else None
+        if especialidad is None:
+            errores_generacion['especialidad'] = "Debe asignar una especialidad en la factura"
 
-        # TODO Verificar si el cod cie principal puede estar vacío
-        cie_principal = 'DESC' if self.codigo_cie_principal is None else self.codigo_cie_principal.code
-        cie_secundarios = [c10.code for c10 in self.codigos_cie_secundarios.all()]
-        
-        cod_hpgd = [prestacion.tipo.codigo for prestacion in self.prestacionesFactura.all()]
+        try:
+            # TODO Verificar si el cod cie principal puede estar vacío
+            cie_principal = self.codigo_cie_principal.code
+        except AttributeError as error:
+            errores_generacion['cie_principal'] = "Debe asignar un código de CIE10 principal en la factura"
+            cie_principal = None
 
-        # Obtener la primer prestacion asociada a la factura
-        prestFactura = self.prestacionesFactura.first()
+        cie_secundarios = '' if self.codigos_cie_secundarios is None else [c10.code for c10 in self.codigos_cie_secundarios.all()]
         
-        # Devuelve el string en minúsculas
-        tipo = prestFactura.tipo.get_tipo_display().casefold()
+        try:
+            # Extraer códigos de las prestaciones copiadas de la consulta
+            cod_hpgd = [prestacion.tipo.codigo for prestacion in self.prestacionesFactura.all()]        
+
+            # Obtener la primer prestacion asociada a la factura
+            prestFactura = self.prestacionesFactura.first()
+
+            # Devuelve el string en minúsculas
+            tipo = prestFactura.tipo.get_tipo_display().casefold()
+
+        except AttributeError as error:
+            errores_generacion['códigos N HPGD'] = "Debe asignar al menos una prestación en la factura"
+            cod_hpgd = None
+            tipo = None
+
 
         # TODO - Hay que agregar tipo de atención a las prestaciones
-        atencion = {'tipo': 'consulta', # if tipo is None else tipo
+        atencion = {'tipo': 'consulta',
                     'profesional': profesional,
-                    'especialidad': prestFactura.tipo.descripcion,
+                    'especialidad': especialidad,
                     'codigos_N_HPGD': cod_hpgd,
                     'fecha': {
                         'dia': self.fecha_atencion.day,
@@ -277,14 +294,26 @@ class Factura(TimeStampedModel):
                                                     'otros': cie_secundarios}
                     }
         
-        # Obtener los datos de la Obra Social del Paciente 
-        # usando la relación ObraSocialPaciente
-        obra_social_paciente = self.paciente.m2m_obras_sociales.get(obra_social=self.obra_social.id)
-        obra_social = obra_social_paciente.as_anexo2_json()
+        # Obtener los datos de la Obra Social del Paciente
+        # a través de la relación M2M ObraSocial <=> Paciente
+        try:
+            os_paciente = self.obra_social.pacientes.get(paciente=self.paciente)
+            obra_social = os_paciente.as_anexo2_json()
 
-        # Obtener la primera empresa del paciente
-        empresa_paciente = self.paciente.empresapaciente_set.first()
-        empresa = empresa_paciente.as_anexo2_json()
+        except AttributeError as error:
+            errores_generacion['obra_social'] = "Debe asignar una obra social en la factura"
+            obra_social = None
+
+        try:
+            # TODO - Revisar como se obtienen los datos de la empresa actual del paciente
+
+            # Obtener la primera empresa del paciente
+            empresa_paciente = self.paciente.empresapaciente_set.first()
+            empresa = empresa_paciente.as_anexo2_json()            
+
+        except AttributeError as error:
+            errores_generacion['empresa'] = "El paciente debe tener asignada al menos una empresa"
+            empresa = None
 
         fecha_actual = timezone.now().date()
 

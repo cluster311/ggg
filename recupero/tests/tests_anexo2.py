@@ -116,6 +116,8 @@ class Anexo2Tests(TestCase, FullUsersMixin):
             nos devuelve los errores explicados
         '''
 
+        print('=== Test errores Anexo2 se muestran en template ===')
+
         self.client.login(username='recupero', password='recupero')
 
         # Ir a la url que dispara la generación del Anexo2
@@ -140,6 +142,8 @@ class Anexo2Tests(TestCase, FullUsersMixin):
             con datos incompletos, se captura este error 
             y se notifica al usuario para que lo complete
         '''
+
+        print('=== Test Anexo2 incompleto captura errores ===')
 
         self.client.login(username='recupero', password='recupero')
 
@@ -166,6 +170,9 @@ class Anexo2Tests(TestCase, FullUsersMixin):
             Corroborar que se les deniega el acceso a ver el Anexo2 
             a usuarios que no tengan el rol recupero
         '''
+
+        print('=== Test permisos Anexo2 ===')
+
         self.factory = RequestFactory()
         
         # Se definen los kwargs porque tienen que ser pasados junto con la request en el assert
