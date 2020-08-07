@@ -1,3 +1,5 @@
+import time
+
 from braces.views import GroupRequiredMixin
 from django.views.generic import TemplateView, ListView, UpdateView
 from django.views.generic.detail import DetailView
@@ -8,7 +10,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMi
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
 from django.conf import settings
@@ -19,11 +21,12 @@ from especialidades.models import MedidasAnexasEspecialidad, MedidaAnexaEnConsul
 from especialidades.forms import MedidaAnexaEnConsultaForm, MedidaAnexaEnConsultaFormset
 from calendario.models import Turno
 from .forms import (EvolucionForm, ConsultaForm,
-                   RecetaFormset, DerivacionFormset, 
-                   PrestacionFormset, CarpetaFamiliarForm, PacienteFormPopUp)
+                    RecetaFormset, DerivacionFormset,
+                    PrestacionFormset, CarpetaFamiliarForm, PacienteFormPopUp)
 from recupero.forms import FacturaPrestacionFormSet
 from crispy_forms.utils import render_crispy_form
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -32,7 +35,8 @@ def PacienteCreatePopup(request):
     if form.is_valid():
         instance = form.save()
         return HttpResponse(
-            '<script>opener.closePopupCleanField(window, "%s", "%s", "#id_paciente");</script>' % (instance.pk, instance))
+            '<script>opener.closePopupCleanField(window, "%s", "%s" );</script>' % (
+            instance.pk, instance.numero_documento))
     return render(request, "pacientes/paciente_createview.html", {"form": form})
 
 
@@ -78,7 +82,7 @@ class ConsultaMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         instance = getattr(self, 'object', None)
-        
+
         data = self.request.POST if self.request.method == "POST" else None
         context["data"] = data
         if data is not None:
@@ -87,12 +91,12 @@ class ConsultaMixin:
         context["recetas_frm"] = RecetaFormset(data, prefix='Recetas', instance=instance)
         context["derivaciones_frm"] = DerivacionFormset(data, prefix='Derivaciones', instance=instance)
         context["prestaciones_frm"] = PrestacionFormset(data, prefix='Prestaciones', instance=instance)
-       
+
         context["formsets"] = [
             context["recetas_frm"],
             context["derivaciones_frm"],
             context["prestaciones_frm"]
-        ]        
+        ]
 
         context['instance'] = instance
         # se requieren las consultas anteriores como historia clínica
@@ -103,7 +107,9 @@ class ConsultaMixin:
             consultas_previas_completas = []
             consultas_previas = Consulta.objects.filter(
                 paciente=instance.paciente
-                ).exclude(pk=instance.pk).exclude(turno__estado__in=[Turno.ASIGNADO, Turno.ESPERANDO_EN_SALA, Turno.CANCELADO_PACIENTE]).order_by('-created')
+            ).exclude(pk=instance.pk).exclude(
+                turno__estado__in=[Turno.ASIGNADO, Turno.ESPERANDO_EN_SALA, Turno.CANCELADO_PACIENTE]).order_by(
+                '-created')
             for cp in consultas_previas:
                 mac = MedidaAnexaEnConsulta.objects.filter(consulta=cp)
                 rec = Receta.objects.filter(consulta=cp)
@@ -111,7 +117,7 @@ class ConsultaMixin:
                 pre = Prestacion.objects.filter(consulta=cp)
                 consultas_previas_completas.append((cp, mac, rec, der, pre))
             context['consultas_previas'] = consultas_previas_completas
-        
+
         consulta = self.object
         medidas_a_tomar = MedidasAnexasEspecialidad.objects.filter(
             especialidad=consulta.especialidad
@@ -120,14 +126,14 @@ class ConsultaMixin:
             MedidaAnexaEnConsulta.objects.get_or_create(
                 consulta=consulta,
                 medida=medida.medida
-                )
+            )
         context["recetas_frm"] = RecetaFormset(data, prefix='Recetas', instance=instance)
         context["medidas_frm"] = MedidaAnexaEnConsultaFormset(data, prefix='Medidas', instance=instance)
         return context
 
     def form_valid(self, form):
         context = self.get_context_data()
-        
+
         rs = context["recetas_frm"]
         ds = context["derivaciones_frm"]
         ps = context["prestaciones_frm"]
@@ -138,39 +144,39 @@ class ConsultaMixin:
         # avisar al turno que fue atendido
         self.object.turno.estado = Turno.ATENDIDO
         self.object.turno.save()
-        
+
         if rs.is_valid():
             rs.instance = self.object
             rs.save()
-        
+
         if ds.is_valid():
             ds.instance = self.object
             ds.save()
-        
+
         if ps.is_valid():
             ps.instance = self.object
             ps.save()
-        
+
         # ISSUE usar MedidaAnexaEnConsultaForm
         # https://github.com/cluster311/ggg/issues/120
         if ms.is_valid():
             ms.instance = self.object
             ms.save()
-        
+
         consulta = self.object
 
         # TODO #248 - Determinar con que OS se atiende el paciente en la consulta
         os_paciente = consulta.paciente.m2m_obras_sociales.first().obra_social
 
         nueva_factura = Factura(
-            consulta=consulta, 
+            consulta=consulta,
             obra_social=os_paciente,
             fecha_atencion=consulta.fecha,
             centro_de_salud=consulta.turno.servicio.centro,
             paciente=consulta.paciente,
             codigo_cie_principal=consulta.codigo_cie_principal,
-            )
-        
+        )
+
         # Guardar la factura antes de agregar los códigos CIE secundarios (M2M)
         nueva_factura.save()
 
@@ -187,8 +193,9 @@ class ConsultaMixin:
 
         return super().form_valid(form)
 
-class EvolucionUpdateView(ConsultaMixin, 
-                          SuccessMessageMixin, 
+
+class EvolucionUpdateView(ConsultaMixin,
+                          SuccessMessageMixin,
                           UserPassesTestMixin,
                           PermissionRequiredMixin,
                           UpdateView):
@@ -219,8 +226,8 @@ class EvolucionUpdateView(ConsultaMixin,
 
 
 class CarpetaFamiliarCreateView(PermissionRequiredMixin,
-                               CreateView,
-                               SuccessMessageMixin):
+                                CreateView,
+                                SuccessMessageMixin):
     model = CarpetaFamiliar
     success_message = "Carpeta creada con éxito."
     form_class = CarpetaFamiliarForm
@@ -238,3 +245,35 @@ class CarpetaFamiliarCreateView(PermissionRequiredMixin,
         return reverse(
             "calendario.agendar"
         )
+
+
+def BuscarPaciente(request, dni):
+    dni_parseado = (''.join(filter(str.isdigit, dni)))
+    if Paciente.objects.filter(numero_documento=dni_parseado).exists():
+        paciente = Paciente.objects.get(numero_documento=dni_parseado)
+        data = {"paciente_id": paciente.id,
+                "nombre": str(paciente.apellidos + ', ' + paciente.nombres),
+                "dni": paciente.numero_documento,
+                "encontrado": True}
+        time.sleep(2)
+    else:
+        save, result = Paciente.create_from_sisa(dni_parseado)
+        if save:
+            data = {"paciente_id": result.id,
+                    "nombre": str(result.apellidos + ', ' + result.nombres),
+                    "dni": result.numero_documento,
+                    "encontrado": True}
+            time.sleep(2)
+        else:
+            data = {"encontrado": False}
+    return JsonResponse(data, status=200)
+
+
+def DatosPaciente(request, paciente_id):
+    if Paciente.objects.filter(id=paciente_id).exists():
+        paciente = Paciente.objects.get(id=paciente_id)
+        data = {"paciente_id": paciente.id,
+                "nombre": str(paciente.apellidos + ', ' + paciente.nombres),
+                "dni": paciente.numero_documento
+                }
+        return JsonResponse(data, status=200)

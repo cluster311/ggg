@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-    <h2>Nuevo Paciente</h2>
+    <h2>Cargue un nuevo Paciente</h2>
     <form method = 'POST' action= '' novalidate id = "author-form">
     {% csrf_token %}
         {{ form|crispy}}

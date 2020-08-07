@@ -4,7 +4,7 @@ from address.models import AddressField
 from address.forms import AddressWidget
 from dal import autocomplete
 from core.admin import ContactoAdminInline
-from .models import Paciente, Consulta, CarpetaFamiliar, Receta
+from .models import Paciente, Consulta, CarpetaFamiliar, Receta, EmpresaPaciente, Empresa
 from .forms import ConsultaForm
 
 
@@ -41,3 +41,5 @@ class PacienteAdmin(admin.ModelAdmin):
 admin.site.register(Consulta, ConsultaAdmin)
 admin.site.register(Paciente, PacienteAdmin)
 admin.site.register(CarpetaFamiliar, CarpetaFamiliarAdmin)
+admin.site.register(Empresa)
+admin.site.register(EmpresaPaciente)
