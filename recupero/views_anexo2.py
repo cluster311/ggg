@@ -21,7 +21,8 @@ class Anexo2View(PermissionRequiredMixin, View):
         factura = Factura.objects.get(pk=factura_id)
         
         # Juntar los datos para el Anexo2
-        data = factura.as_anexo2_json()
+        data, errores_generacion = factura.as_anexo2_json()
+
         anx = Anexo2(data=data)
 
         # Generar el Anexo2
@@ -43,8 +44,11 @@ class Anexo2View(PermissionRequiredMixin, View):
                     description=f'Se encontraron los siguientes errores en la generación del Anexo2 para la factura {factura_id}',
                     data=data)
 
+            # Se crea un dict que contiene los errores de validación del Anexo 
+            # y los de datos faltantes si los hubiera
             newDict = dict()
-            newDict['errors'] = anx.errors
+            newDict['anexo2'] = anx.errors
+            newDict['datos'] = errores_generacion if len(errores_generacion) > 0 else None
 
             return render(request, template_name='recupero/anexo_errors.html', context=newDict)
 
