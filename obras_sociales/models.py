@@ -92,7 +92,6 @@ class ObraSocialPaciente(models.Model):
         default="otro",
     )
 
-    # TODO - Enviar información sobre parentesco y tipo beneficiario
     def as_anexo2_json(self):
         """ devuelve el JSON compatible con la librería Anexo2 https://github.com/cluster311/Anexo2
             Ejemplo:
@@ -102,6 +101,8 @@ class ObraSocialPaciente(models.Model):
                     'nro_carnet_obra_social': '9134818283929101',
                     'fecha_de_emision': {'dia': 11, 'mes': 9, 'anio': 2009},
                     'fecha_de_vencimiento': {'dia': 11, 'mes': 9, 'anio': 2029}
+                    'tipo_beneficiario': 'no titular',
+                    'parentesco': 'conyuge'
                 }
         """
         emision_dia = 1 if self.fecha_de_emision is None else self.fecha_de_emision.day
