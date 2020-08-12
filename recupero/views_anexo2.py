@@ -44,6 +44,9 @@ class Anexo2View(PermissionRequiredMixin, View):
                     description=f'Se encontraron los siguientes errores en la generación del Anexo2 para la factura {factura_id}',
                     data=data)
 
+            # Cambiar el estado de la factura a RECHAZADA
+            factura.change_status(400)
+
             # Se crea un dict que contiene los errores de validación del Anexo 
             # y los de datos faltantes si los hubiera
             newDict = dict()
@@ -51,5 +54,8 @@ class Anexo2View(PermissionRequiredMixin, View):
             newDict['datos'] = errores_generacion if len(errores_generacion) > 0 else None
 
             return render(request, template_name='recupero/anexo_errors.html', context=newDict)
+
+        # Cambiar el estado de la factura a ACEPTADA
+        factura.change_status(500)
 
         return HttpResponse(res)

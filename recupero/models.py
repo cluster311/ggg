@@ -159,7 +159,7 @@ class Factura(TimeStampedModel):
                (EST_ENVIADO_A_OSS, 'Enviada'),
                (EST_RECHAZADO, 'Rechazada'),
                (EST_ACEPTADO, 'Aceptada'),
-               (EST_ACEPTADO, 'Pagada')
+               (EST_PAGADO, 'Pagada')
                )
     estado = models.PositiveIntegerField(choices=estados, default=EST_NUEVO)
     obra_social = models.ForeignKey(
@@ -209,7 +209,7 @@ class Factura(TimeStampedModel):
     def __str__(self):
         return f'Factura {self.id}'
     
-    def change_status(self, new_status):
+    def change_status(self, new_status: int):
         data = {'old_status': self.estado, 'new_status': new_status}
         app_log.send(sender=self.__class__,
                      code='CHANGE_STATUS_FACTURA',
