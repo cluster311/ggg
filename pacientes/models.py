@@ -1,3 +1,6 @@
+import json
+from datetime import date
+
 from sisa.puco import Puco
 from sisa.renaper import Renaper
 from django.db import models
@@ -17,6 +20,7 @@ from django.contrib.contenttypes.models import ContentType
 from obras_sociales.models import ObraSocial, ObraSocialPaciente
 import logging
 logger = logging.getLogger(__name__)
+from sss_beneficiarios_hospitales.data import DataBeneficiariosSSSHospital
 
 
 class CarpetaFamiliar(models.Model):
@@ -173,6 +177,39 @@ class Paciente(Persona):
 
     def __str__(self):
         return f"{self.apellidos}, {self.nombres}"
+
+    @classmethod
+    def create_from_sss(cls, dni):
+        dbh = DataBeneficiariosSSSHospital(user=settings.USER_SSS, password=settings.USER_SSS)
+        res = dbh.query(dni=dni)
+        if res['ok']:
+            tablas = res['resultados']['tablas']
+            if res['resultados']['hay_afiliacion']:
+                data = tablas[0]['data']
+                fecha = data['Fecha de nacimiento'].split('-')
+                fecha_nac = date(int(fecha[2]), int(fecha[1]), int(fecha[0]))
+                paciente = Paciente.objects.create(
+                    apellidos=data['Apellido y nombre'],
+                    sexo=data['Sexo'].lower(),
+                    fecha_nacimiento=fecha_nac,
+                    tipo_documento=data['Tipo de documento'],
+                    numero_documento=data['Número de documento'],
+                )
+
+                oss_data = tablas[1]['data']
+                oss_codigo = (''.join(filter(str.isdigit, oss_data['Código de Obra Social'])))
+                oss, created = ObraSocial.objects.get_or_create(
+                    codigo=oss_codigo,
+                    defaults= {
+                        'nombre': oss_data['Denominación Obra Social'],
+                        })
+                ObraSocialPaciente.objects.create(
+                    data_source=settings.SOURCE_OSS_SSS,
+                    paciente=paciente,
+                    obra_social_updated=now(),
+                    obra_social=oss,
+                    tipo_beneficiario=data['Parentesco'].lower()
+                )
 
     @classmethod
     def create_from_sisa(cls, dni):

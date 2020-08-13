@@ -257,7 +257,7 @@ def BuscarPaciente(request, dni):
                 "encontrado": True}
         time.sleep(2)
     else:
-        save, result = Paciente.create_from_sisa(dni_parseado)
+        result, save = Paciente.create_from_sss(dni_parseado)
         if save:
             data = {"paciente_id": result.id,
                     "nombre": str(result.apellidos + ', ' + result.nombres),
