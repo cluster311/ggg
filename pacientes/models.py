@@ -139,13 +139,10 @@ class Paciente(Persona):
         elif self.sexo == 'femenino':
             sexo = 'F'
         
-        # TODO #251 definir como obtener el tipo de beneficiario y su parentesco
         edad = 0 if self.edad is None else self.edad
         ret = {'apellido_y_nombres': f'{self.apellidos}, {self.nombres}',
                 'tipo_dni': self.tipo_documento,
                 'dni': self.numero_documento,
-                'tipo_beneficiario': 'titular',  # | no titular | adherente
-                'parentesco': 'otro',  # conyuge | hijo | otro
                 'sexo': sexo,  # M | F
                 'edad': edad}
 
@@ -357,29 +354,6 @@ class Consulta(TimeStampedModel):
         else:
             f = self.factura
             logger.info(f'Factura {f.id} OK para la consulta {self}')
-
-    def as_anexo2_json(self):
-        """ devuelve el JSON compatible con la librería Anexo2 https://github.com/cluster311/Anexo2
-            Ejemplo:
-                {'tipo': 'consulta',  # | practica | internacion
-                    'especialidad': 'Va un texto al parecer largo, quizas sea del nomenclador',
-                    'codigos_N_HPGD': ['AA01', 'AA02', 'AA06', 'AA07'],
-                    'fecha': {'dia': 3, 'mes': 9, 'anio': 2019},
-                    'diagnostico_ingreso_cie10': {'principal': 'W020', 'otros': ['w021', 'A189']}}
-        """
-        # TODO detectar tipo de atencion
-        tipo_atencion = 'consulta'  # | practica | internacion
-        cie_secundarios = [c10.code for c10 in self.codigos_cie_secundarios.all()]
-        cie_code = 'DESC' if self.codigo_cie_principal is None else self.codigo_cie_principal.code
-        ret = {'tipo': tipo_atencion,
-               'especialidad': 'Va un texto al parecer largo, quizas sea del nomenclador',
-               'codigos_N_HPGD': ['AA01', 'AA02', 'AA06', 'AA07'],  
-               'fecha': {'dia': self.fecha.day, 'mes': self.fecha.month, 'anio': self.fecha.year},
-               'diagnostico_ingreso_cie10': {'principal': cie_code, 
-                                             'otros': cie_secundarios}
-                }
-        
-        return ret
 
 
 class Receta(TimeStampedModel):

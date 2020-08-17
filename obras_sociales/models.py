@@ -88,18 +88,22 @@ class ObraSocialPaciente(models.Model):
     )
     parentesco = models.CharField(
         max_length=20,
-        choices=Choices("conyugue", "hijo", "otro"),
+        choices=Choices("conyuge", "hijo", "otro"),
         default="otro",
     )
 
     def as_anexo2_json(self):
         """ devuelve el JSON compatible con la librería Anexo2 https://github.com/cluster311/Anexo2
             Ejemplo:
-                {'codigo_rnos': '800501',
+                {
+                    'codigo_rnos': '800501',
                     'nombre': 'OBRA SOCIAL ACEROS PARANA',
                     'nro_carnet_obra_social': '9134818283929101',
                     'fecha_de_emision': {'dia': 11, 'mes': 9, 'anio': 2009},
-                    'fecha_de_vencimiento': {'dia': 11, 'mes': 9, 'anio': 2029}}
+                    'fecha_de_vencimiento': {'dia': 11, 'mes': 9, 'anio': 2029}
+                    'tipo_beneficiario': 'no titular',
+                    'parentesco': 'conyuge'
+                }
         """
         emision_dia = 1 if self.fecha_de_emision is None else self.fecha_de_emision.day
         emision_mes = 2 if self.fecha_de_emision is None else self.fecha_de_emision.month
@@ -109,10 +113,14 @@ class ObraSocialPaciente(models.Model):
         vto_mes = 2 if self.fecha_de_vencimiento is None else self.fecha_de_vencimiento.month
         vto_ano = 2020 if self.fecha_de_vencimiento is None else self.fecha_de_vencimiento.year
 
-        ret = {'codigo_rnos': self.obra_social.codigo,
-                    'nombre': self.obra_social.nombre,
-                    'nro_carnet_obra_social': self.numero_afiliado,
-                    'fecha_de_emision': {'dia': emision_dia, 'mes': emision_mes, 'anio': emision_ano},
-                    'fecha_de_vencimiento': {'dia': vto_dia, 'mes': vto_mes, 'anio': vto_ano}}
+        ret = {
+            'codigo_rnos': self.obra_social.codigo,
+            'nombre': self.obra_social.nombre,
+            'nro_carnet_obra_social': self.numero_afiliado,
+            'fecha_de_emision': {'dia': emision_dia, 'mes': emision_mes, 'anio': emision_ano},
+            'fecha_de_vencimiento': {'dia': vto_dia, 'mes': vto_mes, 'anio': vto_ano},
+            'tipo_beneficiario': self.tipo_beneficiario,
+            'parentesco': self.parentesco
+        }
 
         return ret

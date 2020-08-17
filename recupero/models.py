@@ -290,10 +290,12 @@ class Factura(TimeStampedModel):
                         'mes': self.fecha_atencion.month,
                         'anio': self.fecha_atencion.year,
                         },
-                    'diagnostico_ingreso_cie10': {'principal': cie_principal, 
-                                                    'otros': cie_secundarios}
+                    'diagnostico_ingreso_cie10': {
+                        'principal': cie_principal,
+                        'otros': cie_secundarios
+                        }
                     }
-        
+
         # Obtener los datos de la Obra Social del Paciente
         # a través de la relación M2M ObraSocial <=> Paciente
         try:
@@ -314,6 +316,11 @@ class Factura(TimeStampedModel):
         except AttributeError as error:
             errores_generacion['empresa'] = "El paciente debe tener asignada al menos una empresa"
             empresa = None
+
+        # Quitar los valores de obra_social y asignarlos a beneficiario
+        # para evitar errores de validación de Anexo2
+        beneficiario['tipo_beneficiario'] = obra_social.pop('tipo_beneficiario')
+        beneficiario['parentesco'] = obra_social.pop('parentesco')
 
         fecha_actual = timezone.now().date()
 
