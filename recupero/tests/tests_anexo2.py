@@ -9,6 +9,7 @@ from centros_de_salud.models import CentroDeSalud, Especialidad
 from pacientes.models import Consulta, Paciente, Empresa, EmpresaPaciente
 from obras_sociales.models import ObraSocial, ObraSocialPaciente
 from recupero.models import Factura, TipoDocumentoAnexo, TipoPrestacion, FacturaPrestacion
+from cie10_django.models import CIE10
 
 from profesionales.tests import FullUsersMixin, Profesional
 from anexo2.docs import Anexo2
@@ -31,23 +32,35 @@ class Anexo2Tests(TestCase, FullUsersMixin):
             )
         self.profesional = Profesional.objects.create(
             apellidos='Sanchez', nombres='Romina', sexo='femenino',
-            tipo_documento='DNI', numero_documento='27546859'
+            tipo_documento='DNI', numero_documento='27546859',
+            matricula_profesional="987654"
             )
         self.especialidad = Especialidad.objects.create(nombre='Especialidad 1')
 
         self.tipo_documentacion = TipoDocumentoAnexo.objects.create(nombre="TEST")
-        self.tipo_prestacion = TipoPrestacion.objects.create(nombre="TEST", tipo=100)        
+        self.tipo_prestacion = TipoPrestacion.objects.create(nombre="TEST", tipo=100)
+
+        ### Códigos CIE10 ###
+        self.codigo_cie_1 = CIE10.objects.create(code="TEST01", level=1)
+        self.codigo_cie_2 = CIE10.objects.create(code="TEST02", level=2)
+        self.codigo_cie_3 = CIE10.objects.create(code="TEST03", level=3)
 
         # Crear relación ObraSocial <=> Paciente
-        ObraSocialPaciente.objects.create(paciente=self.paciente, obra_social=self.obra_social)
+        ObraSocialPaciente.objects.create(
+            paciente=self.paciente, obra_social=self.obra_social,
+            numero_afiliado="123456789"
+            )
 
         self.os_paciente = self.paciente.m2m_obras_sociales.first().obra_social
 
         self.empresa = Empresa.objects.create(nombre='Telescopios Hubble', direccion='Av Astronómica s/n', cuit='31-91203043-8')
         
-        EmpresaPaciente.objects.create(empresa=self.empresa, paciente=self.paciente)
+        EmpresaPaciente.objects.create(
+            empresa=self.empresa, paciente=self.paciente,
+            ultimo_recibo_de_sueldo=timezone.now()
+        )
 
-        ### Creación facturas (completas e incompletas) ###
+        ### Factura completa ###
         self.consulta = Consulta.objects.create(centro_de_salud=self.cs, paciente=self.paciente)
 
         self.factura_completa = Factura.objects.create(
@@ -58,7 +71,14 @@ class Anexo2Tests(TestCase, FullUsersMixin):
             fecha_atencion=timezone.now(),
             centro_de_salud=self.cs,
             paciente=self.paciente,
+            codigo_cie_principal=self.codigo_cie_1,
         )
+
+        # Agregar CIE secundarios a la factura
+        self.factura_completa.codigos_cie_secundarios.add(
+            self.codigo_cie_2, self.codigo_cie_3
+        )
+
         # Crear relaciones FK
         FacturaPrestacion.objects.create(factura=self.factura_completa, tipo=self.tipo_prestacion)
 
@@ -101,6 +121,7 @@ class Anexo2Tests(TestCase, FullUsersMixin):
         self.cs.delete()
         self.consulta.delete()
         self.consulta2.delete()
+        self.consulta3.delete()
         self.factura_completa.delete()
         self.factura_sin_CS.delete()
         self.factura_sin_profesional.delete()
@@ -109,32 +130,6 @@ class Anexo2Tests(TestCase, FullUsersMixin):
         self.paciente.delete()
         self.empresa.delete()
         self.obra_social.delete()
-
-    def test_errores_Anexo2_mostrados_en_template(self):
-        '''
-            Al intentar generar un Anexo2 erróneo el sistema 
-            nos devuelve los errores explicados
-        '''
-
-        print('=== Test errores Anexo2 se muestran en template ===')
-
-        self.client.login(username='recupero', password='recupero')
-
-        # Ir a la url que dispara la generación del Anexo2
-        url = reverse('recupero.anexo2', kwargs={'factura_id': self.factura_completa.id})
-
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-        templates = [template.name for template in response.templates]
-
-        # Si hubo errores en el Anexo2 se pasará al template
-        # un dict 'anexo2' con los errores
-        self.assertTrue('anexo2' in response.context)
-        
-        # y se usará el template anexo_errors.html
-        self.assertTrue('recupero/anexo_errors.html' in templates)
 
     def test_errores_Anexo2_incompleto(self):
         '''
@@ -151,7 +146,7 @@ class Anexo2Tests(TestCase, FullUsersMixin):
         # de cada factura con su respectivo error
         facturas = [
             (self.factura_sin_CS, b'Debe asignar un centro de salud en la factura'),
-            (self.factura_sin_profesional, b'Debe asignar un profesional en la factura')
+            (self.factura_sin_profesional, b'Debe asignar un profesional en la factura'),
         ]
 
         for factura, error in facturas:
@@ -162,8 +157,18 @@ class Anexo2Tests(TestCase, FullUsersMixin):
 
                 response = self.client.get(url)
 
+                # Verificar que existen errores en la respuesta HTML
                 self.assertIn(error, response.content)
 
+                # Si hubo errores en el Anexo2 se pasarán en el context
+                # un dict 'anexo2' y otro 'datos' con los errores
+                self.assertTrue('anexo2' in response.context)
+                self.assertTrue('datos' in response.context)
+                
+                templates = [template.name for template in response.templates]
+
+                # Se usará el template anexo_errors.html
+                self.assertTrue('recupero/anexo_errors.html' in templates)
 
     def test_permisos_Anexo2(self):
         '''
@@ -190,3 +195,33 @@ class Anexo2Tests(TestCase, FullUsersMixin):
                 request.user = user
                 with self.assertRaises(PermissionDenied):
                     Anexo2View.as_view()(request, **kwargs) # Acá se pasan los kwargs definidos más arriba
+        
+    def test_cambio_estado_factura_Anexo2(self):
+        '''
+            Chequear que las facturas cambian al estado esperado 
+            en caso de que el Anexo2 se genere correctamente o devuelva errores
+        '''
+
+        print('=== Test Cambio de estado de factura ===')
+
+        self.client.login(username='recupero', password='recupero')
+
+        facturas = [
+            (self.factura_completa, 500), # ACEPTADA
+            (self.factura_sin_CS, 400), # RECHAZADA
+            (self.factura_sin_profesional, 400)
+        ]
+
+        for factura, estado_esperado in facturas:
+            with self.subTest(factura=factura):
+
+                # Ir a la url que dispara la generación del Anexo2
+                url = reverse('recupero.anexo2', kwargs={'factura_id': factura.id})
+                response = self.client.get(url)
+                
+                # Hacer una nueva petición a la BD para tomar
+                # el valor actualizado del estado de cada factura
+                
+                fact_actualizada = Factura.objects.get(id=factura.id)
+
+                self.assertEqual(fact_actualizada.estado, estado_esperado)
