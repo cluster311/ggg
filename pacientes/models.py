@@ -184,8 +184,8 @@ class Paciente(Persona):
         res = dbh.query(dni=dni)
         if res['ok']:
             tablas = res['resultados']['tablas']
+            data = tablas[0]['data']
             if res['resultados']['hay_afiliacion']:
-                data = tablas[0]['data']
                 fecha = data['Fecha de nacimiento'].split('-')
                 fecha_nac = date(int(fecha[2]), int(fecha[1]), int(fecha[0]))
                 paciente = Paciente.objects.create(
@@ -195,7 +195,6 @@ class Paciente(Persona):
                     tipo_documento=data['Tipo de documento'],
                     numero_documento=data['Número de documento'],
                 )
-
                 oss_data = tablas[1]['data']
                 oss_codigo = (''.join(filter(str.isdigit, oss_data['Código de Obra Social'])))
                 oss, created = ObraSocial.objects.get_or_create(
@@ -210,6 +209,15 @@ class Paciente(Persona):
                     obra_social=oss,
                     tipo_beneficiario=data['Parentesco'].lower()
                 )
+            else:
+                paciente = Paciente.objects.create(
+                    apellidos=data['Apellido y nombre'],
+                    tipo_documento=data['Tipo de documento'],
+                    numero_documento=data['Número de documento'],
+                )
+            return True, paciente
+        else:
+            return False, f"Persona no encontrada"
 
     @classmethod
     def create_from_sisa(cls, dni):
