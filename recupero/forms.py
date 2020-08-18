@@ -1,7 +1,7 @@
 from cie10_django.models import CIE10
 from django import forms
 from django.forms import inlineformset_factory
-from calendario.widgets import DateTimePicker
+from calendario.widgets import DatePicker
 from centros_de_salud.models import CentroDeSalud, Especialidad
 from obras_sociales.models import ObraSocial
 from pacientes.models import Paciente
@@ -102,7 +102,7 @@ class FacturaForm(forms.ModelForm):
                   'codigo_cie_principal',
                   'codigos_cie_secundarios',
                    )
-        widgets = {'fecha_atencion': DateTimePicker()}
+        widgets = {'fecha_atencion': DatePicker()}
 
 
 FacturaPrestacionFormSet = inlineformset_factory(Factura, FacturaPrestacion, form=FacturaPrestacionForm, extra=1)
