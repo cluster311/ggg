@@ -178,6 +178,7 @@ class Paciente(Persona):
     def __str__(self):
         return f"{self.apellidos}, {self.nombres}"
 
+
     @classmethod
     def create_from_sss(cls, dni):
         dbh = DataBeneficiariosSSSHospital(user=settings.USER_SSS, password=settings.USER_SSS)
@@ -185,7 +186,7 @@ class Paciente(Persona):
         if res['ok']:
             tablas = res['resultados']['tablas']
             data = tablas[0]['data']
-            if res['resultados']['hay_afiliacion']:
+            if tablas[0]['name'] == 'AFILIACION':
                 fecha = data['Fecha de nacimiento'].split('-')
                 fecha_nac = date(int(fecha[2]), int(fecha[1]), int(fecha[0]))
                 paciente = Paciente.objects.create(
@@ -195,27 +196,29 @@ class Paciente(Persona):
                     tipo_documento=data['Tipo de documento'],
                     numero_documento=data['Número de documento'],
                 )
-                oss_data = tablas[1]['data']
-                oss_codigo = (''.join(filter(str.isdigit, oss_data['Código de Obra Social'])))
-                oss, created = ObraSocial.objects.get_or_create(
-                    codigo=oss_codigo,
-                    defaults= {
-                        'nombre': oss_data['Denominación Obra Social'],
-                        })
-                ObraSocialPaciente.objects.create(
-                    data_source=settings.SOURCE_OSS_SSS,
-                    paciente=paciente,
-                    obra_social_updated=now(),
-                    obra_social=oss,
-                    tipo_beneficiario=data['Parentesco'].lower()
-                )
-            else:
+                if tablas[1]['name'] == 'AFILIADO':
+                    oss_data = tablas[1]['data']
+                    oss_codigo = (''.join(filter(str.isdigit, oss_data['Código de Obra Social'])))
+                    oss, created = ObraSocial.objects.get_or_create(
+                        codigo=oss_codigo,
+                        defaults= {
+                            'nombre': oss_data['Denominación Obra Social'],
+                            })
+                    ObraSocialPaciente.objects.create(
+                        data_source=settings.SOURCE_OSS_SSS,
+                        paciente=paciente,
+                        obra_social_updated=now(),
+                        obra_social=oss,
+                        tipo_beneficiario=data['Parentesco'].lower()
+                    )
+                return True, paciente
+            elif tablas[0]['name'] == 'NO_AFILIADO':
                 paciente = Paciente.objects.create(
                     apellidos=data['Apellido y nombre'],
                     tipo_documento=data['Tipo de documento'],
                     numero_documento=data['Número de documento'],
                 )
-            return True, paciente
+                return True, paciente
         else:
             return False, f"Persona no encontrada"
 

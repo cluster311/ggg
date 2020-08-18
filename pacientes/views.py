@@ -247,23 +247,32 @@ class CarpetaFamiliarCreateView(PermissionRequiredMixin,
         )
 
 
+def buscar_paciente_externo(dni):
+    guardado, paciente = Paciente.create_from_sss(dni)
+    if guardado:
+        return True, paciente
+    else:
+        return Paciente.create_from_sisa(dni)
+
+
 def BuscarPaciente(request, dni):
+    time.sleep(2)
     dni_parseado = (''.join(filter(str.isdigit, dni)))
     if Paciente.objects.filter(numero_documento=dni_parseado).exists():
+        #buscar obra social
         paciente = Paciente.objects.get(numero_documento=dni_parseado)
         data = {"paciente_id": paciente.id,
                 "nombre": str(paciente.apellidos + ', ' + paciente.nombres),
                 "dni": paciente.numero_documento,
                 "encontrado": True}
-        time.sleep(2)
+
     else:
-        save, result = Paciente.create_from_sss(dni_parseado)
+        save, result = buscar_paciente_externo(dni_parseado)
         if save:
             data = {"paciente_id": result.id,
                     "nombre": str(result.apellidos + ', ' + result.nombres),
                     "dni": result.numero_documento,
                     "encontrado": True}
-            time.sleep(2)
         else:
             data = {"encontrado": False}
     return JsonResponse(data, status=200)
