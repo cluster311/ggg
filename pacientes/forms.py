@@ -5,7 +5,7 @@ from django.forms.models import inlineformset_factory
 from django.utils.translation import gettext_lazy as _
 from cie10_django.models import CIE10
 
-from calendario.widgets import DateTimePicker, DatePicker
+from calendario.widgets import DatePicker
 from pacientes.models import (Consulta, Paciente, Receta, Derivacion,
                               CarpetaFamiliar)
 from profesionales.models import Profesional
