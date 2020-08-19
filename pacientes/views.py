@@ -168,8 +168,12 @@ class ConsultaMixin:
         # TODO #248 - Determinar con que OS se atiende el paciente en la consulta
         os_paciente = consulta.paciente.m2m_obras_sociales.first().obra_social
 
-        nueva_factura = Factura(
+        # La factura se actualiza con los nuevos datos
+        # Si no existe se crea una nueva
+        factura, created = Factura.objects.update_or_create(
             consulta=consulta,
+            profesional=consulta.profesional,
+            especialidad=consulta.especialidad,
             obra_social=os_paciente,
             fecha_atencion=consulta.fecha,
             centro_de_salud=consulta.turno.servicio.centro,
@@ -177,16 +181,13 @@ class ConsultaMixin:
             codigo_cie_principal=consulta.codigo_cie_principal,
         )
 
-        # Guardar la factura antes de agregar los códigos CIE secundarios (M2M)
-        nueva_factura.save()
-
         # Agregar códigos CIE secundarios a la factura
         cod_secundarios = [cod for cod in consulta.codigos_cie_secundarios.all()]
-        nueva_factura.codigos_cie_secundarios.set(cod_secundarios)
+        factura.codigos_cie_secundarios.set(cod_secundarios)
 
         # Crear formset de prestaciones de la factura
         # con los datos de prestaciones de la consulta
-        prestaciones = FacturaPrestacionFormSet(ps.data, prefix='Prestaciones', instance=nueva_factura)
+        prestaciones = FacturaPrestacionFormSet(ps.data, prefix='Prestaciones', instance=factura)
 
         if prestaciones.is_valid():
             prestaciones.save()

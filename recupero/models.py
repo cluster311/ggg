@@ -279,17 +279,23 @@ class Factura(TimeStampedModel):
             cod_hpgd = None
             tipo = None
 
+        try:
+            fecha_atencion = {
+                'dia': self.fecha_atencion.day,
+                'mes': self.fecha_atencion.month,
+                'anio': self.fecha_atencion.year
+            }
+        except AttributeError as error:
+            errores_generacion['fecha_atencion'] = "Debe asignar una fecha correcta en la factura"
+            fecha_atencion = None
+
 
         # TODO - Hay que agregar tipo de atención a las prestaciones
         atencion = {'tipo': 'consulta',
                     'profesional': profesional,
                     'especialidad': especialidad,
                     'codigos_N_HPGD': cod_hpgd,
-                    'fecha': {
-                        'dia': self.fecha_atencion.day,
-                        'mes': self.fecha_atencion.month,
-                        'anio': self.fecha_atencion.year,
-                        },
+                    'fecha': fecha_atencion,
                     'diagnostico_ingreso_cie10': {
                         'principal': cie_principal,
                         'otros': cie_secundarios
