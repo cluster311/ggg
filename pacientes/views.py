@@ -259,7 +259,7 @@ def BuscarPaciente(request, dni):
     time.sleep(2)
     dni_parseado = (''.join(filter(str.isdigit, dni)))
     if Paciente.objects.filter(numero_documento=dni_parseado).exists():
-        #buscar obra social
+        #buscar obra social actualizar datos
         paciente = Paciente.objects.get(numero_documento=dni_parseado)
         data = {"paciente_id": paciente.id,
                 "nombre": str(paciente.apellidos + ', ' + paciente.nombres),
