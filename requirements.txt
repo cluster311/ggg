@@ -22,4 +22,4 @@ fastkml>=0.11
 django_tinymce>=2.8.0
 oss-ar>=0.131
 anexo2>=0.107
-sss-beneficiarios-hospitales>=0.8.119
+sss-beneficiarios-hospitales>=0.8.120
