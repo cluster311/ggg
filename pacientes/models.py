@@ -1,3 +1,7 @@
+import datetime
+import json
+from datetime import date
+
 from sisa.puco import Puco
 from sisa.renaper import Renaper
 from django.db import models
@@ -17,6 +21,7 @@ from django.contrib.contenttypes.models import ContentType
 from obras_sociales.models import ObraSocial, ObraSocialPaciente
 import logging
 logger = logging.getLogger(__name__)
+from sss_beneficiarios_hospitales.data import DataBeneficiariosSSSHospital
 
 
 class CarpetaFamiliar(models.Model):
@@ -170,6 +175,62 @@ class Paciente(Persona):
 
     def __str__(self):
         return f"{self.apellidos}, {self.nombres}"
+
+    @classmethod
+    def create_from_sss(cls, dni):
+        dbh = DataBeneficiariosSSSHospital(user=settings.USER_SSS, password=settings.USER_SSS)
+        res = dbh.query(dni=dni)
+        if res['ok']:
+            tablas = res['resultados']['tablas']
+            data = tablas[0]['data']
+            tam_tabla = len(tablas)
+            if tablas[0]['name'] == 'AFILIACION':
+                fecha = data['Fecha de nacimiento'].split('-')
+                fecha_nac = date(int(fecha[2]), int(fecha[1]), int(fecha[0]))
+                paciente = Paciente.objects.create(
+                    apellidos=data['Apellido y nombre'],
+                    sexo=data['Sexo'].lower(),
+                    fecha_nacimiento=fecha_nac,
+                    tipo_documento=data['Tipo de documento'],
+                    numero_documento=data['Número de documento'],
+                )
+                if tam_tabla >= 2:
+                    oss_data = tablas[1]['data']
+                    oss_codigo = (''.join(filter(str.isdigit, oss_data['Código de Obra Social'])))
+                    oss, created = ObraSocial.objects.get_or_create(
+                        codigo=oss_codigo,
+                        defaults={
+                            'nombre': oss_data['Denominación Obra Social'],
+                            })
+                    ObraSocialPaciente.objects.create(
+                        data_source=settings.SOURCE_OSS_SSS,
+                        paciente=paciente,
+                        obra_social_updated=now(),
+                        obra_social=oss,
+                        tipo_beneficiario=data['Parentesco'].lower()
+                    )
+                    if tam_tabla >= 3:
+                        empleador_data = tablas[2]['data']
+                        cuit_parseado = (''.join(filter(str.isdigit, oss_data['CUIT de empleador'])))
+                        empresa, created = Empresa.objects.get_or_create(cuit=cuit_parseado, defaults={
+                                    'nombre': empleador_data['Tipo Beneficiario Declarado'],
+                                })
+                        fecha = empleador_data['Ultimo Período Declarado'].split('-')
+                        EmpresaPaciente.objects.get_or_create(
+                            paciente=paciente,
+                            empresa=empresa,
+                            ultimo_recibo_de_sueldo=datetime.datetime(int(fecha[1]), int(fecha[0]), 1)
+                        )
+                return True, paciente
+            elif tablas[0]['name'] == 'NO_AFILIADO':
+                paciente = Paciente.objects.create(
+                    apellidos=data['Apellido y nombre'],
+                    tipo_documento=data['Tipo de documento'],
+                    numero_documento=data['Número de documento'],
+                )
+                return True, paciente
+        else:
+            return False, f"Persona no encontrada"
 
     @classmethod
     def create_from_sisa(cls, dni):
