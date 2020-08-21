@@ -266,8 +266,7 @@ class Factura(TimeStampedModel):
         
         try:
             # Extraer códigos de las prestaciones copiadas de la consulta
-            cod_hpgd = [prestacion.tipo.codigo for prestacion in self.prestacionesFactura.all()]        
-
+            cod_hpgd = [prestacion.tipo.codigo for prestacion in self.prestacionesFactura.all()]
             # Obtener la primer prestacion asociada a la factura
             prestFactura = self.prestacionesFactura.first()
 

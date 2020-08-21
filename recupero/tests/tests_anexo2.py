@@ -22,7 +22,7 @@ class Anexo2Tests(TestCase, FullUsersMixin):
         self.create_users_and_groups()
         self.client = Client()
 
-        self.cs = CentroDeSalud.objects.create(nombre=f"CdSTEST")
+        self.cs = CentroDeSalud.objects.create(nombre="CdSTEST", codigo_hpgd="04.33.1382")
         self.obra_social = ObraSocial.objects.create(nombre="TEST_Obra_social", codigo=1234)
         self.paciente = Paciente.objects.create(
             apellidos='Garcia', nombres='Alberto', sexo='masculino',
@@ -38,7 +38,7 @@ class Anexo2Tests(TestCase, FullUsersMixin):
         self.especialidad = Especialidad.objects.create(nombre='Especialidad 1')
 
         self.tipo_documentacion = TipoDocumentoAnexo.objects.create(nombre="TEST")
-        self.tipo_prestacion = TipoPrestacion.objects.create(nombre="TEST", tipo=100)
+        self.tipo_prestacion = TipoPrestacion.objects.create(nombre="TEST", codigo="000", tipo=100)
 
         ### Códigos CIE10 ###
         self.codigo_cie_1 = CIE10.objects.create(code="TEST01", level=1)
@@ -48,7 +48,7 @@ class Anexo2Tests(TestCase, FullUsersMixin):
         # Crear relación ObraSocial <=> Paciente
         ObraSocialPaciente.objects.create(
             paciente=self.paciente, obra_social=self.obra_social,
-            numero_afiliado="123456789"
+            numero_afiliado="123456789", tipo_beneficiario="titular", parentesco="conyuge"
             )
 
         self.os_paciente = self.paciente.m2m_obras_sociales.first().obra_social
@@ -80,7 +80,7 @@ class Anexo2Tests(TestCase, FullUsersMixin):
         )
 
         # Crear relaciones FK
-        FacturaPrestacion.objects.create(factura=self.factura_completa, tipo=self.tipo_prestacion)
+        FacturaPrestacion.objects.create(factura=self.factura_completa, tipo=self.tipo_prestacion, cantidad="2")
 
         ### Factura y consulta sin Centro de Salud ###
 
@@ -221,7 +221,6 @@ class Anexo2Tests(TestCase, FullUsersMixin):
                 
                 # Hacer una nueva petición a la BD para tomar
                 # el valor actualizado del estado de cada factura
-                
-                fact_actualizada = Factura.objects.get(id=factura.id)
+                factura.refresh_from_db()
 
-                self.assertEqual(fact_actualizada.estado, estado_esperado)
+                self.assertEqual(factura.estado, estado_esperado)

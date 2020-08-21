@@ -84,7 +84,7 @@ class ObraSocialPaciente(models.Model):
     tipo_beneficiario = models.CharField(
         max_length=20,
         choices=Choices("titular", "no titular", "adherente"),
-        default="Titular",
+        default="titular",
     )
     parentesco = models.CharField(
         max_length=20,
