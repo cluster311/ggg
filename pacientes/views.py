@@ -163,6 +163,7 @@ class ConsultaMixin:
             ms.instance = self.object
             ms.save()
 
+        # Creación/Actualización de la Factura en base a la Consulta
         consulta = self.object
 
         # TODO #248 - Determinar con que OS se atiende el paciente en la consulta
@@ -172,13 +173,15 @@ class ConsultaMixin:
         # Si no existe se crea una nueva
         factura, created = Factura.objects.update_or_create(
             consulta=consulta,
-            profesional=consulta.profesional,
-            especialidad=consulta.especialidad,
-            obra_social=os_paciente,
-            fecha_atencion=consulta.fecha,
-            centro_de_salud=consulta.turno.servicio.centro,
-            paciente=consulta.paciente,
-            codigo_cie_principal=consulta.codigo_cie_principal,
+            defaults = {
+                'profesional': consulta.profesional,
+                'especialidad': consulta.especialidad,
+                'obra_social': os_paciente,
+                'fecha_atencion': consulta.fecha,
+                'centro_de_salud': consulta.turno.servicio.centro,
+                'paciente': consulta.paciente,
+                'codigo_cie_principal': consulta.codigo_cie_principal,
+            }
         )
 
         # Agregar códigos CIE secundarios a la factura

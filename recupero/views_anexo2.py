@@ -18,7 +18,7 @@ class Anexo2View(PermissionRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         factura_id = self.kwargs['factura_id']
-        factura = Factura.objects.get(pk=factura_id)
+        factura: Factura = Factura.objects.get(pk=factura_id)
         
         # Juntar los datos para el Anexo2
         data, errores_generacion = factura.as_anexo2_json()
@@ -45,7 +45,7 @@ class Anexo2View(PermissionRequiredMixin, View):
                     data=data)
 
             # Cambiar el estado de la factura a RECHAZADA
-            factura.change_status(400)
+            factura.change_status(factura.EST_RECHAZADO)
 
             # Se crea un dict que contiene los errores de validación del Anexo 
             # y los de datos faltantes si los hubiera
@@ -56,6 +56,5 @@ class Anexo2View(PermissionRequiredMixin, View):
             return render(request, template_name='recupero/anexo_errors.html', context=newDict)
 
         # Cambiar el estado de la factura a ACEPTADA
-        factura.change_status(500)
-
+        factura.change_status(factura.EST_ACEPTADO)
         return HttpResponse(res)
