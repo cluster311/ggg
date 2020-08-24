@@ -267,34 +267,35 @@ def actualizar_obra_social(paciente):
             defaults={
                 'nombre': oss_data['Denominación Obra Social'],
             })
-        osp, created = ObraSocialPaciente.objects.get_or_create(
+        ObraSocialPaciente.objects.get_or_create(
             paciente=paciente,
             obra_social=oss,
             defaults={'data_source': settings.SOURCE_OSS_SSS,
                       'obra_social_updated': now(),
                       'tipo_beneficiario': data['Parentesco'].lower()}
         )
-        if not created:
-            rena = Renaper(dni=paciente.numero_documento)
-            if rena.rnos is not None and rena.rnos != '':
-                value_default = {"nombre": rena.cobertura_social}
-                oss, created = ObraSocial.objects.get_or_create(
-                    codigo=rena.rnos, defaults=value_default
-                )
-                ObraSocialPaciente.objects.get_or_create(
-                    data_source=settings.SOURCE_OSS_SISA,
-                    paciente=paciente,
-                    obra_social_updated=now(),
-                    obra_social=oss,
-                )
-            return True, paciente
+    else:
+        rena = Renaper(dni=paciente.numero_documento)
+        if rena.rnos is not None and rena.rnos != '':
+            value_default = {"nombre": rena.cobertura_social}
+            oss, created = ObraSocial.objects.get_or_create(
+                codigo=rena.rnos, defaults=value_default
+            )
+            ObraSocialPaciente.objects.get_or_create(
+                data_source=settings.SOURCE_OSS_SISA,
+                paciente=paciente,
+                obra_social_updated=now(),
+                obra_social=oss,
+            )
 
 
 def buscar_paciente_general(dni):
     if Paciente.objects.filter(numero_documento=dni).exists():
         paciente = Paciente.objects.get(numero_documento=dni)
-        if paciente.ultima_actualizacion + timedelta(days=settings.REVISE_DATA_DAYS) > datetime.today():
+        if paciente.ultima_actualizacion + timedelta(days=settings.REVISE_DATA_DAYS) < datetime.now().date():
             actualizar_obra_social(paciente)
+            paciente.ultima_actualizacion = datetime.now().date()
+            paciente.save()
         return paciente
     else:
         guardado, paciente = Paciente.create_from_sss(dni)
@@ -307,7 +308,7 @@ def buscar_paciente_general(dni):
     return None
 
 
-def BuscarPaciente(request, dni):
+def BuscarPacienteRecupero(request, dni):
     time.sleep(2)
     dni_parseado = (''.join(filter(str.isdigit, dni)))
     paciente = buscar_paciente_general(dni_parseado)
