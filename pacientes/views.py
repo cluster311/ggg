@@ -255,6 +255,7 @@ class CarpetaFamiliarCreateView(PermissionRequiredMixin,
 
 
 def actualizar_obra_social(paciente):
+    time.sleep(2)
     dbh = DataBeneficiariosSSSHospital(user=settings.USER_SSS, password=settings.USER_SSS)
     res = dbh.query(dni=paciente.numero_documento)
     if res['ok']:
@@ -298,6 +299,7 @@ def buscar_paciente_general(dni):
             paciente.save()
         return paciente
     else:
+        time.sleep(2)
         guardado, paciente = Paciente.create_from_sss(dni)
         if guardado:
             return paciente
@@ -309,7 +311,9 @@ def buscar_paciente_general(dni):
 
 
 def BuscarPacienteRecupero(request, dni):
-    time.sleep(2)
+    if not request.user.has_perm('pacientes.add_paciente') and not request.user.has_perm('pacientes.change_paciente'):
+        data = {"encontrado": False}
+        return JsonResponse(data, status=400)
     dni_parseado = (''.join(filter(str.isdigit, dni)))
     paciente = buscar_paciente_general(dni_parseado)
     if paciente:

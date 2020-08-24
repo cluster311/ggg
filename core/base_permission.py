@@ -30,8 +30,12 @@ def start_roles_and_permissions():
 
     perm_add_consulta = Permission.objects.get(codename='add_consulta', content_type__app_label='pacientes')
     perm_view_consulta = Permission.objects.get(codename='view_consulta', content_type__app_label='pacientes')
+    perm_add_paciente = Permission.objects.get(codename='add_paciente', content_type__app_label='pacientes')
+    perm_change_paciente = Permission.objects.get(codename='change_paciente', content_type__app_label='pacientes')
 
     group_prof.permissions.add(perm_view_consulta, perm_add_consulta)
+    group_recupero.permissions.add(perm_add_paciente, perm_change_paciente)
+    group_admin.permissions.add(perm_add_paciente, perm_change_paciente)
 
     perm_add_prof = Permission.objects.get(codename='add_profesional', content_type__app_label='profesionales')
     perm_view_prof = Permission.objects.get(codename='view_profesional', content_type__app_label='profesionales')
@@ -100,7 +104,7 @@ def start_roles_and_permissions():
 
     group_recupero.permissions.add(perm_view_fact, perm_chg_fact, perm_view_tda,
                                    perm_chg_tda, perm_view_tp, perm_chg_tp,
-                                   perm_add_tda, perm_add_tp, perm_add_fact, perm_view_oss)
+                                   perm_add_tda, perm_add_tp, perm_add_fact, perm_view_oss,)
 
     perm_view_uecds = Permission.objects.get(codename='view_usuarioencentrodesalud', content_type__app_label='usuarios')
     perm_add_uecds = Permission.objects.get(codename='add_usuarioencentrodesalud', content_type__app_label='usuarios')
