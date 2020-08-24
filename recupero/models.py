@@ -170,7 +170,7 @@ class Factura(TimeStampedModel):
         blank=True
     )
 
-    fecha_atencion = models.DateTimeField(blank=True, null=True)
+    fecha_atencion = models.DateField(blank=True, null=True)
     centro_de_salud = models.ForeignKey(
         "centros_de_salud.CentroDeSalud",
         related_name="facturas_centro",
@@ -269,6 +269,8 @@ class Factura(TimeStampedModel):
             cod_hpgd = [prestacion.tipo.codigo for prestacion in self.prestacionesFactura.all()]
             # Obtener la primer prestacion asociada a la factura
             prestFactura = self.prestacionesFactura.first()
+
+            tipos_prestaciones = [prestacion.tipo.get_tipo_display() for prestacion in self.prestacionesFactura.all()]
 
             # Devuelve el string en minúsculas
             tipo = prestFactura.tipo.get_tipo_display().casefold()
