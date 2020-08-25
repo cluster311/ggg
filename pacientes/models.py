@@ -222,7 +222,7 @@ class Paciente(Persona):
                         ultimo_recibo_de_sueldo=datetime.datetime(int(fecha[1]), int(fecha[0]), 1)
                     )
                 return True, paciente
-            elif not res['resultados']['afiliado']:
+            else:
                 paciente = Paciente.objects.create(
                     apellidos=data['Apellido y nombre'],
                     tipo_documento=data['Tipo de documento'],
