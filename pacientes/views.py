@@ -1,4 +1,5 @@
 import time
+from datetime import timedelta, datetime
 
 from braces.views import GroupRequiredMixin
 from django.views.generic import TemplateView, ListView, UpdateView
@@ -13,8 +14,11 @@ from django.utils.decorators import method_decorator
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
-from django.conf import settings
+from django.conf import settings, Settings
+from sisa.renaper import Renaper
+from sss_beneficiarios_hospitales.data import DataBeneficiariosSSSHospital
 
+from obras_sociales.models import ObraSocial, ObraSocialPaciente
 from recupero.models import Prestacion, Factura, FacturaPrestacion
 from .models import Consulta, CarpetaFamiliar, Receta, Derivacion, Paciente
 from especialidades.models import MedidasAnexasEspecialidad, MedidaAnexaEnConsulta
@@ -26,6 +30,8 @@ from .forms import (EvolucionForm, ConsultaForm,
 from recupero.forms import FacturaPrestacionFormSet
 from crispy_forms.utils import render_crispy_form
 import logging
+from django.utils.timezone import now
+
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +42,7 @@ def PacienteCreatePopup(request):
         instance = form.save()
         return HttpResponse(
             '<script>opener.closePopupCleanField(window, "%s", "%s" );</script>' % (
-            instance.pk, instance.numero_documento))
+                instance.pk, instance.numero_documento))
     return render(request, "pacientes/paciente_createview.html", {"form": form})
 
 
@@ -251,34 +257,75 @@ class CarpetaFamiliarCreateView(PermissionRequiredMixin,
         )
 
 
-def buscar_paciente_externo(dni):
-    guardado, paciente = Paciente.create_from_sss(dni)
-    if guardado:
-        return True, paciente
-    else:
-        return Paciente.create_from_sisa(dni)
-
-
-def BuscarPaciente(request, dni):
+def actualizar_obra_social(paciente):
     time.sleep(2)
+    dbh = DataBeneficiariosSSSHospital(user=settings.USER_SSS, password=settings.USER_SSS)
+    res = dbh.query(dni=paciente.numero_documento)
+    if res['ok']:
+        tablas = res['resultados']['tablas']
+        data = tablas[0]['data']
+        oss_data = tablas[1]['data']
+        oss_codigo = (''.join(filter(str.isdigit, oss_data['Código de Obra Social'])))
+        oss, created = ObraSocial.objects.get_or_create(
+            codigo=oss_codigo,
+            defaults={
+                'nombre': oss_data['Denominación Obra Social'],
+            })
+        ObraSocialPaciente.objects.get_or_create(
+            paciente=paciente,
+            obra_social=oss,
+            defaults={'data_source': settings.SOURCE_OSS_SSS,
+                      'obra_social_updated': now(),
+                      'tipo_beneficiario': data['Parentesco'].lower()}
+        )
+    else:
+        rena = Renaper(dni=paciente.numero_documento)
+        if rena.rnos is not None and rena.rnos != '':
+            value_default = {"nombre": rena.cobertura_social}
+            oss, created = ObraSocial.objects.get_or_create(
+                codigo=rena.rnos, defaults=value_default
+            )
+            ObraSocialPaciente.objects.get_or_create(
+                data_source=settings.SOURCE_OSS_SISA,
+                paciente=paciente,
+                obra_social_updated=now(),
+                obra_social=oss,
+            )
+
+
+def buscar_paciente_general(dni):
+    if Paciente.objects.filter(numero_documento=dni).exists():
+        paciente = Paciente.objects.get(numero_documento=dni)
+        if paciente.ultima_actualizacion + timedelta(days=settings.REVISE_DATA_DAYS) < datetime.now().date():
+            actualizar_obra_social(paciente)
+            paciente.ultima_actualizacion = datetime.now().date()
+            paciente.save()
+        return paciente
+    else:
+        time.sleep(2)
+        guardado, paciente = Paciente.create_from_sss(dni)
+        if guardado:
+            return paciente
+        else:
+            guardado, paciente = Paciente.create_from_sisa(dni)
+            if guardado:
+                return paciente
+    return None
+
+
+def BuscarPacienteRecupero(request, dni):
+    if not request.user.has_perm('pacientes.add_paciente') and not request.user.has_perm('pacientes.change_paciente'):
+        data = {"encontrado": False}
+        return JsonResponse(data, status=400)
     dni_parseado = (''.join(filter(str.isdigit, dni)))
-    if Paciente.objects.filter(numero_documento=dni_parseado).exists():
-        #buscar obra social actualizar datos
-        paciente = Paciente.objects.get(numero_documento=dni_parseado)
+    paciente = buscar_paciente_general(dni_parseado)
+    if paciente:
         data = {"paciente_id": paciente.id,
                 "nombre": str(paciente.apellidos + ', ' + paciente.nombres),
                 "dni": paciente.numero_documento,
                 "encontrado": True}
-
     else:
-        save, result = buscar_paciente_externo(dni_parseado)
-        if save:
-            data = {"paciente_id": result.id,
-                    "nombre": str(result.apellidos + ', ' + result.nombres),
-                    "dni": result.numero_documento,
-                    "encontrado": True}
-        else:
-            data = {"encontrado": False}
+        data = {"encontrado": False}
     return JsonResponse(data, status=200)
 
 
