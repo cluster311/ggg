@@ -113,7 +113,7 @@ class Paciente(Persona):
         max_length=20, null=True, choices=grupos_sanguineos
     )
     observaciones = models.TextField(blank=True, null=True)
-    ultima_actualizacion = models.DateField(default=datetime.datetime.today())
+    ultima_actualizacion = models.DateField(default=date.today)
     datos_de_contacto = GenericRelation(
         "core.DatoDeContacto",
         related_query_name="pacientes",
@@ -222,7 +222,7 @@ class Paciente(Persona):
                         ultimo_recibo_de_sueldo=datetime.datetime(int(fecha[1]), int(fecha[0]), 1)
                     )
                 return True, paciente
-            elif not res['resultados']['afiliado']:
+            else:
                 paciente = Paciente.objects.create(
                     apellidos=data['Apellido y nombre'],
                     tipo_documento=data['Tipo de documento'],
