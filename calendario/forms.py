@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.conf import settings
 from calendario.models import Turno
 from calendario.widgets import DateTimePicker
+from pacientes.views import buscar_paciente_general
 from profesionales.models import Profesional
 from pacientes.models import Paciente
 from obras_sociales.models import ObraSocialPaciente, ObraSocial
@@ -119,35 +120,9 @@ class TurnoForm(forms.ModelForm):
         return turno
 
     def update(self, data, *args, **kwargs):
-        paciente = Paciente.objects.filter(numero_documento=data['paciente']).first()
+        paciente = buscar_paciente_general(data['paciente'])
         if paciente is None:
-            save, result = Paciente.create_from_sisa(data['paciente'])
-            if save:
-                self.instance.paciente = result
-                self.instance.solicitante = data['solicitante']
-                self.instance.estado = Turno.ASIGNADO
-                self.instance.save()
-                return save, result
-            elif not save and ('nombres' in data and 'apellidos' in data):
-                paciente = Paciente.objects.create(
-                    numero_documento=data['paciente'],
-                    nombres=data['nombres'],
-                    apellidos=data['apellidos'],
-                )
-                ObraSocialPaciente.objects.create(
-                    data_source=settings.SOURCE_OSS_SISA,
-                    paciente=paciente,
-                    obra_social_updated=datetime.now(),
-                    obra_social=ObraSocial.objects.get(pk=data['oss']),
-                    numero_afiliado=data['numero-afiliado'] if 'numero-afiliado' in data else None
-                )
-                self.instance.paciente = paciente
-                self.instance.solicitante = data['solicitante']
-                self.instance.estado = Turno.ASIGNADO
-                self.instance.save()
-                return True, self.instance
-            else:
-                return save, result
+            return False, None
         else:
             self.instance.paciente = paciente
             self.instance.solicitante = data['solicitante']

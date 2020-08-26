@@ -185,7 +185,7 @@
         }
          $('#add_paciente').click(function () {
             if ($("#id_dni").val().length>=7){
-                var url = '{% url 'BuscarPaciente' dni=None %}'.replace('None',  $("#id_dni").val() );
+                var url = '{% url 'BuscarPacienteRecupero' dni=None %}'.replace('None',  $("#id_dni").val() );
                 $.ajax({
                     type: "GET",
                     url: url,

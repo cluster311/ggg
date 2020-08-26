@@ -113,6 +113,7 @@ class Paciente(Persona):
         max_length=20, null=True, choices=grupos_sanguineos
     )
     observaciones = models.TextField(blank=True, null=True)
+    ultima_actualizacion = models.DateField(default=date.today)
     datos_de_contacto = GenericRelation(
         "core.DatoDeContacto",
         related_query_name="pacientes",
@@ -184,7 +185,7 @@ class Paciente(Persona):
             tablas = res['resultados']['tablas']
             data = tablas[0]['data']
             tam_tabla = len(tablas)
-            if tablas[0]['name'] == 'AFILIACION':
+            if res['resultados']['afiliado']:
                 fecha = data['Fecha de nacimiento'].split('-')
                 fecha_nac = date(int(fecha[2]), int(fecha[1]), int(fecha[0]))
                 paciente = Paciente.objects.create(
@@ -194,35 +195,34 @@ class Paciente(Persona):
                     tipo_documento=data['Tipo de documento'],
                     numero_documento=data['Número de documento'],
                 )
-                if tam_tabla >= 2:
-                    oss_data = tablas[1]['data']
-                    oss_codigo = (''.join(filter(str.isdigit, oss_data['Código de Obra Social'])))
-                    oss, created = ObraSocial.objects.get_or_create(
-                        codigo=oss_codigo,
-                        defaults={
-                            'nombre': oss_data['Denominación Obra Social'],
+                oss_data = tablas[1]['data']
+                oss_codigo = (''.join(filter(str.isdigit, oss_data['Código de Obra Social'])))
+                oss, created = ObraSocial.objects.get_or_create(
+                    codigo=oss_codigo,
+                    defaults={
+                        'nombre': oss_data['Denominación Obra Social'],
+                        })
+                ObraSocialPaciente.objects.create(
+                    data_source=settings.SOURCE_OSS_SSS,
+                    paciente=paciente,
+                    obra_social_updated=now(),
+                    obra_social=oss,
+                    tipo_beneficiario=data['Parentesco'].lower()
+                )
+                if tam_tabla >= 3:
+                    empleador_data = tablas[2]['data']
+                    cuit_parseado = (''.join(filter(str.isdigit, oss_data['CUIT de empleador'])))
+                    empresa, created = Empresa.objects.get_or_create(cuit=cuit_parseado, defaults={
+                                'nombre': empleador_data['Tipo Beneficiario Declarado'],
                             })
-                    ObraSocialPaciente.objects.create(
-                        data_source=settings.SOURCE_OSS_SSS,
+                    fecha = empleador_data['Ultimo Período Declarado'].split('-')
+                    EmpresaPaciente.objects.get_or_create(
                         paciente=paciente,
-                        obra_social_updated=now(),
-                        obra_social=oss,
-                        tipo_beneficiario=data['Parentesco'].lower()
+                        empresa=empresa,
+                        ultimo_recibo_de_sueldo=datetime.datetime(int(fecha[1]), int(fecha[0]), 1)
                     )
-                    if tam_tabla >= 3:
-                        empleador_data = tablas[2]['data']
-                        cuit_parseado = (''.join(filter(str.isdigit, oss_data['CUIT de empleador'])))
-                        empresa, created = Empresa.objects.get_or_create(cuit=cuit_parseado, defaults={
-                                    'nombre': empleador_data['Tipo Beneficiario Declarado'],
-                                })
-                        fecha = empleador_data['Ultimo Período Declarado'].split('-')
-                        EmpresaPaciente.objects.get_or_create(
-                            paciente=paciente,
-                            empresa=empresa,
-                            ultimo_recibo_de_sueldo=datetime.datetime(int(fecha[1]), int(fecha[0]), 1)
-                        )
                 return True, paciente
-            elif tablas[0]['name'] == 'NO_AFILIADO':
+            else:
                 paciente = Paciente.objects.create(
                     apellidos=data['Apellido y nombre'],
                     tipo_documento=data['Tipo de documento'],

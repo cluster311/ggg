@@ -170,7 +170,7 @@ class Factura(TimeStampedModel):
         blank=True
     )
 
-    fecha_atencion = models.DateTimeField(blank=True, null=True)
+    fecha_atencion = models.DateField(blank=True, null=True)
     centro_de_salud = models.ForeignKey(
         "centros_de_salud.CentroDeSalud",
         related_name="facturas_centro",
