@@ -235,19 +235,19 @@ class Factura(TimeStampedModel):
             # TODO, no permitido
             hospital['codigo_hpgd'] = hospital['codigo_hpgd'] or 'DESC'
 
-        except AttributeError as error:
+        except AttributeError:
             errores_generacion['hospital'] = "Debe asignar un centro de salud en la factura"
             hospital = None
 
         try:
             beneficiario = self.paciente.as_anexo2_json()
-        except AttributeError as error:
+        except AttributeError:
             errores_generacion['beneficiario'] = "Debe asignar un paciente en la factura"
             beneficiario = None
 
         try:
             profesional = self.profesional.as_anexo2_json()
-        except AttributeError as error:
+        except AttributeError:
             errores_generacion['profesional'] = "Debe asignar un profesional en la factura"
             profesional = None
 
@@ -258,7 +258,7 @@ class Factura(TimeStampedModel):
         try:
             # TODO Verificar si el cod cie principal puede estar vacío
             cie_principal = self.codigo_cie_principal.code
-        except AttributeError as error:
+        except AttributeError:
             errores_generacion['cie_principal'] = "Debe asignar un código de CIE10 principal en la factura"
             cie_principal = None
 
@@ -267,15 +267,22 @@ class Factura(TimeStampedModel):
         try:
             # Extraer códigos de las prestaciones copiadas de la consulta
             cod_hpgd = [prestacion.tipo.codigo for prestacion in self.prestacionesFactura.all()]
-            # Obtener la primer prestacion asociada a la factura
-            prestFactura = self.prestacionesFactura.first()
 
-            tipos_prestaciones = [prestacion.tipo.get_tipo_display() for prestacion in self.prestacionesFactura.all()]
+            # Obtener la lista de tipos de las prestaciones de la factura en minúscula
+            # > ['consulta', 'práctica', 'internación']
+            lista_tipos = [prestacion.tipo.get_tipo_display().casefold() for prestacion in self.prestacionesFactura.all()]
 
-            # Devuelve el string en minúsculas
-            tipo = prestFactura.tipo.get_tipo_display().casefold()
+            # Reemplazar valores Desconocido y Laboratorio
+            lista_tipos = [
+                t.replace('desconocido', 'consulta').replace('laboratorio', 'práctica')
+                for t in lista_tipos
+            ]
 
-        except AttributeError as error:
+            # Al convertir a set se eliminan los valores duplicados
+            # Luego se convierte a lista porque es lo que espera el Anexo2
+            prestaciones = list(set(lista_tipos))
+
+        except AttributeError:
             errores_generacion['códigos N HPGD'] = "Debe asignar al menos una prestación en la factura"
             cod_hpgd = None
             tipo = None
@@ -286,13 +293,12 @@ class Factura(TimeStampedModel):
                 'mes': self.fecha_atencion.month,
                 'anio': self.fecha_atencion.year
             }
-        except AttributeError as error:
+        except AttributeError:
             errores_generacion['fecha_atencion'] = "Debe asignar una fecha correcta en la factura"
             fecha_atencion = None
 
 
-        # TODO - Hay que agregar tipo de atención a las prestaciones
-        atencion = {'tipo': 'consulta',
+        atencion = {'tipo': prestaciones,
                     'profesional': profesional,
                     'especialidad': especialidad,
                     'codigos_N_HPGD': cod_hpgd,
@@ -309,7 +315,7 @@ class Factura(TimeStampedModel):
             os_paciente = self.obra_social.pacientes.get(paciente=self.paciente)
             obra_social = os_paciente.as_anexo2_json()
 
-        except AttributeError as error:
+        except AttributeError:
             errores_generacion['obra_social'] = "Debe asignar una obra social en la factura"
             obra_social = None
 
@@ -320,7 +326,7 @@ class Factura(TimeStampedModel):
             empresa_paciente = self.paciente.empresapaciente_set.first()
             empresa = empresa_paciente.as_anexo2_json()            
 
-        except AttributeError as error:
+        except AttributeError:
             errores_generacion['empresa'] = "El paciente debe tener asignada al menos una empresa"
             empresa = None
 
