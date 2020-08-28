@@ -48,8 +48,8 @@ class FacturaListView(PermissionRequiredMixin, ListView):
                 Q(consulta__centro_de_salud__nombre__icontains=q) |
                 Q(obra_social__nombre__icontains=q)
                 )
-        # mostrar prinmero los ultimos modificados
-        objects = objects.order_by('-modified')
+        # Excluir las facturas nuevas y ordernar por últimas modificadas
+        objects = objects.exclude(estado=Factura.EST_NUEVO).order_by('-modified')
         return objects
     
     def get_context_data(self, **kwargs):
