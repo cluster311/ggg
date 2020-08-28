@@ -147,7 +147,7 @@
                 complete: function () {
                 },
             });
-
+            get_numero_carnet();
         }
         })
     </script>
@@ -163,6 +163,28 @@
             var win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
             win.focus();
             return false;
+        }
+        function get_numero_carnet() {
+            var url = '{% url 'BuscarObraSocialPaciente' id_paciente='vacio_id_paciente' id_obra_social='vacio_id_obra_social' %}'
+                .replace('vacio_id_paciente',$("#id_paciente").val())
+                .replace('vacio_id_obra_social',$("#id_obra_social").val());
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.encontrado){
+                            if (data.numero_afiliado){
+                                $("#id_numero_afiliado").val(data.numero_afiliado).prop("disabled", true);
+                            }
+                            else{
+                                $("#id_numero_afiliado").val("").prop("disabled", false).attr('placeholder', 'Ingrese numero de carnet de paciente');
+                            }
+                        }
+                    },
+                    complete: function () {
+                    },
+                });
         }
         function closePopup(win, newID, newRepr, id) {
             $(id).append('<option value=' + newID + ' selected >' + newRepr + '</option>')
@@ -217,28 +239,7 @@
             }
         });
         document.querySelector('select[name="obra_social"]').onchange=function() {
-            var url = '{% url 'BuscarObraSocialPaciente' id_paciente='vacio_id_paciente' id_obra_social='vacio_id_obra_social' %}'
-                .replace('vacio_id_paciente',$("#id_paciente").val())
-                .replace('vacio_id_obra_social',$("#id_obra_social").val());
-                $.ajax({
-                    type: "GET",
-                    url: url,
-                    dataType: 'json',
-                    success: function (data) {
-                        if (data.encontrado){
-                            if (data.numero_afiliado){
-                                $("#id_numero_afiliado").val(data.numero_afiliado).prop("disabled", true);
-
-                            }
-                            else{
-                                $("#id_numero_afiliado").val("").prop("disabled", false).attr('placeholder', 'Ingrese numero de carnet de paciente');
-                            }
-                        }
-                    },
-                    complete: function () {
-
-                    },
-                });
+            get_numero_carnet()
         };
     </script>
 {% endblock js_footer %}
