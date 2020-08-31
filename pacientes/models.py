@@ -200,7 +200,9 @@ class Paciente(Persona):
                 # Solo si es creado cargo datos accesorios, de otra forma se perderían las modificaciones hechas en el sistema 
                 if created:
                     logger.info('Nuevo Paciente desde SSS {}'.format(data['Apellido y nombre']))
-                    paciente.apellidos = data['Apellido y Nombre']
+                    apellidos = data.get('Apellido y Nombre', data.get('Apellido y nombre', None))
+                    if apellidos is not None:
+                        paciente.apellidos = apellidos
                     paciente.sexo = data['Sexo'].lower()
                     paciente.fecha_nacimiento = fecha_nac
                     paciente.tipo_documento = data['Tipo de documento']
@@ -256,7 +258,9 @@ class Paciente(Persona):
                 # Solo si es creado cargo datos accesorios, de otra forma se perderían las modificaciones hechas en el sistema 
                 if created:
                     logger.info(f'[SSS] Data Afiliado {data}')
-                    paciente.apellidos = data['Apellido y Nombre']
+                    apellidos = data.get('Apellido y Nombre', data.get('Apellido y nombre', None))
+                    if apellidos is not None:
+                        paciente.apellidos = apellidos
                     paciente.tipo_documento = data['Tipo de documento']
                     paciente.save()
                     
