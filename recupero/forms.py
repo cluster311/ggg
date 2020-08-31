@@ -21,6 +21,7 @@ class FacturaPrestacionForm(forms.ModelForm):
 
 
 class FacturaForm(forms.ModelForm):
+    numero_afiliado = forms.CharField(required=False)
     paciente = forms.ModelChoiceField(
         label='Paciente',
         required=False,
@@ -94,6 +95,7 @@ class FacturaForm(forms.ModelForm):
     class Meta:
         model = Factura
         fields = ('fecha_atencion',
+                  'numero_afiliado',
                   'paciente',
                   'obra_social',
                   'centro_de_salud',

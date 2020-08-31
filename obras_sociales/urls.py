@@ -1,7 +1,8 @@
 from django.conf.urls import url, include
 from django.urls import path
 from .views import (TableroObraSocialPorPorvinciaView, ObraSocialListView,
-                    ObraSocialCreateView, ObraSocialUpdateView, ObraSocialDetailView, ObraSocialPacienteCreatePopup)
+                    ObraSocialCreateView, ObraSocialUpdateView, ObraSocialDetailView, ObraSocialPacienteCreatePopup,
+                    BuscarObraSocialPaciente)
 
 
 urlpatterns = [
@@ -34,5 +35,10 @@ urlpatterns = [
         r"obrasocial-paciente/(?P<paciente>.*)$",
         ObraSocialPacienteCreatePopup,
         name="ObraSocialPacienteCreate"),
+    path(
+        r"buscar_obra_social_paciente/(?P<id_paciente>.*)/(?P<id_obra_social>.*)$",
+        BuscarObraSocialPaciente,
+        name="BuscarObraSocialPaciente"),
+
 
 ]
