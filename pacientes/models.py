@@ -205,7 +205,9 @@ class Paciente(Persona):
                         paciente.apellidos = apellidos
                     paciente.sexo = data['Sexo'].lower()
                     paciente.fecha_nacimiento = fecha_nac
-                    paciente.tipo_documento = data['Tipo de documento']
+                    tipo_doc = data.get('Tipo Documento', data.get('Tipo de documento', None))
+                    if tipo_doc is not None:
+                        paciente.tipo_documento = tipo_doc
                     paciente.save()
 
                 oss_data = tablas[1]['data']
@@ -258,10 +260,13 @@ class Paciente(Persona):
                 # Solo si es creado cargo datos accesorios, de otra forma se perderían las modificaciones hechas en el sistema 
                 if created:
                     logger.info(f'[SSS] Data Afiliado {data}')
+                    # Data: : 'DU', 'Nro Documento': '20871201', 'CUIL': '27208712018'}
                     apellidos = data.get('Apellido y Nombre', data.get('Apellido y nombre', None))
                     if apellidos is not None:
                         paciente.apellidos = apellidos
-                    paciente.tipo_documento = data['Tipo de documento']
+                    tipo_doc = data.get('Tipo Documento', data.get('Tipo de documento', None))
+                    if tipo_doc is not None:
+                        paciente.tipo_documento = tipo_doc
                     paciente.save()
                     
                 return True, paciente
