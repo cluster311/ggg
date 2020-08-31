@@ -190,7 +190,7 @@ class Paciente(Persona):
             data = tablas[0]['data']
             tam_tabla = len(tablas)
             if res['resultados']['afiliado']:
-                log.info(f'[SSS] Data Afiliado {data}')
+                logger.info(f'[SSS] Data Afiliado {data}')
                 fecha = data['Fecha de nacimiento'].split('-')
                 fecha_nac = date(int(fecha[2]), int(fecha[1]), int(fecha[0]))
                 logger.info(f'SSS encontrado, buscando DNI {dni}')
@@ -255,7 +255,7 @@ class Paciente(Persona):
 
                 # Solo si es creado cargo datos accesorios, de otra forma se perderían las modificaciones hechas en el sistema 
                 if created:
-                    log.info(f'[SSS] Data Afiliado {data}')
+                    logger.info(f'[SSS] Data Afiliado {data}')
                     paciente.apellidos = data['Apellido y Nombre']
                     paciente.tipo_documento = data['Tipo de documento']
                     paciente.save()
