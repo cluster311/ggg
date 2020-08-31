@@ -307,13 +307,13 @@ def buscar_paciente_general(dni):
         guardado2, paciente2 = Paciente.create_from_sisa(dni)
 
         # cualquiera de los dos debe estar OK para devolver
-        if isinstance(paciente1) == Paciente:
+        if isinstance(paciente1, Paciente):
             return paciente1
-        if isinstance(paciente2) == Paciente:
+        if isinstance(paciente2, Paciente):
             return paciente2
 
         # Si ninguno de los dos anduvo entonces hay error
-        
+
     return None
 
 
