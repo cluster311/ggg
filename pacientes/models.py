@@ -179,6 +179,7 @@ class Paciente(Persona):
 
     @classmethod
     def create_from_sss(cls, dni):
+        logger.info(f'Buscando DNI en sss {dni}')
         dbh = DataBeneficiariosSSSHospital(user=settings.USER_SSS, password=settings.USER_SSS)
         res = dbh.query(dni=dni)
         if res['ok']:
@@ -188,12 +189,13 @@ class Paciente(Persona):
             if res['resultados']['afiliado']:
                 fecha = data['Fecha de nacimiento'].split('-')
                 fecha_nac = date(int(fecha[2]), int(fecha[1]), int(fecha[0]))
-                
+                logger.info(f'SSS encontrado, buscando DNI {dni}')
                 paciente, created = Paciente.objects.get_or_create(
-                    numero_documento=data['Número de documento'],
+                    numero_documento=dni,
                 )
                 # Solo si es creado cargo datos accesorios, de otra forma se perderían las modificaciones hechas en el sistema 
                 if created:
+                    logger.info('Nuevo Paciente desde SSS {}'.format(data['Apellido y nombre']))
                     paciente.apellidos = data['Apellido y nombre']
                     paciente.sexo = data['Sexo'].lower()
                     paciente.fecha_nacimiento = fecha_nac
@@ -202,6 +204,8 @@ class Paciente(Persona):
 
                 oss_data = tablas[1]['data']
                 oss_codigo = (''.join(filter(str.isdigit, oss_data['Código de Obra Social'])))
+                logger.info('OSS desde SSS {}: {}'.format(oss_codigo, oss_data['Denominación Obra Social']))
+                    
                 oss, created = ObraSocial.objects.get_or_create(
                     codigo=oss_codigo,
                     defaults={
@@ -212,6 +216,8 @@ class Paciente(Persona):
                 # para desactivar las que ya no existen
 
                 # solo lo básico para saber si ya lo tengo
+                logger.info('Creado OSS+paciente desde SSS {}: {}'.format(paciente, oss))
+                
                 osp, created = ObraSocialPaciente.objects.get_or_create(
                     data_source=settings.SOURCE_OSS_SSS,
                     paciente=paciente,
@@ -225,6 +231,7 @@ class Paciente(Persona):
                 if tam_tabla >= 3:
                     empleador_data = tablas[2]['data']
                     cuit_parseado = (''.join(filter(str.isdigit, oss_data['CUIT de empleador'])))
+                    logger.info('Creado Empresa desde SSS {}'.format(empleador_data['Tipo Beneficiario Declarado']))
                     empresa, created = Empresa.objects.get_or_create(cuit=cuit_parseado, defaults={
                             'nombre': empleador_data['Tipo Beneficiario Declarado'],
                             })
@@ -240,9 +247,7 @@ class Paciente(Persona):
 
                 return True, paciente
             else:
-                paciente, created = Paciente.objects.get_or_create(
-                    numero_documento=data['Número de documento'],
-                )
+                paciente, created = Paciente.objects.get_or_create(numero_documento=dni)
 
                 # Solo si es creado cargo datos accesorios, de otra forma se perderían las modificaciones hechas en el sistema 
                 if created:
@@ -256,6 +261,8 @@ class Paciente(Persona):
 
     @classmethod
     def create_from_sisa(cls, dni):
+        logger.info(f'Busqueda desde SISA/PUCO {dni}')
+                    
         rena = Renaper(dni=dni)
         # puco = Puco(dni=dni)
         resp = rena.get_info_ciudadano()
@@ -280,12 +287,15 @@ class Paciente(Persona):
         # Si los devuelve, setear la oss que devuelve PUCO
         if rena.rnos is not None and rena.rnos != '':
             value_default = {"nombre": rena.cobertura_social}
+            logger.info(f'Crendo OSS desde SISA/PUCO {rena.rnos} {rena.cobertura_social}')
+            
             oss, created = ObraSocial.objects.get_or_create(
                 codigo=rena.rnos, defaults=value_default
             )
 
             # TODO chequear las OSS que tenia antes el paciente en esta fuente
             # para desactivar las que ya no existen
+            logger.info(f'Crendo OSS+Paciente desde SISA/PUCO {paciente} {oss}')
                 
             osp, created = ObraSocialPaciente.objects.get_or_create(
                 data_source=settings.SOURCE_OSS_SISA,
