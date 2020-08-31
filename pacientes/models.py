@@ -184,6 +184,9 @@ class Paciente(Persona):
         res = dbh.query(dni=dni)
         if res['ok']:
             tablas = res['resultados']['tablas']
+            if len(tablas) == 0:
+                logger.error('[SSS] Tabla no encontrada {}'.format(res['resultados']['tablas']))
+                return False, f"tabla no encontrada [SSS]"
             data = tablas[0]['data']
             tam_tabla = len(tablas)
             if res['resultados']['afiliado']:
@@ -257,7 +260,7 @@ class Paciente(Persona):
                     
                 return True, paciente
         else:
-            return False, f"Persona no encontrada"
+            return False, f"Persona no encontrada [SSS]"
 
     @classmethod
     def create_from_sisa(cls, dni):
