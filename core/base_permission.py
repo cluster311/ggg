@@ -122,7 +122,7 @@ def create_test_data():
 
     for x in range(1, 4):
         # crear centros de salud y especialidades
-        cs, created = CentroDeSalud.objects.get_or_create(nombre=f"Centro de Salud {x}")
+        cs, created = CentroDeSalud.objects.get_or_create(nombre=f"Centro de Salud {x}", codigo_hpgd=f"{x}.{x}")
         es, created = Especialidad.objects.get_or_create(nombre=f"Especialidad {x}")
         # crear un servicio en ese centro de salud para esa especialidad
         se, created = Servicio.objects.get_or_create(centro=cs, especialidad=es)

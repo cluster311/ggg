@@ -232,9 +232,6 @@ class Factura(TimeStampedModel):
         try:
             hospital = self.centro_de_salud.as_anexo2_json()
 
-            # TODO, no permitido
-            hospital['codigo_hpgd'] = hospital['codigo_hpgd'] or 'DESC'
-
         except AttributeError:
             errores_generacion['hospital'] = "Debe asignar un centro de salud en la factura"
             hospital = None
