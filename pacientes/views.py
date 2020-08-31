@@ -303,9 +303,12 @@ def buscar_paciente_general(dni):
         return paciente
     else:
         # tomar todos los datos de SSS y los de SISA/PUCO
-        guardado1, paciente1 = Paciente.create_from_sss(dni)
-        guardado2, paciente2 = Paciente.create_from_sisa(dni)
 
+        # PRIMERO SISA porque separa bien apeelido y nombre
+        # (el primero que llega crea el paciente, el segundo no modifica el nombre)
+        guardado1, paciente1 = Paciente.create_from_sisa(dni)
+        guardado2, paciente2 = Paciente.create_from_sss(dni)
+        
         # cualquiera de los dos debe estar OK para devolver
         if isinstance(paciente1, Paciente):
             return paciente1
