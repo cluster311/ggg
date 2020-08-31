@@ -302,14 +302,18 @@ def buscar_paciente_general(dni):
             paciente.save()
         return paciente
     else:
-        time.sleep(2)
-        guardado, paciente = Paciente.create_from_sss(dni)
-        if guardado:
-            return paciente
-        else:
-            guardado, paciente = Paciente.create_from_sisa(dni)
-            if guardado:
-                return paciente
+        # tomar todos los datos de SSS y los de SISA/PUCO
+        guardado1, paciente1 = Paciente.create_from_sss(dni)
+        guardado2, paciente2 = Paciente.create_from_sisa(dni)
+
+        # cualquiera de los dos debe estar OK para devolver
+        if isinstance(paciente1) == Paciente:
+            return paciente1
+        if isinstance(paciente2) == Paciente:
+            return paciente2
+
+        # Si ninguno de los dos anduvo entonces hay error
+        
     return None
 
 
