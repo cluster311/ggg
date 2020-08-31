@@ -157,7 +157,7 @@ def ObraSocialPacienteCreatePopup(request, paciente=None):
         if form.is_valid():
             instance = form.save()
             return HttpResponse(
-                '<script>opener.closePopup(window, "%s", "%s", "#id_obra_social");</script>' % (instance.obra_social.pk, instance.obra_social))
+                '<script>opener.closePopup(window, "%s", "%s", "#id_obra_social","%s");</script>' % (instance.obra_social.pk, instance.obra_social, instance.numero_afiliado))
     form = ObraSocialPacienteCreatePopUp(initial={'paciente': paciente})
     return render(request, "obras_sociales/obrasocial_paciente_createview.html", {"form": form})
 
