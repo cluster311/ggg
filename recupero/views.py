@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.decorators import method_decorator
 from django.contrib.messages.views import SuccessMessageMixin
 
+from obras_sociales.models import ObraSocialPaciente
 from .forms import FacturaForm, FacturaPrestacionFormSet
 from .models import Factura, TipoDocumentoAnexo, TipoPrestacion
 
@@ -136,6 +137,11 @@ class FacturaCreateView(PermissionRequiredMixin,
     def form_valid(self, form):
         context = self.get_context_data()
         fp = context["prestaciones"]
+        afiliado = form.cleaned_data['numero_afiliado']
+        osp = ObraSocialPaciente.objects.get(paciente_id=form['paciente'].value(), obra_social_id=form['obra_social'].value())
+        if not osp.numero_afiliado == afiliado and not context['form']['numero_afiliado'].value() is None:
+            osp.numero_afiliado = afiliado
+            osp.save()
         self.object = form.save()
         if fp.is_valid():
             fp.instance = self.object
