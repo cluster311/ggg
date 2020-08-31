@@ -179,61 +179,104 @@ class Paciente(Persona):
 
     @classmethod
     def create_from_sss(cls, dni):
-        dbh = DataBeneficiariosSSSHospital(user=settings.USER_SSS, password=settings.USER_SSS)
+        logger.info(f'Buscando DNI en sss {dni}')
+        dbh = DataBeneficiariosSSSHospital(user=settings.USER_SSS, password=settings.PASS_SSS)
         res = dbh.query(dni=dni)
         if res['ok']:
             tablas = res['resultados']['tablas']
+            if len(tablas) == 0:
+                logger.error('[SSS] Tabla no encontrada {}'.format(res['resultados']['tablas']))
+                return False, f"tabla no encontrada [SSS]"
             data = tablas[0]['data']
             tam_tabla = len(tablas)
             if res['resultados']['afiliado']:
+                logger.info(f'[SSS] Data Afiliado {data}')
                 fecha = data['Fecha de nacimiento'].split('-')
                 fecha_nac = date(int(fecha[2]), int(fecha[1]), int(fecha[0]))
-                paciente = Paciente.objects.create(
-                    apellidos=data['Apellido y nombre'],
-                    sexo=data['Sexo'].lower(),
-                    fecha_nacimiento=fecha_nac,
-                    tipo_documento=data['Tipo de documento'],
-                    numero_documento=data['Número de documento'],
+                logger.info(f'SSS encontrado, buscando DNI {dni}')
+                paciente, created = Paciente.objects.get_or_create(
+                    numero_documento=dni,
                 )
+                # Solo si es creado cargo datos accesorios, de otra forma se perderían las modificaciones hechas en el sistema 
+                if created:
+                    logger.info('Nuevo Paciente desde SSS {}'.format(data['Apellido y nombre']))
+                    apellidos = data.get('Apellido y Nombre', data.get('Apellido y nombre', None))
+                    if apellidos is not None:
+                        paciente.apellidos = apellidos
+                    paciente.sexo = data['Sexo'].lower()
+                    paciente.fecha_nacimiento = fecha_nac
+                    tipo_doc = data.get('Tipo Documento', data.get('Tipo de documento', None))
+                    if tipo_doc is not None:
+                        paciente.tipo_documento = tipo_doc
+                    paciente.save()
+
                 oss_data = tablas[1]['data']
                 oss_codigo = (''.join(filter(str.isdigit, oss_data['Código de Obra Social'])))
+                logger.info('OSS desde SSS {}: {}'.format(oss_codigo, oss_data['Denominación Obra Social']))
+                    
                 oss, created = ObraSocial.objects.get_or_create(
                     codigo=oss_codigo,
                     defaults={
                         'nombre': oss_data['Denominación Obra Social'],
                         })
-                ObraSocialPaciente.objects.create(
+                
+                # TODO chequear las OSS que tenia antes el paciente en esta fuente
+                # para desactivar las que ya no existen
+
+                # solo lo básico para saber si ya lo tengo
+                logger.info('Creado OSS+paciente desde SSS {}: {}'.format(paciente, oss))
+                
+                osp, created = ObraSocialPaciente.objects.get_or_create(
                     data_source=settings.SOURCE_OSS_SSS,
                     paciente=paciente,
-                    obra_social_updated=now(),
-                    obra_social=oss,
-                    tipo_beneficiario=data['Parentesco'].lower()
+                    obra_social=oss
                 )
+
+                osp.obra_social_updated = now()
+                osp.tipo_beneficiario = data['Parentesco'].lower()
+                osp.save()
+
                 if tam_tabla >= 3:
                     empleador_data = tablas[2]['data']
                     cuit_parseado = (''.join(filter(str.isdigit, oss_data['CUIT de empleador'])))
+                    logger.info('Creado Empresa desde SSS {}'.format(empleador_data['Tipo Beneficiario Declarado']))
                     empresa, created = Empresa.objects.get_or_create(cuit=cuit_parseado, defaults={
-                                'nombre': empleador_data['Tipo Beneficiario Declarado'],
+                            'nombre': empleador_data['Tipo Beneficiario Declarado'],
                             })
                     fecha = empleador_data['Ultimo Período Declarado'].split('-')
-                    EmpresaPaciente.objects.get_or_create(
+
+                    # solo crearlo una vez e ir actualizando la fecha de último recibo
+                    empp, created = EmpresaPaciente.objects.get_or_create(
                         paciente=paciente,
-                        empresa=empresa,
-                        ultimo_recibo_de_sueldo=datetime.datetime(int(fecha[1]), int(fecha[0]), 1)
+                        empresa=empresa
                     )
+                    empp.ultimo_recibo_de_sueldo = datetime.datetime(int(fecha[1]), int(fecha[0]), 1)
+                    empp.save()
+
                 return True, paciente
             else:
-                paciente = Paciente.objects.create(
-                    apellidos=data['Apellido y nombre'],
-                    tipo_documento=data['Tipo de documento'],
-                    numero_documento=data['Número de documento'],
-                )
+                paciente, created = Paciente.objects.get_or_create(numero_documento=dni)
+
+                # Solo si es creado cargo datos accesorios, de otra forma se perderían las modificaciones hechas en el sistema 
+                if created:
+                    logger.info(f'[SSS] Data Afiliado {data}')
+                    # Data: : 'DU', 'Nro Documento': '20871201', 'CUIL': '27208712018'}
+                    apellidos = data.get('Apellido y Nombre', data.get('Apellido y nombre', None))
+                    if apellidos is not None:
+                        paciente.apellidos = apellidos
+                    tipo_doc = data.get('Tipo Documento', data.get('Tipo de documento', None))
+                    if tipo_doc is not None:
+                        paciente.tipo_documento = tipo_doc
+                    paciente.save()
+                    
                 return True, paciente
         else:
-            return False, f"Persona no encontrada"
+            return False, f"Persona no encontrada [SSS]"
 
     @classmethod
     def create_from_sisa(cls, dni):
+        logger.info(f'Busqueda desde SISA/PUCO {dni}')
+                    
         rena = Renaper(dni=dni)
         # puco = Puco(dni=dni)
         resp = rena.get_info_ciudadano()
@@ -248,113 +291,35 @@ class Paciente(Persona):
 
         logger.info(f'SISA persona encontrada: {rena.dni} {rena.nombre} {rena.apellido} RNOS: {rena.rnos}')
 
-        paciente = Paciente.objects.create(
-            tipo_documento=rena.tipo_doc,
-            numero_documento=dni,
-            nombres=rena.nombre,
-            apellidos=rena.apellido,
-        )
+        paciente, created = Paciente.objects.get_or_create(numero_documento=dni)
+        if created:
+            paciente.tipo_documento = rena.tipo_doc
+            paciente.nombres = rena.nombre
+            paciente.apellidos = rena.apellido
+            paciente.save()
 
         # Si los devuelve, setear la oss que devuelve PUCO
         if rena.rnos is not None and rena.rnos != '':
             value_default = {"nombre": rena.cobertura_social}
+            logger.info(f'Crendo OSS desde SISA/PUCO {rena.rnos} {rena.cobertura_social}')
+            
             oss, created = ObraSocial.objects.get_or_create(
                 codigo=rena.rnos, defaults=value_default
             )
-            ObraSocialPaciente.objects.create(
+
+            # TODO chequear las OSS que tenia antes el paciente en esta fuente
+            # para desactivar las que ya no existen
+            logger.info(f'Crendo OSS+Paciente desde SISA/PUCO {paciente} {oss}')
+                
+            osp, created = ObraSocialPaciente.objects.get_or_create(
                 data_source=settings.SOURCE_OSS_SISA,
                 paciente=paciente,
-                obra_social_updated=now(),
                 obra_social=oss,
             )
+            osp.obra_social_updated = now()
+            osp.save()
+
         return True, paciente
-
-    def get_obras_sociales_from_sisa(self, force_update=False):
-        """ Obtener la obra social de este paciente segun SISA
-            Devuelve una tupla indicando
-             - primero si encontro o no los datos
-             - segundo el error si es que hubo uno
-            """
-        oss_paciente = self.m2m_obras_sociales.filter(
-            data_source=settings.SOURCE_OSS_SISA
-        )
-        last_updated = None
-        for os in oss_paciente:
-            if os.obra_social_updated is not None:
-                if last_updated is None:
-                    last_updated = os.obra_social_updated
-                elif os.obra_social_updated > last_updated:
-                    last_updated = os.obra_social_updated
-
-        if last_updated is None:
-            force_update = True
-
-        if not force_update:
-            diff = now() - last_updated
-            seconds_diff = diff.days * 86400 + diff.seconds
-            if seconds_diff < settings.CACHED_OSS_INFO_SISA_SECONDS:
-                return True, f"Cache valido aún {seconds_diff}"
-
-        logger.info("Consultando PUCO")
-        puco = Puco(dni=self.numero_documento)
-        resp = puco.get_info_ciudadano()
-        if not resp["ok"]:
-            error = f"Error de sistema: {puco.last_error}"
-            logger.info(error)
-            return False, error
-
-        if not resp["persona_encontrada"]:
-            logger.info("Persona no encontrada")
-            return False, f"Persona no encontrada: {puco.last_error}"
-
-        logger.info("Persona encontrada")
-        value_default = {"nombre": puco.cobertura_social}
-        oss, created = ObraSocial.objects.get_or_create(
-            codigo=puco.rnos, defaults=value_default
-        )
-
-        found = False
-        for os in oss_paciente:
-            if os.obra_social == oss:
-                found = True
-                os.obra_social_updated = now()
-                os.save()
-        if not found:
-            # ISSUE: estamos detectando un cambio de OSS.
-            # para tableros de control y estadísticas este dato puede
-            # ser valioso de grabar
-            # https://github.com/cluster311/ggg/issues/183
-            new_oss = ObraSocialPaciente.objects.create(
-                data_source=settings.SOURCE_OSS_SISA,
-                paciente=self,
-                obra_social_updated=now(),
-                obra_social=oss,
-            )
-
-        return True, None
-        # tengo aqui algunos datos que podría usar para verificar
-        # puco.tipo_doc
-        # nombre y apellido: puco.denominacion
-        # dict con datos de la obra social: puco.oss
-        """
-        puco.oss = {
-            'rnos': '112301',
-            'exists': True,
-            'nombre': (
-                'OBRA SOCIAL DEL PERSONAL DE MICROS Y OMNIBUS DE MENDOZA'
-            ),
-            'tipo_de_cobertura': 'Obra social',
-            'sigla': 'OSPEMOM',
-            'provincia': 'Mendoza',
-            'localidad': 'MENDOZA',
-            'domicilio': 'CATAMARCA 382',
-            'cp': '5500',
-            'telefonos': ['0261-4-203283', '0261-4-203342'],
-            'emails': ['ospemom@ospemom.org.ar'],
-            'web': None,
-            'sources': ['SISA', 'SSSalud']
-            }
-        """
 
 
 class Consulta(TimeStampedModel):
