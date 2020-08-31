@@ -186,11 +186,18 @@
                     },
                 });
         }
-        function closePopup(win, newID, newRepr, id) {
+        function closePopup(win, newID, newRepr, id, numero) {
             $(id).append('<option value=' + newID + ' selected >' + newRepr + '</option>')
             win.close();
+            if (numero != '' && numero != 'None'){
+                $("#id_numero_afiliado").val(numero).prop("disabled", true);
+            }
+            else{
+                $("#id_numero_afiliado").val("").prop("disabled", false).attr('placeholder', 'Ingrese numero de carnet de paciente');
+            }
             $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None',$('#id_paciente').val()));
         }
+
         function closePopupCleanField(win, pk, doc){
             $("#id_paciente").val(pk);
             $("#id_dni").val(doc).prop("disabled", true);
