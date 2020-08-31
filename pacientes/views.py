@@ -259,7 +259,7 @@ class CarpetaFamiliarCreateView(PermissionRequiredMixin,
 
 def actualizar_obra_social(paciente):
     time.sleep(2)
-    dbh = DataBeneficiariosSSSHospital(user=settings.USER_SSS, password=settings.USER_SSS)
+    dbh = DataBeneficiariosSSSHospital(user=settings.USER_SSS, password=settings.PASS_SSS)
     res = dbh.query(dni=paciente.numero_documento)
     if res['ok']:
         tablas = res['resultados']['tablas']

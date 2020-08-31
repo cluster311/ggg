@@ -180,7 +180,7 @@ class Paciente(Persona):
     @classmethod
     def create_from_sss(cls, dni):
         logger.info(f'Buscando DNI en sss {dni}')
-        dbh = DataBeneficiariosSSSHospital(user=settings.USER_SSS, password=settings.USER_SSS)
+        dbh = DataBeneficiariosSSSHospital(user=settings.USER_SSS, password=settings.PASS_SSS)
         res = dbh.query(dni=dni)
         if res['ok']:
             tablas = res['resultados']['tablas']
