@@ -164,7 +164,7 @@ def ObraSocialPacienteCreatePopup(request, paciente=None):
 
 def BuscarObraSocialPaciente(request, id_paciente, id_obra_social):
     if ObraSocialPaciente.objects.filter(paciente_id=id_paciente, obra_social_id=id_obra_social).exists():
-        osp = ObraSocialPaciente.objects.get(paciente_id=id_paciente, obra_social_id=id_obra_social)
+        osp = ObraSocialPaciente.objects.filter(paciente_id=id_paciente, obra_social_id=id_obra_social).order_by('-id')[0]
         data = {
             "encontrado": True,
             "numero_afiliado": osp.numero_afiliado

@@ -44,10 +44,14 @@ class ObraSocialAutocomplete(autocomplete.Select2QuerySetView):
     """
 
     def get_queryset(self):
-        qs = ObraSocialPaciente.objects.filter(paciente_id=self.forwarded.get('paciente', None))
+        codigos=[]
+        qs = ObraSocialPaciente.objects.select_related('obra_social').filter(paciente_id=self.forwarded.get('paciente', None))
         osp = []
         for q in qs:
-            osp.append(q.obra_social)
+            codigo = q.obra_social.codigo
+            if not codigo in codigos:
+                codigos.append(codigo)
+                osp.append(q.obra_social)
         return osp
 
 
