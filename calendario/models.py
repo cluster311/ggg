@@ -47,6 +47,13 @@ class Turno(models.Model):
         null=True,
         on_delete=models.SET_NULL
     )
+    obra_social = models.ForeignKey(
+        'obras_sociales.ObraSocial',
+        on_delete=models.SET_NULL,
+        related_name='turnos',
+        null=True,
+        blank=True
+    )
     estado = models.IntegerField(choices=OPCIONES_ESTADO, default=DISPONIBLE)
 
     class Meta:
@@ -110,5 +117,6 @@ class Turno(models.Model):
             consulta.profesional = self.profesional
             consulta.centro_de_salud = self.servicio.centro
             consulta.especialidad = self.servicio.especialidad
+            consulta.obra_social = self.obra_social
 
             consulta.save()
