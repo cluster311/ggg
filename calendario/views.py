@@ -11,7 +11,7 @@ import json
 from calendario.decorators import centro_de_salud_habilitado_form, \
     centro_de_salud_habilitado_pk
 from calendario.models import Turno
-from calendario.forms import BulkTurnoForm, FeedForm, TurnoForm
+from calendario.forms import BulkTurnoForm, FeedForm, TurnoForm, AgendarTurnoForm
 import logging
 
 from usuarios.models import UsuarioEnCentroDeSalud
@@ -217,7 +217,8 @@ def agendar(request):
     '''
     context = {
         'obras_sociales': ObraSocial.objects.all(),
-        'sys_logo': settings.SYS_LOGO
+        'sys_logo': settings.SYS_LOGO,
+        'form': AgendarTurnoForm
     }
     return render(request, 'calendario-agregar.html', context)
 
@@ -225,17 +226,23 @@ def agendar(request):
 @permission_required('calendario.can_schedule_turno', raise_exception=True)
 @require_http_methods(["PUT"])
 @centro_de_salud_habilitado_pk
-def confirm_turn(request, pk):
+def confirm_turn(request, pk: int):
     '''
         Confirma el turno de un paciente (Llamada mediante Ajax)
 
         Grupo acceso disponible: grupo_administrativo
     '''
+    # Obtener el turno a confirmar
     instance = get_object_or_404(Turno, id=pk)
+
+    # Guardar en form_data el DNI y la O.S. del paciente
     form_data = json.loads(request.body)
     logger.info(f'Gestion de turno {pk}: {form_data}')
     form_data['solicitante'] = request.user
+    
     form = TurnoForm(form_data, instance=instance)
+
+    # Actualizar el form guardando el turno con la nueva información
     save, result = form.update(form_data)
     if save:
         return JsonResponse({

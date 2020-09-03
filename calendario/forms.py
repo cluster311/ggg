@@ -23,6 +23,27 @@ logger = logging.getLogger(__name__)
 LOCAL_TZ = pytz.timezone(settings.TIME_ZONE)
 
 
+class AgendarTurnoForm(forms.Form):
+    numero_afiliado = forms.CharField(required=False)
+    paciente = forms.ModelChoiceField(
+        label='Paciente',
+        required=False,
+        queryset=Paciente.objects.all(),
+        widget=forms.HiddenInput()
+    )
+    obra_social = forms.ModelChoiceField(
+        label='Obra Social',
+        required=False,
+        queryset=ObraSocial.objects.all(),
+        widget=autocomplete.ModelSelect2(
+            url="obra-social-autocomplete",
+            forward=['paciente'],
+            attrs={
+                "data-placeholder": "Seleccione una Obra social",
+            }
+        ),
+    )
+
 class FeedForm(forms.Form):
     start = forms.DateTimeField(required=False)
     end = forms.DateTimeField(required=False)
@@ -114,6 +135,8 @@ class TurnoForm(forms.ModelForm):
                     hour=turno_time.hour + horas, 
                     minute=mins
                 )
+                # Este turno es la instance del update()
+                # Tiene el paciente, solicitante y obra social pasados del AgendarForm
                 turno = Turno.objects.create(**data)
                 turno_time = time(turno_time.hour + horas, mins)
             turno_date = turno_date + timedelta(days=1)
@@ -124,8 +147,12 @@ class TurnoForm(forms.ModelForm):
         if paciente is None:
             return False, None
         else:
+            obra_social = ObraSocial.objects.get(id=data['obra_social'])
+
             self.instance.paciente = paciente
             self.instance.solicitante = data['solicitante']
+            self.instance.obra_social = obra_social
+
             self.instance.estado = Turno.ASIGNADO
             self.instance.save()
             return True, self.instance

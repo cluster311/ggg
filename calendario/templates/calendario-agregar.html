@@ -1,4 +1,5 @@
 {% extends "base_admin.html" %}
+{% load crispy_forms_tags %}
 {% load static %}
 
 {% block extra_head %}
@@ -172,7 +173,7 @@
     initSelectEspecialidad();
 
     // Cuando cambie el centro de salud activo blanquear especialidad seleccionada
-    // y llamar re inicializar el select de especialidades con el nuevo centro de salud
+    // y re inicializar el select de especialidades con el nuevo centro de salud
     $("#usuario_elegir_centro").change(function() {
       $('#select2Especialidad').val('').change();
 
@@ -194,13 +195,55 @@
 
   </script>
 
+  <script>
+    $('#add_paciente').click(function () {
+      if ($("#id_dni").val().length >= 7) {
+        var url = '{% url 'BuscarPacienteRecupero' dni=None %}'.replace('None', $("#id_dni").val());
+        $.ajax({
+          type: "GET",
+          url: url,
+          dataType: 'json',
+          beforeSend: function () {
+            $("#loading").show();
+            $("#search").hide();
+          },
+          success: function (data) {
+            if (data.encontrado) {
+              $("#id_paciente").val(data.paciente_id);
+              $("#id_dni").val(data.dni).prop("disabled", true);
+              $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None', data.paciente_id));
+              $("#add_paciente").prop("disabled", true);
+              $("#nombre_paciente").text(data.nombre);
+              $("#loading").hide();
+              $("#found").show();
+            } else {
+              showAddPopupPaciente();
+              $("#add_paciente").prop("disabled", true);
+            }
 
+          },
+          complete: function () {
+
+          },
+        });
+      }
+    });
+
+    function showAddPopup(triggeringLink) {
+        var name = triggeringLink.id.replace(/^add_/, '');
+        href = triggeringLink.href;
+        var win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
+        win.focus();
+        return false;
+      }
+  </script>
 
   <script>
     'use strict';
     function confirmTurn() {
       let formData = {
-        'paciente':$("#dni").val(),
+        'paciente':$("#id_dni").val(),
+        'obra_social': $("#id_obra_social").val()
       }
       let pk = $("#turn_pk").val()
       axios({
@@ -210,23 +253,25 @@
         data: formData
       })
         .then(response => {
-          if (!response.data.success) {
-            // En caso de error abrir modal de creación de paciente
-            $("#cargar_dni").val($("#dni").val());
-            $("#cargar_dni").prop("disabled","disabled");
-            $("#cargar_turn_pk").val(pk);
-            $('#crearPacienteModal').modal('show');
-            $('#agendarModal').modal('hide');
-            $("#dni-error").css('display','none');
-            $("#dni").val("");
-          } else {
+          // if (!response.data.success) {
+          //   // En caso de error abrir modal de creación de paciente
+          //   $("#cargar_dni").val($("#dni").val());
+          //   $("#cargar_dni").prop("disabled","disabled");
+          //   $("#cargar_turn_pk").val(pk);
+          //   $('#crearPacienteModal').modal('show');
+          //   $('#agendarModal').modal('hide');
+          //   $("#dni-error").css('display','none');
+          //   $("#dni").val("");
+          // } 
+
+          
+            
             $("#dni-error").css('display','none');
             $("#dni").val("");
             calendar.refetchEvents();
             $('#agendarModal').modal('hide');
             crearTicket(response.data.turno);
             $('#imprimirTurno').modal('show');
-          }
         })
         .catch(error => {
           console.error(error)
@@ -330,10 +375,9 @@
 
 {% endblock %}
 
-
 {% block unwrapped_content %}
 <div class="modal fade" id="agendarModal" tabindex="1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 600px;" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLongTitle">Agendar turno</h5>
@@ -342,21 +386,43 @@
         </button>
       </div>
       <div class="modal-body">
-        <p id="modal-body-text"></p>
-        <div class="form-group">
-          <label for="dni" class="col-form-label">DNI Paciente:</label>
-          <input class="form-control" id="dni">
-          <span class="help-block" id="dni-error" style="display: none;">
-          El DNI es incorrecto. Por favor ingréselo nuevamente.
-          </span>
+      <form method="post" novalidate>
+      <div class="col-6">
+          <div>
+            <label class="col-form-label ">
+              Paciente
+            </label>
+          </div>
+          <div class="d-flex align-items-center">
+            <input name="dni" id="id_dni" class="form-control" placeholder="DNI">
+
+            {{ form.paciente|as_crispy_field }}
+
+            <button type="button" class="btn btn-success ml-3" id="add_paciente">
+              <i class="fa fa-search" id="search"></i>
+              <i id="loading" style="display: none" class="fa fa-spinner fa-spin"></i>
+              <i id="found" style="display: none" class="fa fa-check"></i>
+            </button>
+          </div>
+          <span class="help_text_style" style="margin-top: 0;clear: both;font-weight: bold" id="nombre_paciente"></span>
         </div>
-        <input id="turn_pk" hidden/>
+
+        <div class="d-flex col-6">
+          {{ form.obra_social|as_crispy_field }}
+          <a href="{%  url 'ObraSocialPacienteCreate' paciente=None%}" id="add_obrasocial" class="align-self-center ml-3"
+            onclick="return showAddPopup(this);">
+            <button type="button" class="btn btn-success">+</button>
+          </a>
+        </div>
       </div>
+      <input id="turn_pk" hidden />
+
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
         <button type="button" class="btn btn-primary" onclick="confirmTurn()">Agendar</button>
       </div>
     </div>
+    </form>
   </div>
 </div>
 
