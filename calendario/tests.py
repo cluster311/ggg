@@ -5,10 +5,13 @@ from django.test import TestCase, RequestFactory
 from django.test import Client
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
+from django.utils.encoding import force_str
 
 from calendario.models import Turno
+from pacientes.models import Paciente
+from obras_sociales.models import ObraSocialPaciente, ObraSocial
 from calendario.views import feed, index, add_appointment, copy_appointments, agendar, edit_turn, cancelar_turno, \
-    crear_sobreturno
+    crear_sobreturno, confirm_turn
 from centros_de_salud.models import CentroDeSalud, Especialidad, Servicio, ProfesionalesEnServicio
 from core.base_permission import start_roles_and_permissions, create_test_users
 from profesionales.models import Profesional
@@ -51,6 +54,15 @@ class CalendarioTests(TestCase, FullUsersMixin):
         self.tr2 = Turno.objects.create(inicio=datetime.now(tz=timezone.utc), fin=datetime.now(tz=timezone.utc), servicio=self.se2, profesional=self.pr)
         self.ucds = UsuarioEnCentroDeSalud.objects.create(usuario=self.user_admin, centro_de_salud=self.cs)
 
+        self.paciente = Paciente.objects.create(apellidos='Garcia', nombres='Alberto', numero_documento='24987563')
+        self.obra_social = ObraSocial.objects.create(nombre="TEST_Obra_social", codigo=1234)
+        
+        # Crear relación ObraSocial <=> Paciente
+        self.os_paciente = ObraSocialPaciente.objects.create(
+            paciente=self.paciente, obra_social=self.obra_social,
+            numero_afiliado="123456789", tipo_beneficiario="titular", parentesco="conyuge"
+            )
+
     def tearDown(self):
         self.user_city.delete()
         self.user_admin.delete()
@@ -69,6 +81,9 @@ class CalendarioTests(TestCase, FullUsersMixin):
         self.cs.delete()
         self.es.delete()
         self.cs2.delete()
+        self.paciente.delete()
+        self.obra_social.delete()
+        self.os_paciente.delete()
 
     def test_redireccion_no_logeado(self):
         request = self.factory.get('/turnos/feed')
@@ -249,3 +264,51 @@ class CalendarioTests(TestCase, FullUsersMixin):
         with self.assertRaises(PermissionDenied):
             crear_sobreturno(request, pk=self.tr2.pk)
 
+    def test_confirmar_turno(self):
+        """
+            Cuando se agenda un turno se crea una consulta 
+            que debe tener asignada la Obra Social elegida
+            por el paciente.
+        """
+
+        data = {
+            "id": str(self.tr.pk),
+            "paciente": str(self.paciente.numero_documento),
+            "obra_social": str(self.obra_social.pk)
+        }
+
+        # Es necesario serializar antes de enviar
+        form_data = json.dumps(data)
+        
+        url = reverse('calendario.confirm', kwargs={'pk': self.tr.pk})
+
+        request = self.factory.put(url, form_data)
+        request.user = self.user_admin
+
+        response = confirm_turn(request, pk=self.tr.pk)
+
+        # Decodificar de bytes a Json
+        response_data = json.loads(response.content)
+
+        self.assertEqual(response.status_code, 200)
+        
+        # El turno se creó con exito
+        self.assertEqual(response_data.get('success'), True)
+
+        # El turno se confirmó
+        self.assertEqual(
+            response_data.get('turno').get('estado'), 
+            'Asignado'
+        )
+
+        # El turno tiene asignado el paciente que se envió en el formulario
+        self.assertEqual(
+            response_data.get('turno').get('paciente'), 
+            str(self.paciente)
+        )
+        
+        # La consulta creada tiene la OS con la que se agendó el turno
+        self.assertEqual(
+            self.tr.consulta.obra_social_id, 
+            self.obra_social.pk
+        )

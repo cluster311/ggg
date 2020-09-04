@@ -231,11 +231,14 @@ def confirm_turn(request, pk: int):
         Confirma el turno de un paciente (Llamada mediante Ajax)
 
         Grupo acceso disponible: grupo_administrativo
+
+        :param pk: El ID del turno a agendar
     '''
     # Obtener el turno a confirmar
     instance = get_object_or_404(Turno, id=pk)
 
-    # Guardar en form_data el DNI y la O.S. del paciente
+    # Extraer los datos enviados mediante el form
+    # {'paciente': '12345678', 'obra_social': '1'}
     form_data = json.loads(request.body)
     logger.info(f'Gestion de turno {pk}: {form_data}')
     form_data['solicitante'] = request.user
