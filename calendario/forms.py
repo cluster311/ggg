@@ -40,6 +40,7 @@ class AgendarTurnoForm(forms.Form):
             forward=['paciente'],
             attrs={
                 "data-placeholder": "Seleccione una Obra social",
+                "data-width": "10em",
             }
         ),
     )

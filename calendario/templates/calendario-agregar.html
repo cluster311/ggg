@@ -160,6 +160,7 @@
     function initSelectEspecialidad() {
       $('#select2Especialidad').select2({
           placeholder: "Seleccione una especialidad",
+          width: '20em',
           ajax: {
             url: function(centro_elegido) {
               return "{% url 'centros_de_salud.servicios-by-centro-salud' pk=0 %}".replace(0, $("#usuario_elegir_centro").val());
@@ -198,7 +199,7 @@
   <script>
     $('#add_paciente').click(function () {
       if ($("#id_dni").val().length >= 7) {
-        var url = '{% url 'BuscarPacienteRecupero' dni=None %}'.replace('None', $("#id_dni").val());
+        var url = "{% url 'BuscarPacienteRecupero' dni=None %}".replace('None', $("#id_dni").val());
         $.ajax({
           type: "GET",
           url: url,
@@ -236,6 +237,14 @@
         win.focus();
         return false;
       }
+    
+    // Esta función se llama desde el popup creado en ObraSocialPacienteCreatePopup
+    // Archivo: obras_sociales/views.py
+    function closePopup(win, newID, newRepr, id, numero) {
+        $(id).append('<option value=' + newID + ' selected >' + newRepr + '</option>')
+        win.close();
+        $("#add_obrasocial").attr("href", "{%  url 'ObraSocialPacienteCreate' paciente=None %}".replace('None', $('#id_paciente').val()));
+      }
   </script>
 
   <script>
@@ -253,31 +262,43 @@
         data: formData
       })
         .then(response => {
-          // if (!response.data.success) {
-          //   // En caso de error abrir modal de creación de paciente
-          //   $("#cargar_dni").val($("#dni").val());
-          //   $("#cargar_dni").prop("disabled","disabled");
-          //   $("#cargar_turn_pk").val(pk);
-          //   $('#crearPacienteModal').modal('show');
-          //   $('#agendarModal').modal('hide');
-          //   $("#dni-error").css('display','none');
-          //   $("#dni").val("");
-          // } 
-
-          
-            
+          if (!response.data.success) {
+            // En caso de error abrir modal de creación de paciente
+            // TODO - Verificar si este formulario se debería seguir usando
+            // ya que ahora los pacientes se crean en base a SSS o SISA 
+            $("#cargar_dni").val($("#dni").val());
+            $("#cargar_dni").prop("disabled","disabled");
+            $("#cargar_turn_pk").val(pk);
+            $('#crearPacienteModal').modal('show');
+            $('#agendarModal').modal('hide');
             $("#dni-error").css('display','none');
             $("#dni").val("");
+          } else {
+
+            // Resetear valores del formulario
+            $("#dni-error").css('display','none');
+            $("#id_dni").val("").prop("disabled", false);
+            $("#nombre_paciente").text("");
+            $("#search").show();
+            $("#found").hide();
+            $("#add_paciente").prop("disabled", false);
+
+            $("#id_obra_social").val("").text("")
+
             calendar.refetchEvents();
             $('#agendarModal').modal('hide');
+
+            // Crear ticket y mostrar modal para imprimirlo
             crearTicket(response.data.turno);
             $('#imprimirTurno').modal('show');
+          }
         })
         .catch(error => {
           console.error(error)
         });
     }
 
+    // TODO - Ver si esta función sigue siendo necesaria
     function cargarPaciente(){
       if ($("#cargar_apellidos").val() == ""){
         $("#cargar_apellidos-error").css("display","block");
@@ -369,13 +390,10 @@
     <div class="row">
       <div id='calendar'></div>
     </div>
-
-
-    
-
 {% endblock %}
 
 {% block unwrapped_content %}
+<!-- MODAL AGENDAR TURNO -->
 <div class="modal fade" id="agendarModal" tabindex="1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" style="max-width: 600px;" role="document">
     <div class="modal-content">
@@ -425,8 +443,9 @@
     </form>
   </div>
 </div>
+<!-- FIN MODAL AGENDAR TURNO -->
 
-
+<!-- MODAL IMPRIMIR TURNO -->
 <div class="modal fade" id="imprimirTurno" tabindex="1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -462,7 +481,9 @@
     </div>
   </div>
 </div>
+<!-- FIN MODAL IMPRIMIR TURNO -->
 
+<!-- MODAL CREAR PACIENTE -->
 <div class="modal fade" id="crearPacienteModal" tabindex="1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document" style="max-width:40%">
     <div class="modal-content">
@@ -526,4 +547,5 @@
     </div>
   </div>
 </div>
+<!-- FIN MODAL CREAR PACIENTE -->
 {% endblock %}
