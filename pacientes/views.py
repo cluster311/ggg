@@ -172,9 +172,6 @@ class ConsultaMixin:
         # Creación/Actualización de la Factura en base a la Consulta
         consulta = self.object
 
-        # TODO #248 - Determinar con que OS se atiende el paciente en la consulta
-        os_paciente = consulta.paciente.m2m_obras_sociales.first().obra_social
-
         # La factura se actualiza con los nuevos datos
         # Si no existe se crea una nueva
         factura, created = Factura.objects.update_or_create(
@@ -182,7 +179,7 @@ class ConsultaMixin:
             defaults = {
                 'profesional': consulta.profesional,
                 'especialidad': consulta.especialidad,
-                'obra_social': os_paciente,
+                'obra_social': consulta.obra_social,
                 'fecha_atencion': consulta.fecha,
                 'centro_de_salud': consulta.turno.servicio.centro,
                 'paciente': consulta.paciente,

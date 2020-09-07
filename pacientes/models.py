@@ -358,6 +358,13 @@ class Consulta(TimeStampedModel):
                                      null=True,
                                      blank=True,
                                      related_name='consultas')
+    obra_social = models.ForeignKey(
+        'obras_sociales.ObraSocial',
+        on_delete=models.SET_NULL,
+        related_name='consultas',
+        null=True,
+        blank=True
+    )
     codigo_cie_principal = models.ForeignKey(CIE10, null=True, blank=True,
                                              on_delete=models.SET_NULL,
                                              related_name='diagnositicos_principales')
