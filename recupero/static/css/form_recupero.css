@@ -1,0 +1,20 @@
+.columna{
+  display: flex;
+  flex-flow:row ;
+  flex-wrap: wrap;
+}
+
+@media all and (max-width: 800px) {
+  .columna div {
+    flex-basis: 45%;
+
+  }
+}
+
+/* Small screens */
+@media all and (max-width: 500px) {
+  .columna div{
+    flex-basis: 100%;
+    padding: 0px;
+  }
+}
