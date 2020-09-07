@@ -4,6 +4,7 @@
 
 {% block content %}
     <link rel="stylesheet" href="{% static 'css/ldbtn.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/form_recupero.css' %}">
     <h2>Crear factura {{ object.id }}</h2>
 
     <a role="button" 
@@ -12,8 +13,8 @@
 
     <form method="post" novalidate>
 
-    <div class="col-12 col-md-12 " style="display: flex;" >
-        <div class="col-6 col-md-6">
+    <div  class="columna" >
+        <div style="width: 800px" >
             {% csrf_token %}
             <div class="form-row">
                 <div class="col-md-6  col-lg-6">
@@ -41,9 +42,7 @@
                 </div>
             </div>
             <div class="form-row">
-
-
-                <div class=" col-md-6  col-lg-6 " style="display: flex;">
+                <div class=" col-md-6  col-lg-6 col-sm-12" style="display: flex;">
                     {{ form.obra_social|as_crispy_field }}
                     <a href="{%  url 'ObraSocialPacienteCreate' paciente=None%}" id="add_obrasocial" class="button-add-popup" onclick="return showAddPopup(this);">
                         <button type="button" class="btn btn-success">+</button>
@@ -75,9 +74,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-6" style=" width: 50%;
-  height: 600px;
-  overflow: scroll;padding-left: 15px">
+        <div style="height: 600px;width: 750px;
+            overflow: scroll;padding-left: 15px">
 
          {% with prestaciones.prefix|slugify as p %}
            <H4>Prestaciones</H4>
@@ -85,10 +83,10 @@
                 {% for form in prestaciones %}
                     <div class="{{ p }}-form">
                         <div class="form-row">
-                            <div class=" col-md-8 ">
+                            <div class=" col-md-8 col-sm-12 ">
                                 {{ form.tipo|as_crispy_field }}
                             </div>
-                            <div class=" col-md-4 ">
+                            <div class=" col-md-4 col-sm-12 ">
                                 {{ form.cantidad|as_crispy_field }}
                             </div>
                         </div>

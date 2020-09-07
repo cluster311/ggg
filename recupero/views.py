@@ -138,10 +138,11 @@ class FacturaCreateView(PermissionRequiredMixin,
         context = self.get_context_data()
         fp = context["prestaciones"]
         afiliado = form.cleaned_data['numero_afiliado']
-        osp = ObraSocialPaciente.objects.get(paciente_id=form['paciente'].value(), obra_social_id=form['obra_social'].value())
-        if not osp.numero_afiliado == afiliado and not context['form']['numero_afiliado'].value() is None:
-            osp.numero_afiliado = afiliado
-            osp.save()
+        if form['obra_social'].value():
+            osp = ObraSocialPaciente.objects.get(paciente_id=form['paciente'].value(), obra_social_id=form['obra_social'].value())
+            if not osp.numero_afiliado == afiliado and not context['form']['numero_afiliado'].value() is None:
+                osp.numero_afiliado = afiliado
+                osp.save()
         self.object = form.save()
         if fp.is_valid():
             fp.instance = self.object
