@@ -5,11 +5,11 @@
 {% block content %}
     <link rel="stylesheet" href="{% static 'css/ldbtn.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/form_recupero.css' %}">
-    <h2>Crear factura {{ object.id }}</h2>
+    <h2>Crear factura {{ object.id }} <a role="button"
+        class="btn btn-warning btn-sm active"
+        href="{% url 'recupero.facturas' %}">Volver a la lista</a></h2>
 
-    <a role="button" 
-        class="btn btn-warning btn-sm active" 
-        href="{% url 'recupero.facturas' %}">Volver a la lista</a>
+
 
     <form method="post" novalidate>
 
@@ -73,8 +73,25 @@
                     {{ form.codigos_cie_secundarios|as_crispy_field }}
                 </div>
             </div>
+            <H4>Datos de la Empresa</H4>
+            <div class="form-row">
+                <div class=" col-md-6 ">
+                    {{ form.nombre|as_crispy_field }}
+                </div>
+                <div class=" col-md-6 ">
+                    {{ form.cuit|as_crispy_field }}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class=" col-md-6 ">
+                    {{ form.direccion|as_crispy_field }}
+                </div>
+                <div class=" col-md-6 ">
+                    {{ form.ultimo_recibo_de_sueldo|as_crispy_field }}
+                </div>
+            </div>
         </div>
-        <div style="height: 600px;width: 750px;
+        <div style="height: 700px;width: 750px;
             overflow: scroll;padding-left: 15px">
 
          {% with prestaciones.prefix|slugify as p %}
