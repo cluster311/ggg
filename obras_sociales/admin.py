@@ -5,9 +5,9 @@ from .models import ObraSocial, ObraSocialPaciente
 @admin.register(ObraSocial)
 class ObraSocialAdmin(admin.ModelAdmin):
     list_display = ['nombre', 'codigo', 'siglas']
+    search_fields = ['nombre']
 
 
 @admin.register(ObraSocialPaciente)
 class ObraSocialPacienteAdmin(admin.ModelAdmin):
     list_display = ['paciente', 'obra_social', 'data_source']
-
