@@ -90,8 +90,9 @@
                     {{ form.ultimo_recibo_de_sueldo|as_crispy_field }}
                 </div>
             </div>
+            {{ form.empresa_paciente|as_crispy_field }}
         </div>
-        <div style="height: 700px;width: 750px;
+        <div style="height: 700px;width: 700px;
             overflow: scroll;padding-left: 15px">
 
          {% with prestaciones.prefix|slugify as p %}
@@ -146,6 +147,19 @@
             for (var x=0; x<max_prestacion_factura; x++) {
                 $('#id_prestacionesFactura-'+x+'-tipo').select2();
             }
+        if ($("#id_empresa_paciente").val()){
+             var url = '{% url 'DatosEmpresaPaciente' empresa_paciente_id=None %}'.replace('None',  $("#id_empresa_paciente").val() );
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: 'json',
+                success: function (data) {
+
+                },
+                complete: function () {
+                },
+            });
+        }
         if ($("#id_paciente").val()){
             var url = '{% url 'DatosPaciente' paciente_id=None %}'.replace('None',  $("#id_paciente").val() );
             $.ajax({
@@ -248,6 +262,13 @@
                             $("#nombre_paciente").text(data.nombre);
                             $("#loading").hide();
                             $("#found").show();
+                            if(data.empresa.encontrado){
+                                $("#id_nombre").val(data.empresa.nombre);
+                                $("#id_cuit").val(data.empresa.cuit);
+                                $("#id_direccion").val(data.empresa.direccion);
+                                $("#id_ultimo_recibo_de_sueldo").val(data.empresa.ultimo_recibo_de_sueldo);
+                                $("#id_empresa_paciente").val(data.empresa.empresa_paciente);
+                            }
                         }else{
                             showAddPopupPaciente();
                             $("#add_paciente").prop("disabled", true);
@@ -263,6 +284,22 @@
         document.querySelector('select[name="obra_social"]').onchange=function() {
             get_numero_carnet()
         };
+        $("#id_nombre").on('change',function(){
+            $("#id_empresa_paciente").val("");
+        })
+        $("#id_cuit").on('change',function(){
+            $("#id_empresa_paciente").val("");
+        })
+        $("#id_direccion").on('change',function(){
+            $("#id_empresa_paciente").val("");
+        })
+        $("#id_ultimo_recibo_de_sueldo").on('change',function(){
+            $("#id_empresa_paciente").val("");
+        })
+         $('#datetimepicker_ultimo_recibo_de_sueldo').on("change.datetimepicker", function (e) {
+              $("#id_empresa_paciente").val("");
+           });
     </script>
+
 {% endblock js_footer %}
 

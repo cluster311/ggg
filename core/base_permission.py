@@ -53,9 +53,12 @@ def start_roles_and_permissions():
     perm_view_oss = Permission.objects.get(codename='view_obrasocial', content_type__app_label='obras_sociales')
     perm_add_oss = Permission.objects.get(codename='add_obrasocial', content_type__app_label='obras_sociales')
     perm_chg_oss = Permission.objects.get(codename='change_obrasocial', content_type__app_label='obras_sociales')
+    perm_view_ossp = Permission.objects.get(codename='view_obrasocialpaciente', content_type__app_label='obras_sociales')
+    perm_add_ossp = Permission.objects.get(codename='add_obrasocialpaciente', content_type__app_label='obras_sociales')
+    perm_chg_ossp = Permission.objects.get(codename='change_obrasocialpaciente', content_type__app_label='obras_sociales')
 
     group_data.permissions.add(perm_tablero_oss)
-    group_super.permissions.add(perm_view_oss, perm_add_oss, perm_chg_oss)
+    group_super.permissions.add(perm_view_oss, perm_add_oss, perm_chg_oss,perm_view_ossp, perm_add_ossp, perm_chg_ossp)
 
     perm_tablero_cds = Permission.objects.get(codename='can_view_tablero', content_type__app_label='centros_de_salud')
     perm_add_serv = Permission.objects.get(codename='add_servicio', content_type__app_label='centros_de_salud')
