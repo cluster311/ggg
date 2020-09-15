@@ -122,7 +122,7 @@ class FacturaCreateView(PermissionRequiredMixin,
 
     def get_context_data(self, **kwargs):
         context = super(FacturaCreateView, self).get_context_data(**kwargs)
-        context['title'] = 'Facturas de rcupero'
+        context['title'] = 'Facturas de recupero'
         context['title_url'] = 'recupero.facturas'
         if self.request.POST:
             context['prestaciones'] = FacturaPrestacionFormSet(self.request.POST)
