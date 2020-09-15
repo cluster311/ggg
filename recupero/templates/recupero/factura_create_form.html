@@ -154,7 +154,10 @@
                 url: url,
                 dataType: 'json',
                 success: function (data) {
-
+                    $("#id_nombre").val(data.nombre);
+                    $("#id_cuit").val(data.cuit);
+                    $("#id_direccion").val(data.direccion);
+                    $("#id_ultimo_recibo_de_sueldo").val(data.ultimo_recibo_de_sueldo);
                 },
                 complete: function () {
                 },

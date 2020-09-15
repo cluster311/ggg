@@ -361,9 +361,14 @@ def DatosPaciente(request, paciente_id):
 
 def DatosPacienteEmpresa(request, empresa_paciente_id):
     if EmpresaPaciente.objects.filter(id=empresa_paciente_id).exists():
-        paciente = EmpresaPaciente.objects.get(id=empresa_paciente_id)
-        data = {"paciente_id": paciente.id,
-                "nombre": str(paciente.apellidos + ', ' + paciente.nombres),
-                "dni": paciente.numero_documento
+        emp_paciente = EmpresaPaciente.objects.select_related('empresa').get(id=empresa_paciente_id)
+        if emp_paciente.ultimo_recibo_de_sueldo:
+            urs = emp_paciente.ultimo_recibo_de_sueldo.strftime('%d/%m/%Y')
+        else:
+            urs = ''
+        data = {"ultimo_recibo_de_sueldo": urs,
+                "nombre": emp_paciente.empresa.nombre,
+                "cuit": emp_paciente.empresa.cuit,
+                "direccion": emp_paciente.empresa.direccion,
                 }
         return JsonResponse(data, status=200)
