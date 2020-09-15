@@ -218,7 +218,34 @@ class FacturaUpdateView(PermissionRequiredMixin, UpdateView):
     def form_valid(self, form):
         context = self.get_context_data()
         fp = context["prestaciones"]
-        self.object = form.save()
+        nombre = form.cleaned_data['nombre']
+        cuit = form.cleaned_data['cuit']
+        direccion = form.cleaned_data['direccion']
+        ultimo_recibo_de_sueldo = form.cleaned_data['ultimo_recibo_de_sueldo']
+        if not form['empresa_paciente'].value() and form['paciente'].value():
+            empresa, created = Empresa.objects.get_or_create(
+                nombre=nombre,
+                cuit=cuit,
+                direccion=direccion,
+            )
+            if created:
+                empresa_paciente = EmpresaPaciente.objects.create(
+                    paciente_id=form['paciente'].value(),
+                    empresa=empresa,
+                    ultimo_recibo_de_sueldo=ultimo_recibo_de_sueldo
+                )
+            else:
+                empresa_paciente = EmpresaPaciente.objects.get(
+                    paciente_id=form['paciente'].value(),
+                    empresa=empresa,
+                )
+                empresa_paciente.ultimo_recibo_de_sueldo = ultimo_recibo_de_sueldo
+                empresa_paciente.save()
+            form_change = form.save(commit=False)
+            form_change.empresa_paciente_id = empresa_paciente.id
+            self.object = form_change.save()
+        else:
+            self.object = form.save()
         if fp.is_valid():
             fp.instance = self.object
             fp.save()
