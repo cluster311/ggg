@@ -6,3 +6,4 @@ class TurnoAdmin(admin.ModelAdmin):
     list_display = ['estado', 'inicio', 'fin', 'servicio', 'profesional', 'paciente', 'solicitante']
     search_fields = ['paciente__apellidos', 'profesional__apellidos']
     list_filter = ['estado', 'servicio__centro', 'servicio__especialidad']
+    autocomplete_fields = ['obra_social']

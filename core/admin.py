@@ -14,6 +14,8 @@ class ContactoAdminInline(GenericTabularInline):
     model = DatoDeContacto
     form = DatoDeContactoModelForm
 
+    extra = 1
+
 
 class GeoAdmin(gisadmin.GeoModelAdmin):
     """
