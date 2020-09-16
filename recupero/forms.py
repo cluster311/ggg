@@ -1,10 +1,10 @@
 from cie10_django.models import CIE10
 from django import forms
 from django.forms import inlineformset_factory
-from calendario.widgets import DatePicker
+from calendario.widgets import DatePicker, DateTimePicker
 from centros_de_salud.models import CentroDeSalud, Especialidad
 from obras_sociales.models import ObraSocial
-from pacientes.models import Paciente
+from pacientes.models import Paciente, EmpresaPaciente
 from dal import autocomplete
 
 from profesionales.models import Profesional
@@ -22,6 +22,16 @@ class FacturaPrestacionForm(forms.ModelForm):
 
 class FacturaForm(forms.ModelForm):
     numero_afiliado = forms.CharField(required=False)
+    nombre = forms.CharField(label='Razon social', required=False)
+    direccion = forms.CharField(required=False)
+    cuit = forms.CharField(required=False)
+    ultimo_recibo_de_sueldo = forms.DateField(required=False, widget=DatePicker())
+    empresa_paciente = forms.ModelChoiceField(
+        label='empresa paciente',
+        required=False,
+        queryset=EmpresaPaciente.objects.all(),
+        widget=forms.HiddenInput()
+    )
     paciente = forms.ModelChoiceField(
         label='Paciente',
         required=False,
@@ -103,6 +113,7 @@ class FacturaForm(forms.ModelForm):
                   'profesional',
                   'codigo_cie_principal',
                   'codigos_cie_secundarios',
+                  'empresa_paciente',
                    )
         widgets = {'fecha_atencion': DatePicker()}
 

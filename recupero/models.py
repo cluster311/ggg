@@ -205,6 +205,13 @@ class Factura(TimeStampedModel):
          blank=True,
          null=True,
     )
+    empresa_paciente = models.ForeignKey(
+        'pacientes.EmpresaPaciente',
+        on_delete=models.CASCADE,
+        related_name='empresa_paciente_factura',
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
         return f'Factura {self.id}'

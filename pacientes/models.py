@@ -422,12 +422,13 @@ class Empresa(models.Model):
     def __str__(self):
         return self.nombre
 
+
 class EmpresaPaciente(models.Model):
     """ Empresa donde trabaja un paciente un paciente """
 
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
-    ultimo_recibo_de_sueldo = models.DateTimeField(null=True, blank=True)
+    ultimo_recibo_de_sueldo = models.DateField(null=True, blank=True)
   
     def as_anexo2_json(self):
         """ devuelve el JSON compatible con la librería Anexo2 https://github.com/cluster311/Anexo2

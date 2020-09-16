@@ -20,7 +20,7 @@ from sss_beneficiarios_hospitales.data import DataBeneficiariosSSSHospital
 
 from obras_sociales.models import ObraSocial, ObraSocialPaciente
 from recupero.models import Prestacion, Factura, FacturaPrestacion
-from .models import Consulta, CarpetaFamiliar, Receta, Derivacion, Paciente
+from .models import Consulta, CarpetaFamiliar, Receta, Derivacion, Paciente, EmpresaPaciente
 from especialidades.models import MedidasAnexasEspecialidad, MedidaAnexaEnConsulta
 from especialidades.forms import MedidaAnexaEnConsultaForm, MedidaAnexaEnConsultaFormset
 from calendario.models import Turno
@@ -324,10 +324,26 @@ def BuscarPacienteRecupero(request, dni):
     dni_parseado = (''.join(filter(str.isdigit, dni)))
     paciente = buscar_paciente_general(dni_parseado)
     if paciente:
+        empresa_paciente = EmpresaPaciente.objects.select_related('empresa').filter(paciente_id=paciente.id).order_by('-id')
+        if empresa_paciente:
+            empresa = {
+                "encontrado": True,
+                "nombre": empresa_paciente[0].empresa.nombre,
+                "direccion": empresa_paciente[0].empresa.direccion,
+                "cuit": empresa_paciente[0].empresa.cuit,
+                "ultimo_recibo_de_sueldo": empresa_paciente[0].ultimo_recibo_de_sueldo.strftime('%d/%m/%Y'),
+                "empresa_paciente": empresa_paciente[0].id,
+            }
+        else:
+            empresa = {
+                "encontrado": False,
+            }
         data = {"paciente_id": paciente.id,
                 "nombre": str(paciente.apellidos + ', ' + paciente.nombres),
                 "dni": paciente.numero_documento,
-                "encontrado": True}
+                "encontrado": True,
+                "empresa": empresa
+                }
     else:
         data = {"encontrado": False}
     return JsonResponse(data, status=200)
@@ -339,5 +355,20 @@ def DatosPaciente(request, paciente_id):
         data = {"paciente_id": paciente.id,
                 "nombre": str(paciente.apellidos + ', ' + paciente.nombres),
                 "dni": paciente.numero_documento
+                }
+        return JsonResponse(data, status=200)
+
+
+def DatosPacienteEmpresa(request, empresa_paciente_id):
+    if EmpresaPaciente.objects.filter(id=empresa_paciente_id).exists():
+        emp_paciente = EmpresaPaciente.objects.select_related('empresa').get(id=empresa_paciente_id)
+        if emp_paciente.ultimo_recibo_de_sueldo:
+            urs = emp_paciente.ultimo_recibo_de_sueldo.strftime('%d/%m/%Y')
+        else:
+            urs = ''
+        data = {"ultimo_recibo_de_sueldo": urs,
+                "nombre": emp_paciente.empresa.nombre,
+                "cuit": emp_paciente.empresa.cuit,
+                "direccion": emp_paciente.empresa.direccion,
                 }
         return JsonResponse(data, status=200)
