@@ -146,9 +146,10 @@ class Paciente(Persona):
             sexo = 'F'
         
         edad = 0 if self.edad is None else self.edad
-        if self.tipo_documento.upper() == 'DOCUMENTO UNICO':
+
+        tmp = self.tipo_documento.upper()
+        if tmp == 'DOCUMENTO UNICO' or tmp == 'DU':
             tipo_doc = 'DNI'
-        # ... otros
         else:
             tipo_doc = self.tipo_documento
 
