@@ -92,6 +92,11 @@ class ObraSocialPaciente(models.Model):
         default="otro",
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['paciente', 'obra_social'], name='relacion_unica')
+        ]
+
     def as_anexo2_json(self):
         """ devuelve el JSON compatible con la librería Anexo2 https://github.com/cluster311/Anexo2
             Ejemplo:
