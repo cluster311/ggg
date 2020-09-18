@@ -199,11 +199,13 @@ def get_appointments_list(servicio, user, **kwargs):
         kw['servicio__pk'] = servicio
         kw['estado__in'] = [Turno.DISPONIBLE, Turno.CANCELADO_PACIENTE, Turno.CANCELADO_ESTABLECIMIENTO]
         return Turno.objects.filter(**kw)
-    else:
-        csp = user.centros_de_salud_permitidos.filter(estado=UsuarioEnCentroDeSalud.EST_ACTIVO)
-        centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
+    return []
+    # se comento este codigo porque devuelve los turnos de todos los centros de salud
+    #else:
+    #    csp = user.centros_de_salud_permitidos.filter(estado=UsuarioEnCentroDeSalud.EST_ACTIVO)
+    #    centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
         
-        return Turno.objects.filter(servicio__centro__in=centros_de_salud_permitidos, **kw)
+    #    return Turno.objects.filter(servicio__centro__in=centros_de_salud_permitidos, **kw)
 
 
 @permission_required('calendario.can_schedule_turno', raise_exception=True)
