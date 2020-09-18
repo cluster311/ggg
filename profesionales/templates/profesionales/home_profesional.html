@@ -26,6 +26,7 @@
         <thead>
         <tr>
             <th scope="col">Paciente</th>
+            <th scope="col">Centro</th>
             <th scope="col">Inicio</th>
             <th scope="col">Fin</th>
             <th scope="col">Servicio</th>
@@ -37,6 +38,7 @@
             {% for turno in turnos %}
                 <tr>
                     <th scope="row">{{ turno.paciente.nombres }} {{ turno.paciente.apellidos }}</th>
+                    <td>{{ turno.servicio.centro }}</td>
                     <td>{{ turno.inicio|time:"H:i" }}</td>
                     <td>{{ turno.fin|time:"H:i" }}</td>
                     <td>{{ turno.servicio.especialidad.nombre }}</td>
