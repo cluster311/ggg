@@ -56,7 +56,7 @@ class Persona(models.Model):
     )
     fecha_nacimiento = models.DateField(null=True, blank=True)
     tipo_documento = models.CharField(
-        max_length=20,
+        max_length=40,
         default="DNI",
         choices=Choices("DNI", "LC", "LE", "PASAPORTE", "OTRO"),
     )
