@@ -117,16 +117,18 @@ def copy_appointments(request):
     else:
         c_end = datetime.now() - timedelta(days=1)
     end = c_end - timedelta(days=7)
-
+    print(request.GET['servicio'])
     current_appointments = get_appointments_list(
+        servicio=request.GET['servicio'],
         user=request.user,
         start=c_start.strftime('%Y-%m-%d %H:%M:%S'),
-        end=c_end.strftime('%Y-%m-%d %H:%M:%S')
+        end=c_end.strftime('%Y-%m-%d %H:%M:%S'),
     )
     appointments = get_appointments_list(
+        servicio=request.GET['servicio'],
         user=request.user,
         start=start.strftime('%Y-%m-%d %H:%M:%S'),
-        end=end.strftime('%Y-%m-%d %H:%M:%S')
+        end=end.strftime('%Y-%m-%d %H:%M:%S'),
     )
 
     new_appointments = []

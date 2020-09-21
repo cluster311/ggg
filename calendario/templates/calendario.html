@@ -330,6 +330,7 @@
   <script>
     'use strict';
     function copyPreviousWeek() {
+      let servicio_id = $('#select2Especialidad').val();
       if (calendar.state.viewType.indexOf('Week') === -1) {
         showCopyWeekErrors('Selecciona la vista semanal primero.');
         return;
@@ -338,8 +339,9 @@
         method: 'get',
         url: "{% url 'copy_appointments' %}",
         params: {
+          servicio: servicio_id,
           start: calendar.state.dateProfile.currentRange.start,
-          end: calendar.state.dateProfile.currentRange.end
+          end: calendar.state.dateProfile.currentRange.end,
         }
       })
         .then(response => {
