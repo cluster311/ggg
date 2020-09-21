@@ -40,6 +40,7 @@ class ProfesionalHome(TemplateView, GroupRequiredMixin):
         context = super().get_context_data(**kwargs)
         hoy = datetime.now()
         context['hoy'] = hoy
+        context['estados'] = Turno.OPCIONES_ESTADO
         # sólo se muestran los turnos si está autenticado(y además debe
         # estar dentro del grupo profesionales).
         if self.request.user.is_authenticated:
