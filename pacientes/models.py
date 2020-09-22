@@ -147,6 +147,12 @@ class Paciente(Persona):
         
 
         edad = self.edad
+        
+        tmp = self.tipo_documento.upper()
+        if tmp == 'DOCUMENTO UNICO' or tmp == 'DU':
+            tipo_doc = 'DNI'
+        else:
+            tipo_doc = self.tipo_documento
 
         ret = {'apellido_y_nombres': f'{self.apellidos}, {self.nombres}',
                 'tipo_dni': tipo_doc,
