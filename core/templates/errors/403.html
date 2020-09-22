@@ -1,10 +1,13 @@
 {% extends "base_admin.html" %}
-
 {% load static %}
+
 {% block title %} Permiso Denegado 403 {% endblock %}
+
 {% block content %}
-<div class="card-header">
-  Permiso Denegado - Error 403
+
+<div class="d-flex align-items-center mx-auto">
+    <h4>Permiso Denegado - Error 403</h4>
+    <a href="{% url 'home' %}" class="btn btn-warning active m-3">Volver al inicio</a>
 </div>
 
 {% endblock %}
