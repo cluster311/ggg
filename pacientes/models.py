@@ -146,7 +146,7 @@ class Paciente(Persona):
             sexo = 'F'
         
 
-        edad = None if self.edad is None else self.edad
+        edad = self.edad
 
         ret = {'apellido_y_nombres': f'{self.apellidos}, {self.nombres}',
                 'tipo_dni': tipo_doc,
