@@ -145,7 +145,7 @@ class Paciente(Persona):
         elif self.sexo == 'femenino':
             sexo = 'F'
         
-        edad = 0 if self.edad is None else self.edad
+        edad = None if self.edad is None else self.edad
         ret = {'apellido_y_nombres': f'{self.apellidos}, {self.nombres}',
                 'tipo_dni': self.tipo_documento,
                 'dni': self.numero_documento,
