@@ -21,26 +21,14 @@ Versión en desarrollo del manual [aquí](https://docs.google.com/document/d/1eP
 
 ## Cargar con datos de prueba
 
-    ```bash
-    ./manage.py import_centros_salud_cba
-    ./manage.py start_permissions
-    ./manage.py create_test_users
-    ./manage.py create_test_data
-    ./manage.py create_test_paciente_data
+```bash
+./manage.py import_centros_salud_cba
+./manage.py start_permissions
+./manage.py create_test_users
+./manage.py create_test_data
+./manage.py create_test_paciente_data
 
-    ```
-
-    5. Crear un superusuario (Opcional)
-
-    ```bash
-    ./manage.py createsuperuser
-    ```
-
-    6. `exit` para cerrar la shell dentro del contenedor.
-
-
--   Para detener los contenedores ejecutar `docker-compose stop`.
-
+```
 ## Como contribuir
 
 Como contribuir con este proyecto abierto:
