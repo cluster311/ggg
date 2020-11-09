@@ -145,7 +145,7 @@ class Paciente(Persona):
         elif self.sexo == 'femenino':
             sexo = 'F'
         
-        edad = 0 if self.edad is None else self.edad
+        edad = self.edad
 
         tmp = self.tipo_documento.upper()
         if tmp == 'DOCUMENTO UNICO' or tmp == 'DU':

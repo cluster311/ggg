@@ -6,6 +6,7 @@ from cie10_django.models import CIE10
 from model_utils.models import TimeStampedModel
 from core.signals import app_log
 from core.models import private_file_storage
+from obras_sociales.models import ObraSocialPaciente
 
 
 class TipoDocumentoAnexo(models.Model):
@@ -293,9 +294,9 @@ class Factura(TimeStampedModel):
 
         try:
             fecha_atencion = {
-                'dia': self.fecha_atencion.day,
-                'mes': self.fecha_atencion.month,
-                'anio': self.fecha_atencion.year
+                'dia': None if self.fecha_atencion is None else self.fecha_atencion.day,
+                'mes': None if self.fecha_atencion is None else self.fecha_atencion.month,
+                'anio': None if self.fecha_atencion is None else self.fecha_atencion.year
             }
         except AttributeError:
             errores_generacion['fecha_atencion'] = "Debe asignar una fecha correcta en la factura"
@@ -316,7 +317,7 @@ class Factura(TimeStampedModel):
         # Obtener los datos de la Obra Social del Paciente
         # a través de la relación M2M ObraSocial <=> Paciente
         try:
-            os_paciente = self.obra_social.pacientes.get(paciente=self.paciente)
+            os_paciente = ObraSocialPaciente.objects.get(paciente=self.paciente, obra_social=self.obra_social)
             obra_social = os_paciente.as_anexo2_json()
 
         except AttributeError:
@@ -324,15 +325,11 @@ class Factura(TimeStampedModel):
             obra_social = None
 
         try:
-            # TODO - Revisar como se obtienen los datos de la empresa actual del paciente
 
-            # Obtener la primera empresa del paciente
-            empresa_paciente = self.paciente.empresapaciente_set.first()
-            empresa = empresa_paciente.as_anexo2_json()            
-
+            empresa = self.empresa_paciente.as_anexo2_json()
+            
         except AttributeError:
-            errores_generacion['empresa'] = "El paciente debe tener asignada al menos una empresa"
-            empresa = None
+            empresa = {}
 
         # Quitar los valores de obra_social y asignarlos a beneficiario
         # para evitar errores de validación de Anexo2
