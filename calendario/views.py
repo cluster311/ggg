@@ -117,16 +117,18 @@ def copy_appointments(request):
     else:
         c_end = datetime.now() - timedelta(days=1)
     end = c_end - timedelta(days=7)
-
+    print(request.GET['servicio'])
     current_appointments = get_appointments_list(
+        servicio=request.GET['servicio'],
         user=request.user,
         start=c_start.strftime('%Y-%m-%d %H:%M:%S'),
-        end=c_end.strftime('%Y-%m-%d %H:%M:%S')
+        end=c_end.strftime('%Y-%m-%d %H:%M:%S'),
     )
     appointments = get_appointments_list(
+        servicio=request.GET['servicio'],
         user=request.user,
         start=start.strftime('%Y-%m-%d %H:%M:%S'),
-        end=end.strftime('%Y-%m-%d %H:%M:%S')
+        end=end.strftime('%Y-%m-%d %H:%M:%S'),
     )
 
     new_appointments = []
@@ -199,11 +201,13 @@ def get_appointments_list(servicio, user, **kwargs):
         kw['servicio__pk'] = servicio
         kw['estado__in'] = [Turno.DISPONIBLE, Turno.CANCELADO_PACIENTE, Turno.CANCELADO_ESTABLECIMIENTO]
         return Turno.objects.filter(**kw)
-    else:
-        csp = user.centros_de_salud_permitidos.filter(estado=UsuarioEnCentroDeSalud.EST_ACTIVO)
-        centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
+    return []
+    # se comento este codigo porque devuelve los turnos de todos los centros de salud
+    #else:
+    #    csp = user.centros_de_salud_permitidos.filter(estado=UsuarioEnCentroDeSalud.EST_ACTIVO)
+    #    centros_de_salud_permitidos = [c.centro_de_salud for c in csp]
         
-        return Turno.objects.filter(servicio__centro__in=centros_de_salud_permitidos, **kw)
+    #    return Turno.objects.filter(servicio__centro__in=centros_de_salud_permitidos, **kw)
 
 
 @permission_required('calendario.can_schedule_turno', raise_exception=True)
