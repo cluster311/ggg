@@ -170,6 +170,7 @@ class FacturaCreateView(PermissionRequiredMixin,
             form_change = form.save(commit=False)
             form_change.empresa_paciente_id = empresa_paciente.id
             self.object = form_change.save()
+            self.object = form_change
         else:
             self.object = form.save()
         if fp.is_valid():
